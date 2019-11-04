@@ -1,0 +1,7 @@
+resolver: nightly-2020-01-05
+
+packages:
+  - .
+
+extra-deps:
+  - aeson-schemas-1.0.3

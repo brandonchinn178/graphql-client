@@ -1,0 +1,49 @@
+name: graphql-client
+version: 0.1.0
+verbatim:
+  cabal-version: '>= 1.10'
+license: BSD3
+license-file: LICENSE
+author:
+  - Brandon Chinn <brandon@leapyear.io>
+maintainer:
+  - Brandon Chinn <brandon@leapyear.io>
+category: Graphql
+synopsis: A client for Haskell programs to query a GraphQL API
+description: A client for Haskell programs to query a GraphQL API.
+extra-source-files:
+  - README.md
+  - CHANGELOG.md
+
+github: LeapYear/graphql-client
+
+ghc-options: -Wall
+when:
+  - condition: impl(ghc >= 8.0)
+    ghc-options:
+      - -Wcompat
+      - -Wincomplete-record-updates
+      - -Wincomplete-uni-patterns
+      - -Wnoncanonical-monad-instances
+  - condition: impl(ghc < 8.8)
+    ghc-options:
+      - -Wnoncanonical-monadfail-instances
+
+dependencies:
+# TODO: set version bounds
+- aeson
+- aeson-schemas
+- base >= 4.9 && < 5
+- http-client
+- http-client-tls
+- http-types
+- mtl
+- path
+- path-io
+- template-haskell
+- text
+- transformers
+- unliftio-core
+
+library:
+  source-dirs: src

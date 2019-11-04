@@ -1,0 +1,8 @@
+resolver: lts-12.26
+
+packages:
+  - .
+
+extra-deps:
+  - aeson-schemas-1.0.3
+  - first-class-families-0.6.0.0

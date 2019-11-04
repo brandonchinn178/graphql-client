@@ -1,0 +1,7 @@
+resolver: lts-13.22
+
+packages:
+  - .
+
+extra-deps:
+  - aeson-schemas-1.0.3
