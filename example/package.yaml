@@ -28,3 +28,14 @@ executable:
   main:           Main.hs
   dependencies:
     - graphql-client-example
+
+tests:
+  graphql-example-test:
+    source-dirs:  test
+    main:         Main.hs
+    dependencies:
+      - aeson-qq
+      - bytestring
+      - graphql-client-example
+      - tasty
+      - tasty-golden
