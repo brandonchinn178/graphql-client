@@ -1,0 +1,10 @@
+schema: https://graphbrainz.herokuapp.com
+documents: src/Example/GraphQL/api/*.graphql
+generates:
+  src/Example/GraphQL/API.hs:
+    - add: '{- This file was automatically generated and should not be edited. -}'
+    - graphql-codegen-haskell
+
+config:
+  enums: Example.GraphQL.Enums
+  scalars: Example.GraphQL.Scalars

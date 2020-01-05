@@ -1,0 +1,15 @@
+{
+  "name": "graphql-client-example",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "codegen": "graphql-codegen"
+  },
+  "devDependencies": {
+    "@graphql-codegen/add": "^1.10.0",
+    "@graphql-codegen/cli": "^1.10.0",
+    "graphql": "^14.5.8",
+    "graphql-codegen-haskell": "file:../graphql-codegen-haskell",
+    "typescript": "^2.7.4"
+  }
+}
