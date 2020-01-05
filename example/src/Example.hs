@@ -17,10 +17,10 @@ import Data.Maybe (fromMaybe)
 import Data.Monoid ((<>))
 import qualified Data.Text as Text
 
-import Example.GraphQL.Custom.Date (showDate)
-import Example.GraphQL.Custom.Duration (showDuration)
-import Example.GraphQL.Custom.ReleaseStatus (ReleaseStatus(..))
+import Example.GraphQL.Enums (ReleaseStatus(..))
 import qualified Example.GraphQL.Recordings as Recordings
+import Example.GraphQL.Scalars.Date (showDate)
+import Example.GraphQL.Scalars.Duration (showDuration)
 
 newtype App a = App { unApp :: QueryT IO a }
   deriving (Functor,Applicative,Monad,MonadIO,MonadQuery)

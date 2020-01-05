@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
-module Example.GraphQL.Custom.Date where
+module Example.GraphQL.Scalars.Date where
 
 import Data.Aeson (FromJSON(..), withText)
 import Data.List (intercalate)

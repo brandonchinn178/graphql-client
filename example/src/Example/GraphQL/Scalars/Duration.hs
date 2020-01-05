@@ -1,6 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
-module Example.GraphQL.Custom.Duration where
+module Example.GraphQL.Scalars.Duration where
 
 import Data.Aeson (FromJSON)
 import Text.Printf (printf)

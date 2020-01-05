@@ -11,9 +11,9 @@ import Data.Aeson (object, (.=))
 import Data.GraphQL hiding (Query, query)
 import qualified Data.GraphQL as GraphQL
 
-import Example.GraphQL.Custom.Date (Date)
-import Example.GraphQL.Custom.Duration (Duration)
-import Example.GraphQL.Custom.ReleaseStatus (ReleaseStatus)
+import Example.GraphQL.Enums (ReleaseStatus)
+import Example.GraphQL.Scalars.Date (Date)
+import Example.GraphQL.Scalars.Duration (Duration)
 
 type Query = GraphQL.Query Args Schema
 

@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module Example.GraphQL.Custom.ReleaseStatus where
+module Example.GraphQL.Enums where
 
 import Data.Aeson.Schema.TH (mkEnum)
 
