@@ -2,6 +2,7 @@ resolver: lts-12.26
 
 packages:
   - .
+  - example/
 
 extra-deps:
   - aeson-schemas-1.0.3

@@ -1,0 +1,27 @@
+query Recordings($query: String!, $first: Int) {
+  search {
+    recordings(query: $query, first: $first) {
+      nodes {
+        title
+        artists {
+          nodes {
+            name
+          }
+        }
+        video
+        length
+        rating {
+          voteCount
+          value
+        }
+        releases {
+          nodes {
+            title
+            date
+            status
+          }
+        }
+      }
+    }
+  }
+}
