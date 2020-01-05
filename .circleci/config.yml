@@ -116,6 +116,10 @@ jobs:
           name: Test
           command: stack test
 
+      - run:
+          name: Run example
+          command: stack exec graphql-client-example
+
 workflows:
   version: 2
 
