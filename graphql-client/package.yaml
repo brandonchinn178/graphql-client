@@ -3,7 +3,7 @@ version: 0.1.0
 verbatim:
   cabal-version: '>= 1.10'
 license: BSD3
-license-file: LICENSE
+license-file: ../LICENSE
 author:
   - Brandon Chinn <brandon@leapyear.io>
 maintainer:
@@ -12,8 +12,8 @@ category: Graphql
 synopsis: A client for Haskell programs to query a GraphQL API
 description: A client for Haskell programs to query a GraphQL API.
 extra-source-files:
-  - README.md
-  - CHANGELOG.md
+  - ../README.md
+  - ../CHANGELOG.md
 
 github: LeapYear/graphql-client
 
