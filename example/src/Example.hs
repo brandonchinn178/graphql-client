@@ -18,7 +18,7 @@ import Data.Monoid ((<>))
 import qualified Data.Text as Text
 
 import Example.GraphQL.Enums (ReleaseStatus(..))
-import qualified Example.GraphQL.Recordings as Recordings
+import Example.GraphQL.API (GetRecordingsArgs(..), GetRecordingsSchema, runGetRecordingsQuery)
 import Example.GraphQL.Scalars.Date (showDate)
 import Example.GraphQL.Scalars.Duration (showDuration)
 
@@ -32,10 +32,10 @@ runApp = runQueryT querySettings . unApp
       { url = "https://graphbrainz.herokuapp.com/"
       }
 
-mkGetter "Song" "getSongs" ''Recordings.Schema ".search!.recordings!.nodes![]!"
+mkGetter "Song" "getSongs" ''GetRecordingsSchema ".search!.recordings!.nodes![]!"
 
 searchForSong :: (MonadIO m, MonadQuery m) => String -> m [Song]
-searchForSong song = getSongs <$> runQuery Recordings.query Recordings.Args
+searchForSong song = getSongs <$> runGetRecordingsQuery GetRecordingsArgs
   { _query = song
   , _first = Just 5
   }
