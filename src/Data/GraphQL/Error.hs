@@ -26,13 +26,13 @@ data GraphQLError = GraphQLError
   { message   :: Text
   , locations :: Maybe [GraphQLErrorLoc]
   , path      :: Maybe [Value]
-  } deriving (Show,Generic,ToJSON,FromJSON)
+  } deriving (Show,Eq,Generic,ToJSON,FromJSON)
 
 -- | A location in an error in a GraphQL query.
 data GraphQLErrorLoc = GraphQLErrorLoc
   { errorLine :: Int
   , errorCol  :: Int
-  } deriving (Show,Generic,ToJSON)
+  } deriving (Show,Eq,Generic,ToJSON)
 
 instance FromJSON GraphQLErrorLoc where
   parseJSON = withObject "GraphQLErrorLoc" $ \o ->
@@ -42,4 +42,4 @@ instance FromJSON GraphQLErrorLoc where
 
 -- | An exception thrown as a result of an error in a GraphQL query.
 newtype GraphQLException = GraphQLException [GraphQLError]
-  deriving (Show,Exception)
+  deriving (Show,Exception,Eq)

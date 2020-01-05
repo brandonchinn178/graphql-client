@@ -12,7 +12,7 @@ Definitions parsing responses from a GraphQL API.
 {-# LANGUAGE OverloadedStrings #-}
 
 module Data.GraphQL.Result
-  ( GraphQLResult
+  ( GraphQLResult(..)
   , getErrors
   , getResult
   ) where
