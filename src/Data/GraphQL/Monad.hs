@@ -9,7 +9,6 @@ Defines the 'QueryT' monad transformer, which implements
 -}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -45,7 +44,7 @@ import Data.GraphQL.Monad.Class
 import Data.GraphQL.Query (GraphQLArgs(..), fromQuery)
 
 -- | The state for running QueryT.
-data QueryState api = QueryState
+data QueryState = QueryState
   { manager :: Manager
   , baseReq :: Request
   }
@@ -66,22 +65,22 @@ data QueryState api = QueryState
 --           }
 --       }
 -- @
-newtype QueryT (api :: k) m a = QueryT { unQueryT :: ReaderT (QueryState api) m a }
+newtype QueryT m a = QueryT { unQueryT :: ReaderT QueryState m a }
   deriving
     ( Functor
     , Applicative
     , Monad
     , MonadIO
-    , MonadReader (QueryState api)
+    , MonadReader QueryState
     , MonadTrans
     )
 
-instance MonadUnliftIO m => MonadUnliftIO (QueryT api m) where
+instance MonadUnliftIO m => MonadUnliftIO (QueryT m) where
   askUnliftIO = QueryT $
     withUnliftIO $ \u ->
       return $ UnliftIO (unliftIO u . unQueryT)
 
-instance MonadIO m => MonadQuery api (QueryT api m) where
+instance MonadIO m => MonadQuery (QueryT m) where
   runQuerySafe query args = do
     QueryState{..} <- ask
 
@@ -95,7 +94,7 @@ instance MonadIO m => MonadQuery api (QueryT api m) where
     liftIO $ either fail return . Aeson.eitherDecode . responseBody =<< httpLbs request manager
 
 -- | Run a QueryT stack.
-runQueryT :: MonadIO m => QuerySettings api -> QueryT api m a -> m a
+runQueryT :: MonadIO m => QuerySettings -> QueryT m a -> m a
 runQueryT QuerySettings{..} query = do
   state <- liftIO $ do
     manager <- newManager managerSettings
@@ -112,7 +111,7 @@ runQueryT QuerySettings{..} query = do
       }
 
 -- | The settings for running QueryT.
-data QuerySettings api = QuerySettings
+data QuerySettings = QuerySettings
   { managerSettings :: ManagerSettings
     -- ^ Uses TLS by default
   , url             :: String
@@ -120,7 +119,7 @@ data QuerySettings api = QuerySettings
   }
 
 -- | Default query settings.
-defaultQuerySettings :: QuerySettings api
+defaultQuerySettings :: QuerySettings
 defaultQuerySettings = QuerySettings
   { managerSettings = tlsManagerSettings
   , url = error "No URL is provided"

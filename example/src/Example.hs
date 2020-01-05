@@ -2,7 +2,6 @@
 {-# LANGUAGE DisambiguateRecordFields #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TemplateHaskell #-}
@@ -18,14 +17,13 @@ import Data.Maybe (fromMaybe)
 import Data.Monoid ((<>))
 import qualified Data.Text as Text
 
-import Example.GraphQL.API (API)
 import Example.GraphQL.Custom.Date (showDate)
 import Example.GraphQL.Custom.Duration (showDuration)
 import Example.GraphQL.Custom.ReleaseStatus (ReleaseStatus(..))
 import qualified Example.GraphQL.Recordings as Recordings
 
-newtype App a = App { unApp :: QueryT API IO a }
-  deriving (Functor,Applicative,Monad,MonadIO,MonadQuery API)
+newtype App a = App { unApp :: QueryT IO a }
+  deriving (Functor,Applicative,Monad,MonadIO,MonadQuery)
 
 runApp :: App a -> IO a
 runApp = runQueryT querySettings . unApp
@@ -36,7 +34,7 @@ runApp = runQueryT querySettings . unApp
 
 mkGetter "Song" "getSongs" ''Recordings.Schema ".search!.recordings!.nodes![]!"
 
-searchForSong :: (MonadIO m, MonadQuery API m) => String -> m [Song]
+searchForSong :: (MonadIO m, MonadQuery m) => String -> m [Song]
 searchForSong song = getSongs <$> runQuery Recordings.query Recordings.Args
   { _query = song
   , _first = Just 5

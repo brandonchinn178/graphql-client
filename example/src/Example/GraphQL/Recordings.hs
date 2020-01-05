@@ -11,12 +11,11 @@ import Data.Aeson (object, (.=))
 import Data.GraphQL hiding (Query)
 import qualified Data.GraphQL as GraphQL
 
-import Example.GraphQL.API (API)
 import Example.GraphQL.Custom.Date (Date)
 import Example.GraphQL.Custom.Duration (Duration)
 import Example.GraphQL.Custom.ReleaseStatus (ReleaseStatus)
 
-type Query = GraphQL.Query API Args Schema
+type Query = GraphQL.Query Args Schema
 
 data Args = Args
   { _query :: String

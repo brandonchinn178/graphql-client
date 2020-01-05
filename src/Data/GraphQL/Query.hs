@@ -47,18 +47,18 @@ class GraphQLArgs args where
   fromArgs :: args -> Value
 
 -- | A GraphQL Query that is validated at compile-time.
-data Query (api :: k) (args :: Type) (schema :: SchemaType) = UnsafeQuery
+data Query (args :: Type) (schema :: SchemaType) = UnsafeQuery
   { queryName' :: String
   , queryText  :: Text
   }
   deriving (Show)
 
 -- | Extract the text of the Query.
-fromQuery :: Query api args r -> Text
+fromQuery :: Query args r -> Text
 fromQuery = queryText
 
 -- | Get the name of the Query.
-queryName :: Query api args r -> String
+queryName :: Query args r -> String
 queryName = queryName'
 
 -- | A temporary function to read a graphql file and output it as a Query.

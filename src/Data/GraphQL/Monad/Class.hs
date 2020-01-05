@@ -10,7 +10,6 @@ queries to be run and mocked.
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TypeFamilies #-}
@@ -41,17 +40,17 @@ import Data.GraphQL.Query (GraphQLArgs(..), Query)
 import Data.GraphQL.Result (GraphQLResult, getErrors, getResult)
 
 -- | A type class for monads that can run queries.
-class Monad m => MonadQuery (api :: k) m where
+class Monad m => MonadQuery m where
   runQuerySafe
     :: forall args (schema :: SchemaType)
      . (GraphQLArgs args, IsSchemaObject schema)
-    => Query api args schema -> args -> m (GraphQLResult (Object schema))
+    => Query args schema -> args -> m (GraphQLResult (Object schema))
 
 -- | Runs the given query and returns the result, erroring if the query returned errors.
 runQuery
-  :: forall api m args (schema :: SchemaType)
-   . (MonadIO m, MonadQuery api m, GraphQLArgs args, IsSchemaObject schema)
-  => Query api args schema -> args -> m (Object schema)
+  :: forall m args (schema :: SchemaType)
+   . (MonadIO m, MonadQuery m, GraphQLArgs args, IsSchemaObject schema)
+  => Query args schema -> args -> m (Object schema)
 runQuery query args = do
   result <- runQuerySafe query args
   case getErrors result of
@@ -60,32 +59,32 @@ runQuery query args = do
 
 {- Instances for common monad transformers -}
 
-instance MonadQuery api m => MonadQuery api (ReaderT r m) where
+instance MonadQuery m => MonadQuery (ReaderT r m) where
   runQuerySafe query = lift . runQuerySafe query
 
-instance MonadQuery api m => MonadQuery api (ExceptT e m) where
+instance MonadQuery m => MonadQuery (ExceptT e m) where
   runQuerySafe query = lift . runQuerySafe query
 
-instance MonadQuery api m => MonadQuery api (IdentityT m) where
+instance MonadQuery m => MonadQuery (IdentityT m) where
   runQuerySafe query = lift . runQuerySafe query
 
-instance MonadQuery api m => MonadQuery api (MaybeT m) where
+instance MonadQuery m => MonadQuery (MaybeT m) where
   runQuerySafe query = lift . runQuerySafe query
 
-instance (Monoid w, MonadQuery api m) => MonadQuery api (Lazy.RWST r w s m) where
+instance (Monoid w, MonadQuery m) => MonadQuery (Lazy.RWST r w s m) where
   runQuerySafe query = lift . runQuerySafe query
 
-instance (Monoid w, MonadQuery api m) => MonadQuery api (Strict.RWST r w s m) where
+instance (Monoid w, MonadQuery m) => MonadQuery (Strict.RWST r w s m) where
   runQuerySafe query = lift . runQuerySafe query
 
-instance MonadQuery api m => MonadQuery api (Lazy.StateT s m) where
+instance MonadQuery m => MonadQuery (Lazy.StateT s m) where
   runQuerySafe query = lift . runQuerySafe query
 
-instance MonadQuery api m => MonadQuery api (Strict.StateT s m) where
+instance MonadQuery m => MonadQuery (Strict.StateT s m) where
   runQuerySafe query = lift . runQuerySafe query
 
-instance (Monoid w, MonadQuery api m) => MonadQuery api (Lazy.WriterT w m) where
+instance (Monoid w, MonadQuery m) => MonadQuery (Lazy.WriterT w m) where
   runQuerySafe query = lift . runQuerySafe query
 
-instance (Monoid w, MonadQuery api m) => MonadQuery api (Strict.WriterT w m) where
+instance (Monoid w, MonadQuery m) => MonadQuery (Strict.WriterT w m) where
   runQuerySafe query = lift . runQuerySafe query
