@@ -7,40 +7,28 @@ Portability :  portable
 Definitions needed by GraphQL queries.
 -}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeFamilyDependencies #-}
-{-# LANGUAGE TypeInType #-}
 
 module Data.GraphQL.Query
   ( Query
   , GraphQLArgs(..)
   , fromQuery
   , queryName
-  , readGraphQLFile
+  -- * Instantiating a query
+  , query
   ) where
 
+import Control.Applicative ((<|>))
 import Data.Aeson (Value)
 import Data.Aeson.Schema (SchemaType)
 import Data.Kind (Type)
+import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import qualified Data.Text as Text
-import Language.Haskell.TH (ExpQ, Loc(..), location, runIO)
-import Language.Haskell.TH.Syntax (addDependentFile, lift)
-import Path
-    ( filename
-    , fromAbsFile
-    , fromRelFile
-    , parent
-    , parseAbsFile
-    , parseRelFile
-    , setFileExtension
-    , (</>)
-    )
-import Path.IO (getCurrentDir)
-
+import Language.Haskell.TH.Quote (QuasiQuoter(..))
+import Language.Haskell.TH.Syntax (lift)
 
 -- | A type class for query arguments.
 class GraphQLArgs args where
@@ -48,7 +36,7 @@ class GraphQLArgs args where
 
 -- | A GraphQL Query that is validated at compile-time.
 data Query (args :: Type) (schema :: SchemaType) = UnsafeQuery
-  { queryName' :: String
+  { queryName' :: Text
   , queryText  :: Text
   }
   deriving (Show)
@@ -58,26 +46,22 @@ fromQuery :: Query args r -> Text
 fromQuery = queryText
 
 -- | Get the name of the Query.
-queryName :: Query args r -> String
+queryName :: Query args r -> Text
 queryName = queryName'
 
--- | A temporary function to read a graphql file and output it as a Query.
---
--- This function should go away when we generate the entire file with Template Haskell.
-readGraphQLFile :: FilePath -> ExpQ
-readGraphQLFile fp = do
-  loc <- loc_filename <$> location
-  here <- case loc of
-    '/':_ -> parseAbsFile loc
-    _ -> do
-      cwd <- runIO getCurrentDir
-      loc' <- parseRelFile loc
-      return $ cwd </> loc'
-  file <- parseRelFile fp
-  query <- readFile' $ fromAbsFile $ parent here </> file
-  name <- fmap ((++ ".query") . fromRelFile) . setFileExtension "" . filename $ file
-  [| UnsafeQuery name $ Text.pack $(lift query) |]
+query :: QuasiQuoter
+query = QuasiQuoter
+  { quoteExp = mkQuery . Text.strip . Text.pack
+  , quotePat = error "Cannot use the 'query' QuasiQuoter for patterns"
+  , quoteType = error "Cannot use the 'query' QuasiQuoter for types"
+  , quoteDec = error "Cannot use the 'query' QuasiQuoter for declarations"
+  }
   where
-    readFile' file = do
-      addDependentFile file
-      runIO $ readFile file
+    mkQuery s = [| UnsafeQuery $(getName s) $(liftS s) |]
+    liftS s = [| Text.pack $(lift $ Text.unpack s) |]
+    getName = liftS . Text.strip . Text.takeWhile (/= '(') . dropHeader
+
+    dropHeader s =
+      fromMaybe
+        (error $ "Invalid GraphQL query: " ++ Text.unpack s)
+        $ ("query" `Text.stripPrefix` s) <|> ("mutation" `Text.stripPrefix` s)

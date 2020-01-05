@@ -1,4 +1,4 @@
-query Recordings($query: String!, $first: Int) {
+query getRecordings($query: String!, $first: Int) {
   search {
     recordings(query: $query, first: $first) {
       nodes {

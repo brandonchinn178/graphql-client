@@ -8,7 +8,7 @@
 module Example.GraphQL.Recordings where
 
 import Data.Aeson (object, (.=))
-import Data.GraphQL hiding (Query)
+import Data.GraphQL hiding (Query, query)
 import qualified Data.GraphQL as GraphQL
 
 import Example.GraphQL.Custom.Date (Date)
@@ -29,7 +29,35 @@ instance GraphQLArgs Args where
     ]
 
 query :: Query
-query = $(readGraphQLFile "Recordings.graphql")
+query = [GraphQL.query|
+  query getRecordings($query: String!, $first: Int) {
+    search {
+      recordings(query: $query, first: $first) {
+        nodes {
+          title
+          artists {
+            nodes {
+              name
+            }
+          }
+          video
+          length
+          rating {
+            voteCount
+            value
+          }
+          releases {
+            nodes {
+              title
+              date
+              status
+            }
+          }
+        }
+      }
+    }
+  }
+|]
 
 type Schema = [schema|
   {

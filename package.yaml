@@ -38,8 +38,6 @@ dependencies:
 - http-client-tls
 - http-types
 - mtl
-- path
-- path-io
 - template-haskell
 - text
 - transformers
