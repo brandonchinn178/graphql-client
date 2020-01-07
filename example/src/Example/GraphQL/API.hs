@@ -9,11 +9,22 @@ module Example.GraphQL.API where
 
 import Control.Monad.IO.Class (MonadIO)
 import Data.Aeson (object, (.=))
+import Data.Aeson.Schema.TH (mkEnum)
 import Data.GraphQL
 
-import Example.GraphQL.Enums (ReleaseStatus)
 import Example.GraphQL.Scalars.Date (Date)
 import Example.GraphQL.Scalars.Duration (Duration)
+
+{-----------------------------------------------------------------------------
+* Enums
+-----------------------------------------------------------------------------}
+
+mkEnum "ReleaseStatus"
+  [ "OFFICIAL"
+  , "PROMOTION"
+  , "BOOTLEG"
+  , "PSEUDORELEASE"
+  ]
 
 {-----------------------------------------------------------------------------
 * getRecordings

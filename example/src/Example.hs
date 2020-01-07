@@ -17,8 +17,12 @@ import Data.Maybe (fromMaybe)
 import Data.Monoid ((<>))
 import qualified Data.Text as Text
 
-import Example.GraphQL.Enums (ReleaseStatus(..))
-import Example.GraphQL.API (GetRecordingsArgs(..), GetRecordingsSchema, runGetRecordingsQuery)
+import Example.GraphQL.API
+    ( GetRecordingsArgs(..)
+    , GetRecordingsSchema
+    , ReleaseStatus(..)
+    , runGetRecordingsQuery
+    )
 import Example.GraphQL.Scalars.Date (showDate)
 import Example.GraphQL.Scalars.Duration (showDuration)
 
