@@ -12,8 +12,7 @@ import Data.Aeson (object, (.=))
 import Data.Aeson.Schema.TH (mkEnum)
 import Data.GraphQL
 
-import Example.GraphQL.Scalars.Date (Date)
-import Example.GraphQL.Scalars.Duration (Duration)
+import Example.GraphQL.Scalars
 
 {-----------------------------------------------------------------------------
 * Enums
