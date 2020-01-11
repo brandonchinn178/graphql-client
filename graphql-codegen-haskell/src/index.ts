@@ -18,8 +18,8 @@ export const plugin: PluginFunction<PluginConfig> = (
   const { outputFile = '' } = info
 
   const config = {
-    ...rawConfig,
     apiModule: pathToModule(outputFile),
+    ...rawConfig,
   }
 
   const ast = concatAST(documents.map(({ content }) => content))
