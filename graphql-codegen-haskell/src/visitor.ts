@@ -4,6 +4,7 @@ import {
   GraphQLSchema,
   OperationDefinitionNode,
   print as renderGraphQLNode,
+  TypeNode,
 } from 'graphql'
 
 import { PluginConfig } from './config'
@@ -47,6 +48,7 @@ export type ParsedOperation = {
 export class GraphQLHaskellVisitor {
   private _enums: ParsedEnum[]
   private _operations: ParsedOperation[]
+  private _unnamedCounter: number
 
   constructor(
     readonly schema: GraphQLSchema,
@@ -55,6 +57,7 @@ export class GraphQLHaskellVisitor {
   ) {
     this._enums = []
     this._operations = []
+    this._unnamedCounter = 0
 
     autoBind(this)
   }
@@ -68,19 +71,62 @@ export class GraphQLHaskellVisitor {
   }
 
   OperationDefinition(node: OperationDefinitionNode) {
+    const name = node.name?.value ?? `unnamed${this._unnamedCounter++}`
+    const capitalName = capitalize(name)
+    const opType = capitalize(node.operation)
+
+    const args = (node.variableDefinitions ?? []).map((variableDef) => {
+      const type = parseType(variableDef.type)
+
+      return {
+        arg: variableDef.variable.name.value,
+        type: renderHaskellType(type),
+      }
+    })
+
     this._operations.push({
-      name: 'getRecordings',
+      name,
       query: renderGraphQLNode(node),
-      queryName: 'getRecordingsQuery',
-      queryType: 'GetRecordingsQuery',
-      queryFunction: 'runGetRecordingsQuery',
-      argsType: 'GetRecordingsArgs',
-      args: [
-        { arg: 'query', type: 'String' },
-        { arg: 'first', type: 'Maybe Int' },
-      ],
-      schemaType: 'GetRecordingsSchema',
+      queryName: `${name}${opType}`,
+      queryType: `${capitalName}${opType}`,
+      queryFunction: `run${capitalName}${opType}`,
+      argsType: `${capitalName}Args`,
+      args,
+      schemaType: `${capitalName}Schema`,
       schema: 'TODO',
     })
   }
+}
+
+const capitalize = (s: string) => s.replace(/^\w/, (c) => c.toUpperCase())
+
+type ParsedType =
+  | { list: false; name: string; nullable: boolean }
+  | { list: true; inner: ParsedType; nullable: boolean }
+
+const parseType = (type: TypeNode): ParsedType => {
+  switch (type.kind) {
+    case 'NamedType':
+      return {
+        list: false,
+        name: type.name.value,
+        nullable: true,
+      }
+    case 'ListType':
+      return {
+        list: true,
+        inner: parseType(type.type),
+        nullable: true,
+      }
+    case 'NonNullType':
+      return {
+        ...parseType(type.type),
+        nullable: false,
+      }
+  }
+}
+
+const renderHaskellType = (type: ParsedType): string => {
+  const baseType = type.list ? `[${renderHaskellType(type.inner)}]` : type.name
+  return type.nullable ? `Maybe ${baseType}` : baseType
 }
