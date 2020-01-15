@@ -1,14 +1,20 @@
 import autoBind from 'auto-bind'
 import {
-  FragmentDefinitionNode,
+  GraphQLObjectType,
   GraphQLSchema,
   OperationDefinitionNode,
   print as renderGraphQLNode,
 } from 'graphql'
 
 import { PluginConfig } from './config'
-import { ParsedEnum, ParsedOperation, parseType } from './parse'
-import { renderHaskellType } from './render'
+import {
+  ParsedEnum,
+  ParsedFragments,
+  ParsedOperation,
+  parseSelectionSet,
+  parseType,
+} from './parse'
+import { renderAesonSchema, renderHaskellType } from './render'
 
 export class GraphQLHaskellVisitor {
   private _enums: ParsedEnum[]
@@ -17,7 +23,7 @@ export class GraphQLHaskellVisitor {
 
   constructor(
     readonly schema: GraphQLSchema,
-    readonly fragments: FragmentDefinitionNode[],
+    readonly fragments: ParsedFragments,
     readonly config: PluginConfig
   ) {
     this._enums = []
@@ -49,6 +55,30 @@ export class GraphQLHaskellVisitor {
       }
     })
 
+    let schemaRoot: GraphQLObjectType | undefined | null
+    switch (node.operation) {
+      case 'query':
+        schemaRoot = this.schema.getQueryType()
+        break
+      case 'mutation':
+        schemaRoot = this.schema.getMutationType()
+        break
+      case 'subscription':
+        schemaRoot = this.schema.getSubscriptionType()
+        break
+    }
+    if (!schemaRoot) {
+      throw new Error(
+        `Unable to find root schema type for operation type "${node.operation}"`
+      )
+    }
+
+    const selections = parseSelectionSet(
+      node.selectionSet,
+      schemaRoot,
+      this.fragments
+    )
+
     this._operations.push({
       name,
       query: renderGraphQLNode(node),
@@ -58,7 +88,7 @@ export class GraphQLHaskellVisitor {
       argsType: `${capitalName}Args`,
       args,
       schemaType: `${capitalName}Schema`,
-      schema: 'TODO',
+      schema: renderAesonSchema(selections),
     })
   }
 }

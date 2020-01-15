@@ -5,6 +5,7 @@ import {
 import { concatAST, FragmentDefinitionNode, Kind, visit } from 'graphql'
 
 import { PluginConfig, validateConfig } from './config'
+import { parseFragments } from './parse'
 import { renderAPIModule } from './render'
 import { GraphQLHaskellVisitor } from './visitor'
 
@@ -26,8 +27,9 @@ export const plugin: PluginFunction<PluginConfig> = (
   const fragments = ast.definitions.filter(
     ({ kind }) => kind === Kind.FRAGMENT_DEFINITION
   ) as FragmentDefinitionNode[]
+  const parsedFragments = parseFragments(fragments)
 
-  const visitor = new GraphQLHaskellVisitor(schema, fragments, config)
+  const visitor = new GraphQLHaskellVisitor(schema, parsedFragments, config)
   visit(ast, { leave: visitor })
 
   return renderAPIModule(config, visitor.getEnums(), visitor.getOperations())

@@ -37,3 +37,17 @@ export const templateOverList = (
 
   return lines.map((s) => s + '\n').join('')
 }
+
+/**
+ * Implementation of lodash's fromPairs.
+ */
+export const fromPairs = <K extends string | number | symbol, V>(
+  pairs: Array<[K, V]>
+): Record<K, V> => {
+  const acc = {} as Record<K, V>
+  for (const pair of pairs) {
+    const [k, v] = pair
+    acc[k] = v
+  }
+  return acc
+}
