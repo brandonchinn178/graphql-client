@@ -6,6 +6,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# OPTIONS_GHC -fno-warn-unused-imports #-}
 
 module Example.GraphQL.API where
 
@@ -14,10 +15,10 @@ import Data.Aeson (object, (.=))
 import Data.Aeson.Schema.TH (mkEnum)
 import Data.GraphQL
 
-import Example.GraphQL.Scalars
+import qualified Example.GraphQL.Scalars as Scalars
 
 {-----------------------------------------------------------------------------
-* Enums
+* ReleaseStatus
 -----------------------------------------------------------------------------}
 
 mkEnum "ReleaseStatus"
@@ -30,14 +31,14 @@ mkEnum "ReleaseStatus"
 {-----------------------------------------------------------------------------
 * getRecordings
 
--- result :: GraphQLResult (Object GetRecordingsSchema)
-result <- runGetRecordingsQuerySafe GetRecordingsArgs
+-- result :: Object GetRecordingsSchema; throws a GraphQL exception on errors
+result <- runGetRecordingsQuery GetRecordingsArgs
   { _query = ...
   , _first = ...
   }
 
--- result :: Object GetRecordingsSchema; throws a GraphQL exception on errors
-result <- runGetRecordingsQuery GetRecordingsArgs
+-- result :: GraphQLResult (Object GetRecordingsSchema)
+result <- runGetRecordingsQuerySafe GetRecordingsArgs
   { _query = ...
   , _first = ...
   }
@@ -48,7 +49,8 @@ type GetRecordingsQuery = Query GetRecordingsArgs GetRecordingsSchema
 data GetRecordingsArgs = GetRecordingsArgs
   { _query :: String
   , _first :: Maybe Int
-  } deriving (Show)
+  }
+  deriving (Show)
 
 type GetRecordingsSchema = [schema|
   {
@@ -117,10 +119,10 @@ getRecordingsQuery = [query|
   }
 |]
 
-runGetRecordingsQuerySafe :: (MonadIO m, MonadQuery m)
-  => GetRecordingsArgs -> m (GraphQLResult (Object GetRecordingsSchema))
-runGetRecordingsQuerySafe = runQuerySafe getRecordingsQuery
-
 runGetRecordingsQuery :: (MonadIO m, MonadQuery m)
   => GetRecordingsArgs -> m (Object GetRecordingsSchema)
 runGetRecordingsQuery = runQuery getRecordingsQuery
+
+runGetRecordingsQuerySafe :: (MonadIO m, MonadQuery m)
+  => GetRecordingsArgs -> m (GraphQLResult (Object GetRecordingsSchema))
+runGetRecordingsQuerySafe = runQuerySafe getRecordingsQuery
