@@ -59,6 +59,7 @@ export type ParsedFragments = Record<string, ParsedFragment>
 export type ParsedFragment = {
   name: string
   selectionSet: SelectionSetNode
+  node: FragmentDefinitionNode
 }
 
 export const parseFragments = (
@@ -70,6 +71,7 @@ export const parseFragments = (
       const fragment = {
         name,
         selectionSet: node.selectionSet,
+        node,
       }
 
       return [name, fragment]
@@ -104,6 +106,7 @@ export const parseType = (type: TypeNode): ParsedType => {
 
 export type ParsedSelectionSet = {
   enums: string[]
+  fragments: string[]
   selections: ParsedSelection
 }
 
@@ -128,19 +131,26 @@ export const parseSelectionSet = (
 
   return {
     enums: parser.getEnums(),
+    fragments: parser.getFragments(),
     selections,
   }
 }
 
 class SelectionSetParser {
   _enums: string[]
+  _fragments: string[]
 
-  constructor(readonly fragments: ParsedFragments) {
+  constructor(readonly allFragments: ParsedFragments) {
     this._enums = []
+    this._fragments = []
   }
 
   getEnums(): string[] {
     return this._enums
+  }
+
+  getFragments(): string[] {
+    return this._fragments
   }
 
   parseSelectionSetNode(
@@ -185,7 +195,10 @@ class SelectionSetParser {
     node: FragmentSpreadNode,
     schema: GraphQLSelectionSchema
   ): ParsedSelection {
-    const { selectionSet } = this.fragments[node.name.value]
+    const fragmentName = node.name.value
+    this._fragments.push(fragmentName)
+
+    const { selectionSet } = this.allFragments[fragmentName]
     return this.parseSelectionSetNode(selectionSet, schema)
   }
 

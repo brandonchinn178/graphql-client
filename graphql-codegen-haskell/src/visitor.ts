@@ -74,7 +74,7 @@ export class GraphQLHaskellVisitor {
       )
     }
 
-    const { enums, selections } = parseSelectionSet(
+    const { enums, fragments, selections } = parseSelectionSet(
       node.selectionSet,
       schemaRoot,
       this.fragments
@@ -92,7 +92,12 @@ export class GraphQLHaskellVisitor {
 
     this._operations.push({
       name,
-      query: renderGraphQLNode(node),
+      query: [
+        renderGraphQLNode(node),
+        ...fragments.map(
+          (fragment) => renderGraphQLNode(this.fragments[fragment].node)
+        ),
+      ].join('\n'),
       queryName: `${name}${opType}`,
       queryType: `${capitalName}${opType}`,
       queryFunction: `run${capitalName}${opType}`,
