@@ -10,17 +10,19 @@
  * , b ~ 2
  * ]
  */
-export const templateOverList = (
+export const templateOverList = <T>(
   text: string,
-  list: Array<{ [key: string]: string }>
+  list: Array<T>
 ) => {
   const match = text.match(/^\s*\n(.*?)\n(.*?)\n\s*$/)
   if (!match) {
     throw new Error('templateOverList requires a two-line template')
   }
 
-  const render = (template: string, vars: { [key: string]: string }): string =>
-    template.replace(/{{(.*?)}}/g, (_, name) => vars[name])
+  const render = (template: string, elem: any): string =>
+    template
+      .replace(/{{\.}}/g, (_) => elem)
+      .replace(/{{(.*?)}}/g, (_, name) => elem[name])
 
   const templateFirst = match[1]
   const templateRest = templateFirst.replace(/[^\s]/, ',')

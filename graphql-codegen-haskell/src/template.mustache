@@ -22,7 +22,7 @@ import qualified {{scalarsModule}} as Scalars
 
 mkEnum "{{name}}"
   {{#overValues}}
-  [ "{{value}}"
+  [ "{{.}}"
   ]
   {{/overValues}}
 {{/enums}}
