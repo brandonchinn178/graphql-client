@@ -5,6 +5,7 @@ import {
   GraphQLObjectType,
   GraphQLOutputType,
   isCompositeType,
+  isEnumType,
   isLeafType,
   isListType,
   isNonNullType,
@@ -13,7 +14,7 @@ import {
   TypeNode,
 } from 'graphql'
 
-import { fromPairs } from './utils'
+import { fromPairs, mergeObjects } from './utils'
 
 export type ParsedEnum = {
   // The name of the enum, e.g. "Status"
@@ -99,6 +100,11 @@ export const parseType = (type: TypeNode): ParsedType => {
   }
 }
 
+export type ParsedSelectionSet = {
+  enums: string[]
+  selections: ParsedSelection
+}
+
 export type ParsedSelection = Record<string, ParsedSelectionType>
 
 export type ParsedSelectionType =
@@ -113,32 +119,34 @@ export const parseSelectionSet = (
   { selections }: SelectionSetNode,
   schema: GraphQLSelectionSchema,
   fragments: ParsedFragments
-): ParsedSelection => {
-  return fromPairs(
-    selections.flatMap((node) => {
-      switch (node.kind) {
-        case 'Field': {
-          const field = parseSelectionField(node, schema, fragments)
-          return [field]
-        }
-        case 'FragmentSpread': {
-          const { selectionSet } = fragments[node.name.value]
-          return Object.entries(
-            parseSelectionSet(selectionSet, schema, fragments)
-          )
-        }
-        case 'InlineFragment':
-          throw new Error('TODO: parse InlineFragment')
+): ParsedSelectionSet => {
+  const parsedSelections = selections.map((node) => {
+    switch (node.kind) {
+      case 'Field': {
+        return parseSelectionField(node, schema, fragments)
       }
-    })
-  )
+      case 'FragmentSpread': {
+        const { selectionSet } = fragments[node.name.value]
+        return parseSelectionSet(selectionSet, schema, fragments)
+      }
+      case 'InlineFragment':
+        throw new Error('TODO: parse InlineFragment')
+    }
+  })
+
+  return {
+    enums: parsedSelections.flatMap(({ enums }) => enums),
+    selections: mergeObjects(
+      parsedSelections.map(({ selections }) => selections)
+    ),
+  }
 }
 
 const parseSelectionField = (
   node: FieldNode,
   schema: GraphQLSelectionSchema,
   fragments: ParsedFragments
-): [string, ParsedSelectionType] => {
+): ParsedSelectionSet => {
   const name = (node.alias ?? node.name).value
 
   const field = schema.getFields()[node.name.value]
@@ -148,25 +156,39 @@ const parseSelectionField = (
     )
   }
 
-  const parseSelectionType = (type: GraphQLOutputType): ParsedSelectionType => {
+  const parseSelectionType = (type: GraphQLOutputType): {
+    enums: string[]
+    selectionType: ParsedSelectionType
+  } => {
     if (isNonNullType(type)) {
+      const { enums, selectionType } = parseSelectionType(type.ofType)
       return {
-        ...parseSelectionType(type.ofType),
-        nullable: false,
+        enums,
+        selectionType: {
+          ...selectionType,
+          nullable: false,
+        },
       }
     }
     if (isListType(type)) {
+      const { enums, selectionType } = parseSelectionType(type.ofType)
       return {
-        list: true,
-        inner: parseSelectionType(type.ofType),
-        nullable: true,
+        enums,
+        selectionType: {
+          list: true,
+          inner: selectionType,
+          nullable: true,
+        }
       }
     }
     if (isLeafType(type)) {
       return {
-        list: false,
-        name: type.name,
-        nullable: true,
+        enums: isEnumType(type) ? [type.name] : [],
+        selectionType: {
+          list: false,
+          name: type.name,
+          nullable: true,
+        },
       }
     }
     if (isCompositeType(type)) {
@@ -179,17 +201,27 @@ const parseSelectionField = (
         throw new Error('TODO: union type')
       }
 
+      const { enums, selections } = parseSelectionSet(node.selectionSet, type, fragments)
+
       return {
-        list: false,
-        fields: parseSelectionSet(node.selectionSet, type, fragments),
-        nullable: true,
+        enums,
+        selectionType: {
+          list: false,
+          fields: selections,
+          nullable: true,
+        },
       }
     }
 
     throw new Error(`Unknown GraphQLOutputType: ${type}`)
   }
 
-  const selectionType = parseSelectionType(field.type)
+  const { enums, selectionType } = parseSelectionType(field.type)
 
-  return [name, selectionType]
+  return {
+    enums,
+    selections: {
+      [name]: selectionType,
+    },
+  }
 }

@@ -1,5 +1,6 @@
 import autoBind from 'auto-bind'
 import {
+  assertEnumType,
   GraphQLObjectType,
   GraphQLSchema,
   OperationDefinitionNode,
@@ -73,11 +74,21 @@ export class GraphQLHaskellVisitor {
       )
     }
 
-    const selections = parseSelectionSet(
+    const { enums, selections } = parseSelectionSet(
       node.selectionSet,
       schemaRoot,
       this.fragments
     )
+
+    const parsedEnums = enums.map((enumName) => {
+      const enumType = assertEnumType(this.schema.getType(enumName))
+      return {
+        name: enumName,
+        values: enumType.getValues().map(({ name }) => name),
+      }
+    })
+
+    this._enums.push(...parsedEnums)
 
     this._operations.push({
       name,
