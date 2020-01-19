@@ -8,9 +8,8 @@ import {
   print as renderGraphQLNode,
 } from 'graphql'
 
-import { renderAesonSchema } from '../render'
 import { ParsedFragments } from './fragments'
-import { parseSelectionSet } from './selectionSet'
+import { ParsedSelection, parseSelectionSet } from './selectionSet'
 import {
   ParsedVariableDefinitions,
   parseVariableDefinitions,
@@ -48,8 +47,8 @@ export type ParsedOperation = {
 
   // The name of the Haskell schema type, e.g. "GetUserSchema"
   schemaType: string
-  // The schema DSL, e.g. "{ user: { name: String } }"
-  schema: string
+  // The schema of the GraphQL result
+  schema: ParsedSelection
 }
 
 export const parseOperations = (
@@ -139,7 +138,7 @@ class OperationDefinitionParser {
       argsType: `${capitalName}Args`,
       args,
       schemaType: `${capitalName}Schema`,
-      schema: renderAesonSchema(selections),
+      schema: selections,
     }
   }
 }

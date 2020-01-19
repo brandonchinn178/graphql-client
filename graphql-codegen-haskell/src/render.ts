@@ -23,7 +23,7 @@ export const renderAPIModule = (
     operations: operations.map((operation) => ({
       ...operation,
       query: operation.query.replace(/\n/g, '\n  '),
-      schema: operation.schema.replace(/\n/g, '\n  '),
+      schema: renderAesonSchema(operation.schema).replace(/\n/g, '\n  '),
       args: operation.args.map(({ name, type }) => ({
         arg: name,
         type: renderHaskellType(type),
@@ -39,7 +39,7 @@ const renderHaskellType = (type: ParsedType): string => {
   return type.nullable ? `Maybe ${baseType}` : baseType
 }
 
-export const renderAesonSchema = (selections: ParsedSelection): string => {
+const renderAesonSchema = (selections: ParsedSelection): string => {
   const renderSelectionType = (selectionType: ParsedSelectionType): string => {
     if (selectionType.nullable) {
       const type = renderSelectionType({
@@ -73,9 +73,8 @@ export const renderAesonSchema = (selections: ParsedSelection): string => {
   }
 
   const fields = Object.entries(selections).map(
-    ([name, selectionType]) =>
-      `  ${name}: ${renderSelectionType(selectionType)},\n`
+    ([name, selectionType]) => `${name}: ${renderSelectionType(selectionType)}`
   )
 
-  return '{\n' + fields.join('') + '}'
+  return '{\n' + fields.map((field) => `  ${field},`).join('\n') + '\n}'
 }
