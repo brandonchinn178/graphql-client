@@ -1,17 +1,22 @@
-import autoBind from 'auto-bind'
 import {
   assertEnumType,
+  DocumentNode,
   GraphQLObjectType,
   GraphQLSchema,
+  Kind,
   OperationDefinitionNode,
   print as renderGraphQLNode,
 } from 'graphql'
 
-import { PluginConfig } from './config'
-import { ParsedFragments } from './parse/fragments'
-import { parseSelectionSet } from './parse/selectionSet'
-import { parseVariableDefinitions } from './parse/variableDefinition'
-import { renderAesonSchema, renderHaskellType } from './render'
+import { renderAesonSchema, renderHaskellType } from '../render'
+import { ParsedFragments } from './fragments'
+import { parseSelectionSet } from './selectionSet'
+import { parseVariableDefinitions } from './variableDefinition'
+
+export type ParsedOperations = {
+  enums: ParsedEnum[]
+  operations: ParsedOperation[]
+}
 
 export type ParsedEnum = {
   // The name of the enum, e.g. "Status"
@@ -49,32 +54,47 @@ export type ParsedOperation = {
   schema: string
 }
 
-export class GraphQLHaskellVisitor {
-  private _enums: ParsedEnum[]
-  private _operations: ParsedOperation[]
+export const parseOperations = (
+  ast: DocumentNode,
+  schema: GraphQLSchema,
+  fragments: ParsedFragments
+): ParsedOperations => {
+  const operationNodes = ast.definitions.filter(
+    ({ kind }) => kind === Kind.OPERATION_DEFINITION
+  ) as OperationDefinitionNode[]
+
+  const parser = new OperationDefinitionParser(schema, fragments)
+  const operations = operationNodes.map((operation) =>
+    parser.parseOperation(operation)
+  )
+  const enums = parser.getEnums().map((enumName) => {
+    const enumType = assertEnumType(schema.getType(enumName))
+    return {
+      name: enumName,
+      values: enumType.getValues().map(({ name }) => name),
+    }
+  })
+
+  return { enums, operations }
+}
+
+class OperationDefinitionParser {
+  private _enums: string[]
   private _unnamedCounter: number
 
   constructor(
     readonly schema: GraphQLSchema,
-    readonly fragments: ParsedFragments,
-    readonly config: PluginConfig
+    readonly fragments: ParsedFragments
   ) {
     this._enums = []
-    this._operations = []
     this._unnamedCounter = 0
-
-    autoBind(this)
   }
 
-  getEnums(): readonly ParsedEnum[] {
+  getEnums(): readonly string[] {
     return this._enums
   }
 
-  getOperations(): readonly ParsedOperation[] {
-    return this._operations
-  }
-
-  OperationDefinition(node: OperationDefinitionNode) {
+  parseOperation(node: OperationDefinitionNode) {
     const name = node.name?.value ?? `unnamed${this._unnamedCounter++}`
     const capitalName = capitalize(name)
     const opType = capitalize(node.operation)
@@ -105,17 +125,9 @@ export class GraphQLHaskellVisitor {
       this.fragments
     )
 
-    const parsedEnums = enums.map((enumName) => {
-      const enumType = assertEnumType(this.schema.getType(enumName))
-      return {
-        name: enumName,
-        values: enumType.getValues().map(({ name }) => name),
-      }
-    })
+    this._enums.push(...enums)
 
-    this._enums.push(...parsedEnums)
-
-    this._operations.push({
+    return {
       name,
       query: [
         renderGraphQLNode(node),
@@ -133,7 +145,7 @@ export class GraphQLHaskellVisitor {
       })),
       schemaType: `${capitalName}Schema`,
       schema: renderAesonSchema(selections),
-    })
+    }
   }
 }
 

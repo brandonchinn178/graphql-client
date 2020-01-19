@@ -2,12 +2,12 @@ import {
   PluginFunction,
   PluginValidateFn,
 } from '@graphql-codegen/plugin-helpers'
-import { concatAST, visit } from 'graphql'
+import { concatAST } from 'graphql'
 
 import { PluginConfig, validateConfig } from './config'
 import { parseFragments } from './parse/fragments'
+import { parseOperations } from './parse/operation'
 import { renderAPIModule } from './render'
-import { GraphQLHaskellVisitor } from './visitor'
 
 export const plugin: PluginFunction<PluginConfig> = (
   schema,
@@ -25,11 +25,9 @@ export const plugin: PluginFunction<PluginConfig> = (
   const ast = concatAST(documents.map(({ content }) => content))
 
   const parsedFragments = parseFragments(ast)
+  const { enums, operations } = parseOperations(ast, schema, parsedFragments)
 
-  const visitor = new GraphQLHaskellVisitor(schema, parsedFragments, config)
-  visit(ast, { leave: visitor })
-
-  return renderAPIModule(config, visitor.getEnums(), visitor.getOperations())
+  return renderAPIModule(config, enums, operations)
 }
 
 export const validate: PluginValidateFn = (_schema, _documents, config) => {
