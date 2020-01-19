@@ -22,8 +22,8 @@ export const renderAPIModule = (
     })),
     operations: operations.map((operation) => ({
       ...operation,
-      query: operation.query.replace(/\n/g, '\n  '),
-      schema: renderAesonSchema(operation.schema).replace(/\n/g, '\n  '),
+      query: indent(operation.query),
+      schema: indent(renderAesonSchema(operation.schema)),
       args: operation.args.map(({ name, type }) => ({
         arg: name,
         type: renderHaskellType(type),
@@ -69,7 +69,7 @@ const renderAesonSchema = (selections: ParsedSelection): string => {
       }
     }
 
-    return renderAesonSchema(selectionType.fields).replace(/\n/g, '\n  ')
+    return indent(renderAesonSchema(selectionType.fields))
   }
 
   const fields = Object.entries(selections).map(
@@ -78,3 +78,5 @@ const renderAesonSchema = (selections: ParsedSelection): string => {
 
   return '{\n' + fields.map((field) => `  ${field},`).join('\n') + '\n}'
 }
+
+const indent = (s: string) => s.replace(/\n/g, '\n  ')
