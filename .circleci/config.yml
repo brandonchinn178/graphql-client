@@ -25,6 +25,7 @@ executors:
     environment:
       STACK_YAML: << parameters.stack_yaml >>
       CI_LATEST: <<# parameters.latest >>1<</ parameters.latest >>
+      LANG: en_US.UTF-8
 
 jobs:
   run_build_and_test:
@@ -44,7 +45,8 @@ jobs:
           command: |
             FILES=(
               "${STACK_YAML}"
-              package.yaml
+              graphql-client/package.yaml
+              example/package.yaml
             )
             cat "${FILES[@]}" > cache-key.txt
             curl -sSL https://get.haskellstack.org/ | sed -n 's/^STACK_VERSION="\(.*\)"/\1/p' >> cache-key.txt
@@ -55,6 +57,9 @@ jobs:
           command: |
             curl -sSL https://get.haskellstack.org/ | sh
             stack --version
+      - run:
+          name: Install system dependencies
+          command: yum install -y zlib-devel
       - restore_cache:
           key: *cache_key
       - run:
@@ -86,6 +91,7 @@ jobs:
                 command: |
                   set +e
                   STATUS=0
+                  scripts/eslint.sh || STATUS=1
                   scripts/hlint.sh || STATUS=1
                   scripts/stylish-haskell.sh || STATUS=1
                   exit "${STATUS}"
@@ -105,7 +111,7 @@ jobs:
 
             if [[ -n "${CI_LATEST}" ]]; then
               mkdir -p .ci/
-              tar czf .ci/haddock-docs.tar.gz -C "$(find .stack-work/dist -regex '.*/doc/html/[^/]*')" .
+              tar czf .ci/haddock-docs.tar.gz -C "$(find graphql-client/.stack-work/dist -regex '.*/doc/html/[^/]*')" .
             fi
       - when:
           condition: << parameters.latest >>
