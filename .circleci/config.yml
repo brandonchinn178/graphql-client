@@ -113,6 +113,12 @@ jobs:
             - store_artifacts:
                 path: .ci/
       - run:
+          name: Ensure that example API is up to date
+          command: |
+            yarn graphql build
+            yarn example codegen
+            git --no-pager diff --exit-code example/src/Example/GraphQL/API.hs
+      - run:
           name: Test
           command: stack test
 
