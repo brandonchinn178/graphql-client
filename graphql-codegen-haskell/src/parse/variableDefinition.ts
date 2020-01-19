@@ -2,7 +2,7 @@ import { Kind, TypeNode, VariableDefinitionNode } from 'graphql'
 
 export type ParsedVariableDefinitions = {
   // The name of the argument
-  arg: string
+  name: string
   // The Haskell type of the argument
   type: ParsedType
 }
@@ -11,7 +11,7 @@ export const parseVariableDefinitions = (
   variableDefinitions: ReadonlyArray<VariableDefinitionNode>
 ): ParsedVariableDefinitions[] =>
   variableDefinitions.map(({ type, variable }) => ({
-    arg: variable.name.value,
+    name: variable.name.value,
     type: parseType(type),
   }))
 

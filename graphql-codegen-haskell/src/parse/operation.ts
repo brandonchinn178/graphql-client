@@ -8,10 +8,13 @@ import {
   print as renderGraphQLNode,
 } from 'graphql'
 
-import { renderAesonSchema, renderHaskellType } from '../render'
+import { renderAesonSchema } from '../render'
 import { ParsedFragments } from './fragments'
 import { parseSelectionSet } from './selectionSet'
-import { parseVariableDefinitions } from './variableDefinition'
+import {
+  ParsedVariableDefinitions,
+  parseVariableDefinitions,
+} from './variableDefinition'
 
 export type ParsedOperations = {
   enums: ParsedEnum[]
@@ -41,12 +44,7 @@ export type ParsedOperation = {
   // The name of the Haskell query args type, e.g. "GetUserArgs"
   argsType: string
   // The GraphQL arguments
-  args: Array<{
-    // The name of the argument
-    arg: string
-    // The Haskell type of the argument
-    type: string
-  }>
+  args: Array<ParsedVariableDefinitions>
 
   // The name of the Haskell schema type, e.g. "GetUserSchema"
   schemaType: string
@@ -139,10 +137,7 @@ class OperationDefinitionParser {
       queryType: `${capitalName}${opType}`,
       queryFunction: `run${capitalName}${opType}`,
       argsType: `${capitalName}Args`,
-      args: args.map((arg) => ({
-        ...arg,
-        type: renderHaskellType(arg.type),
-      })),
+      args,
       schemaType: `${capitalName}Schema`,
       schema: renderAesonSchema(selections),
     }

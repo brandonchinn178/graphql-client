@@ -24,13 +24,17 @@ export const renderAPIModule = (
       ...operation,
       query: operation.query.replace(/\n/g, '\n  '),
       schema: operation.schema.replace(/\n/g, '\n  '),
+      args: operation.args.map(({ name, type }) => ({
+        arg: name,
+        type: renderHaskellType(type),
+      })),
       overArgs() {
         return (text: string) => templateOverList(text, this.args)
       },
     })),
   })
 
-export const renderHaskellType = (type: ParsedType): string => {
+const renderHaskellType = (type: ParsedType): string => {
   const baseType = type.list ? `[${renderHaskellType(type.inner)}]` : type.name
   return type.nullable ? `Maybe ${baseType}` : baseType
 }
