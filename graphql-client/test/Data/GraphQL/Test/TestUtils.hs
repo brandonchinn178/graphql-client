@@ -12,8 +12,8 @@ import Data.Either (isLeft)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@?), (@?=))
 
-import Data.GraphQL.Test.TestQuery (TestArgs(..), testQuery)
 import Data.GraphQL.Monad (runQuery)
+import Data.GraphQL.Test.TestQuery (TestArgs(..), testQuery)
 import Data.GraphQL.TestUtils (ResultMock(..), mocked, runMockQueryT)
 
 testTestUtils :: TestTree

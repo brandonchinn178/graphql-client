@@ -8,7 +8,7 @@ module Data.GraphQL.Test.Monad.Class where
 
 import Control.Exception (try)
 import Control.Monad.IO.Class (MonadIO)
-import Control.Monad.Reader (MonadReader, ReaderT, ask, runReaderT)
+import Control.Monad.Reader (MonadReader, ReaderT, asks, runReaderT)
 import Data.Aeson (Value, object, (.=))
 import Data.Aeson.Schema (get)
 import qualified Data.Aeson.Types as Aeson
@@ -27,7 +27,7 @@ runMockQueryM :: Either GraphQLError Value -> MockQueryM a -> IO a
 runMockQueryM mockedResult = (`runReaderT` mockedResult) . unMock
 
 instance MonadQuery MockQueryM where
-  runQuerySafe _ _ = toGraphQLResult <$> ask
+  runQuerySafe _ _ = asks toGraphQLResult
     where
       toGraphQLResult = \case
         Left e -> GraphQLResult [e] Nothing
