@@ -15,7 +15,7 @@ import Data.Aeson (object, (.=))
 import Data.Aeson.Schema.TH (mkEnum)
 import Data.GraphQL
 
-import qualified Example.GraphQL.Scalars as Scalars
+import Example.GraphQL.Scalars
 
 {-----------------------------------------------------------------------------
 * ReleaseStatus
