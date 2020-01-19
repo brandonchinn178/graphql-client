@@ -9,7 +9,7 @@
     "@graphql-codegen/add": "^1.10.0",
     "@graphql-codegen/cli": "^1.10.0",
     "graphql": "^14.5.8",
-    "graphql-codegen-haskell": "file:../graphql-codegen-haskell",
+    "graphql-codegen-haskell": "0.0.1",
     "typescript": "^2.7.4"
   }
 }
