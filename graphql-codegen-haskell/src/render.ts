@@ -1,15 +1,11 @@
 import * as Mustache from 'mustache'
 
 import { PluginConfig } from './config'
-import {
-  ParsedEnum,
-  ParsedOperation,
-  ParsedSelection,
-  ParsedSelectionType,
-} from './parse'
+import { ParsedSelection, ParsedSelectionType } from './parse/selectionSet'
 import { ParsedType } from './parse/variableDefinition'
 import template from './template.mustache'
 import { templateOverList } from './utils'
+import { ParsedEnum, ParsedOperation } from './visitor'
 
 export const renderAPIModule = (
   config: PluginConfig,
