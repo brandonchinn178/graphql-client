@@ -12,7 +12,6 @@ import {
   isNonNullType,
   isUnionType,
   SelectionSetNode,
-  TypeNode,
 } from 'graphql'
 
 import { mergeObjects } from '../utils'
@@ -52,32 +51,6 @@ export type ParsedOperation = {
   schemaType: string
   // The schema DSL, e.g. "{ user: { name: String } }"
   schema: string
-}
-
-export type ParsedType =
-  | { list: false; name: string; nullable: boolean }
-  | { list: true; inner: ParsedType; nullable: boolean }
-
-export const parseType = (type: TypeNode): ParsedType => {
-  switch (type.kind) {
-    case 'NamedType':
-      return {
-        list: false,
-        name: type.name.value,
-        nullable: true,
-      }
-    case 'ListType':
-      return {
-        list: true,
-        inner: parseType(type.type),
-        nullable: true,
-      }
-    case 'NonNullType':
-      return {
-        ...parseType(type.type),
-        nullable: false,
-      }
-  }
 }
 
 export type ParsedSelectionSet = {

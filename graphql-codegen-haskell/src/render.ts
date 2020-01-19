@@ -6,8 +6,8 @@ import {
   ParsedOperation,
   ParsedSelection,
   ParsedSelectionType,
-  ParsedType,
 } from './parse'
+import { ParsedType } from './parse/variableDefinition'
 import template from './template.mustache'
 import { templateOverList } from './utils'
 

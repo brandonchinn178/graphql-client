@@ -8,13 +8,9 @@ import {
 } from 'graphql'
 
 import { PluginConfig } from './config'
-import {
-  ParsedEnum,
-  ParsedOperation,
-  parseSelectionSet,
-  parseType,
-} from './parse'
+import { ParsedEnum, ParsedOperation, parseSelectionSet } from './parse'
 import { ParsedFragments } from './parse/fragments'
+import { parseVariableDefinitions } from './parse/variableDefinition'
 import { renderAesonSchema, renderHaskellType } from './render'
 
 export class GraphQLHaskellVisitor {
@@ -47,14 +43,7 @@ export class GraphQLHaskellVisitor {
     const capitalName = capitalize(name)
     const opType = capitalize(node.operation)
 
-    const args = (node.variableDefinitions ?? []).map((variableDef) => {
-      const type = parseType(variableDef.type)
-
-      return {
-        arg: variableDef.variable.name.value,
-        type: renderHaskellType(type),
-      }
-    })
+    const args = parseVariableDefinitions(node.variableDefinitions ?? [])
 
     let schemaRoot: GraphQLObjectType | undefined | null
     switch (node.operation) {
@@ -102,7 +91,10 @@ export class GraphQLHaskellVisitor {
       queryType: `${capitalName}${opType}`,
       queryFunction: `run${capitalName}${opType}`,
       argsType: `${capitalName}Args`,
-      args,
+      args: args.map((arg) => ({
+        ...arg,
+        type: renderHaskellType(arg.type),
+      })),
       schemaType: `${capitalName}Schema`,
       schema: renderAesonSchema(selections),
     })
