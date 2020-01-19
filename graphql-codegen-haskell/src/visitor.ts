@@ -94,8 +94,8 @@ export class GraphQLHaskellVisitor {
       name,
       query: [
         renderGraphQLNode(node),
-        ...fragments.map(
-          (fragment) => renderGraphQLNode(this.fragments[fragment].node)
+        ...fragments.map((fragment) =>
+          renderGraphQLNode(this.fragments[fragment].node)
         ),
       ].join('\n'),
       queryName: `${name}${opType}`,

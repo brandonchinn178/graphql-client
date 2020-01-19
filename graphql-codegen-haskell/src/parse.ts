@@ -202,12 +202,14 @@ class SelectionSetParser {
     return this.parseSelectionSetNode(selectionSet, schema)
   }
 
+  /* eslint-disable-next-line class-methods-use-this */
   parseInlineFragmentNode(
     node: InlineFragmentNode,
     schema: GraphQLSelectionSchema
   ): ParsedSelection {
-    throw new Error('TODO')
+    /* eslint-disable-next-line no-console */
     console.log(node, schema)
+    throw new Error('TODO')
   }
 
   parseSelectionType(

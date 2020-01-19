@@ -10,15 +10,13 @@
  * , b ~ 2
  * ]
  */
-export const templateOverList = <T>(
-  text: string,
-  list: Array<T>
-) => {
+export const templateOverList = <T>(text: string, list: Array<T>) => {
   const match = text.match(/^\s*\n(.*?)\n(.*?)\n\s*$/)
   if (!match) {
     throw new Error('templateOverList requires a two-line template')
   }
 
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const render = (template: string, elem: any): string =>
     template
       .replace(/{{\.}}/g, (_) => elem)
