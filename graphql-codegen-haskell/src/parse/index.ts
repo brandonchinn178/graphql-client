@@ -1,6 +1,5 @@
 import {
   FieldNode,
-  FragmentDefinitionNode,
   FragmentSpreadNode,
   GraphQLInterfaceType,
   GraphQLObjectType,
@@ -16,7 +15,8 @@ import {
   TypeNode,
 } from 'graphql'
 
-import { fromPairs, mergeObjects } from './utils'
+import { mergeObjects } from '../utils'
+import { ParsedFragments } from './fragments'
 
 export type ParsedEnum = {
   // The name of the enum, e.g. "Status"
@@ -53,30 +53,6 @@ export type ParsedOperation = {
   // The schema DSL, e.g. "{ user: { name: String } }"
   schema: string
 }
-
-export type ParsedFragments = Record<string, ParsedFragment>
-
-export type ParsedFragment = {
-  name: string
-  selectionSet: SelectionSetNode
-  node: FragmentDefinitionNode
-}
-
-export const parseFragments = (
-  nodes: FragmentDefinitionNode[]
-): ParsedFragments =>
-  fromPairs(
-    nodes.map((node) => {
-      const name = node.name.value
-      const fragment = {
-        name,
-        selectionSet: node.selectionSet,
-        node,
-      }
-
-      return [name, fragment]
-    })
-  )
 
 export type ParsedType =
   | { list: false; name: string; nullable: boolean }

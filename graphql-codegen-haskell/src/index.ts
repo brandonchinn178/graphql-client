@@ -2,10 +2,10 @@ import {
   PluginFunction,
   PluginValidateFn,
 } from '@graphql-codegen/plugin-helpers'
-import { concatAST, FragmentDefinitionNode, Kind, visit } from 'graphql'
+import { concatAST, visit } from 'graphql'
 
 import { PluginConfig, validateConfig } from './config'
-import { parseFragments } from './parse'
+import { parseFragments } from './parse/fragments'
 import { renderAPIModule } from './render'
 import { GraphQLHaskellVisitor } from './visitor'
 
@@ -24,10 +24,7 @@ export const plugin: PluginFunction<PluginConfig> = (
 
   const ast = concatAST(documents.map(({ content }) => content))
 
-  const fragments = ast.definitions.filter(
-    ({ kind }) => kind === Kind.FRAGMENT_DEFINITION
-  ) as FragmentDefinitionNode[]
-  const parsedFragments = parseFragments(fragments)
+  const parsedFragments = parseFragments(ast)
 
   const visitor = new GraphQLHaskellVisitor(schema, parsedFragments, config)
   visit(ast, { leave: visitor })

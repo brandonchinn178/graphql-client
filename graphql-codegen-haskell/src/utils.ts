@@ -39,20 +39,6 @@ export const templateOverList = <T>(text: string, list: Array<T>) => {
 }
 
 /**
- * Implementation of lodash's fromPairs.
- */
-export const fromPairs = <K extends string | number | symbol, V>(
-  pairs: Array<[K, V]>
-): Record<K, V> => {
-  const acc = {} as Record<K, V>
-  for (const pair of pairs) {
-    const [k, v] = pair
-    acc[k] = v
-  }
-  return acc
-}
-
-/**
  * Loosely based on lodash's assign.
  */
 export const mergeObjects = <T extends object>(objects: T[]): T =>

@@ -10,11 +10,11 @@ import {
 import { PluginConfig } from './config'
 import {
   ParsedEnum,
-  ParsedFragments,
   ParsedOperation,
   parseSelectionSet,
   parseType,
 } from './parse'
+import { ParsedFragments } from './parse/fragments'
 import { renderAesonSchema, renderHaskellType } from './render'
 
 export class GraphQLHaskellVisitor {
