@@ -1,0 +1,30 @@
+repos:
+  - repo: local
+    hooks:
+      - id: eslint
+        name: Run ESLint
+        entry: scripts/eslint.sh
+        language: script
+        files: '\.ts$'
+        require_serial: true
+
+      - id: hlint
+        name: Run HLint
+        entry: scripts/hlint.sh
+        language: script
+        files: '\.hs$'
+        pass_filenames: false
+
+      - id: stylish-haskell
+        name: Run stylish-haskell
+        entry: scripts/stylish-haskell.sh
+        language: script
+        files: '\.hs$'
+        pass_filenames: false
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: no-commit-to-branch
