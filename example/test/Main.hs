@@ -9,7 +9,8 @@ import Test.Tasty (defaultMain, testGroup)
 import Test.Tasty.Golden (goldenVsString)
 
 import Example (searchForSong)
-import Example.GraphQL.API (GetRecordingsArgs(..), ReleaseStatus(..), getRecordingsQuery)
+import Example.GraphQL.API
+    (GetRecordingsArgs(..), ReleaseStatus(..), getRecordingsQuery)
 
 main :: IO ()
 main = defaultMain $ testGroup "searchForSong"

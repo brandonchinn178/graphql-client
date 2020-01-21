@@ -10,8 +10,11 @@ aliases:
       type: boolean
       default: false
 
-  - &cache_key
-    v0-{{ checksum "cache-key.txt" }}
+  - &stack_cache_key
+    v0-{{ checksum "stack-cache-key.txt" }}
+
+  - &yarn_cache_key
+    v0-{{ checksum "yarn-cache-key.txt" }}
 
 executors:
   centos7:
@@ -25,6 +28,7 @@ executors:
     environment:
       STACK_YAML: << parameters.stack_yaml >>
       CI_LATEST: <<# parameters.latest >>1<</ parameters.latest >>
+      LANG: en_US.UTF-8
 
 jobs:
   run_build_and_test:
@@ -40,14 +44,20 @@ jobs:
       # init
       - checkout
       - run:
-          name: Build cache key
+          name: Build cache keys
           command: |
-            FILES=(
+            STACK_FILES=(
               "${STACK_YAML}"
-              package.yaml
+              graphql-client/package.yaml
+              example/package.yaml
             )
-            cat "${FILES[@]}" > cache-key.txt
-            curl -sSL https://get.haskellstack.org/ | sed -n 's/^STACK_VERSION="\(.*\)"/\1/p' >> cache-key.txt
+            cat "${STACK_FILES[@]}" > stack-cache-key.txt
+            curl -sSL https://get.haskellstack.org/ | sed -n 's/^STACK_VERSION="\(.*\)"/\1/p' >> stack-cache-key.txt
+
+            YARN_FILES=(
+              yarn.lock
+            )
+            cat "${YARN_FILES[@]}" > yarn-cache-key.txt
 
       # install stack and dependencies
       - run:
@@ -55,8 +65,11 @@ jobs:
           command: |
             curl -sSL https://get.haskellstack.org/ | sh
             stack --version
+      - run:
+          name: Install system dependencies
+          command: yum install -y zlib-devel
       - restore_cache:
-          key: *cache_key
+          key: *stack_cache_key
       - run:
           name: Build external dependencies
           command: |
@@ -72,10 +85,27 @@ jobs:
                 stack build hlint stylish-haskell
             fi
       - save_cache:
-          key: *cache_key
+          key: *stack_cache_key
           paths:
             - ~/.stack
             - .stack-work
+
+      # install yarn and dependencies
+      - run:
+          name: Install yarn
+          command: |
+            curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
+            curl --silent --location https://rpm.nodesource.com/setup_12.x | bash -
+            yum install -y yarn
+      - restore_cache:
+          key: *yarn_cache_key
+      - run:
+          name: Install yarn dependencies
+          command: yarn --frozen-lockfile
+      - save_cache:
+          key: *yarn_cache_key
+          paths:
+            - node_modules
 
       # lint, build, and test
       - when:
@@ -86,6 +116,7 @@ jobs:
                 command: |
                   set +e
                   STATUS=0
+                  scripts/eslint.sh || STATUS=1
                   scripts/hlint.sh || STATUS=1
                   scripts/stylish-haskell.sh || STATUS=1
                   exit "${STATUS}"
@@ -105,13 +136,19 @@ jobs:
 
             if [[ -n "${CI_LATEST}" ]]; then
               mkdir -p .ci/
-              tar czf .ci/haddock-docs.tar.gz -C "$(find .stack-work/dist -regex '.*/doc/html/[^/]*')" .
+              tar czf .ci/haddock-docs.tar.gz -C "$(find graphql-client/.stack-work/dist -regex '.*/doc/html/[^/]*')" .
             fi
       - when:
           condition: << parameters.latest >>
           steps:
             - store_artifacts:
                 path: .ci/
+      - run:
+          name: Ensure that example API is up to date
+          command: |
+            yarn graphql build
+            yarn example codegen
+            git --no-pager diff --exit-code example/src/Example/GraphQL/API.hs
       - run:
           name: Test
           command: stack test

@@ -1,0 +1,9 @@
+schema: https://graphbrainz.herokuapp.com
+documents: src/Example/GraphQL/api/*.graphql
+generates:
+  src/Example/GraphQL/API.hs:
+    config:
+      scalarsModule: Example.GraphQL.Scalars
+    plugins:
+      - add: '{- This file was automatically generated and should not be edited. -}'
+      - graphql-codegen-haskell

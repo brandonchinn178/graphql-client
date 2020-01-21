@@ -2,3 +2,4 @@
 .stack-work/
 *.cabal
 /.ci/
+node_modules/

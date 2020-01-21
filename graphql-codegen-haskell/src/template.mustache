@@ -1,0 +1,81 @@
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# OPTIONS_GHC -fno-warn-unused-imports #-}
+
+module {{apiModule}} where
+
+import Control.Monad.IO.Class (MonadIO)
+import Data.Aeson (object, (.=))
+import Data.Aeson.Schema.TH (mkEnum)
+import Data.GraphQL
+
+import {{scalarsModule}}
+
+{{#enums}}
+{-----------------------------------------------------------------------------
+* {{name}}
+-----------------------------------------------------------------------------}
+
+mkEnum "{{name}}"
+  {{#overValues}}
+  [ "{{.}}"
+  ]
+  {{/overValues}}
+{{/enums}}
+
+{{#operations}}
+{-----------------------------------------------------------------------------
+* {{name}}
+
+-- result :: Object {{schemaType}}; throws a GraphQL exception on errors
+result <- {{queryFunction}} {{argsType}}
+  {{#overArgs}}
+  { _{{arg}} = ...
+  }
+  {{/overArgs}}
+
+-- result :: GraphQLResult (Object {{schemaType}})
+result <- {{queryFunction}}Safe {{argsType}}
+  {{#overArgs}}
+  { _{{arg}} = ...
+  }
+  {{/overArgs}}
+-----------------------------------------------------------------------------}
+
+type {{queryType}} = Query {{argsType}} {{schemaType}}
+
+data {{argsType}} = {{argsType}}
+  {{#overArgs}}
+  { _{{arg}} :: {{type}}
+  }
+  {{/overArgs}}
+  deriving (Show)
+
+type {{schemaType}} = [schema|
+  {{schema}}
+|]
+
+instance GraphQLArgs {{argsType}} where
+  fromArgs args = object
+    {{#overArgs}}
+    [ "{{arg}}" .= _{{arg}} args
+    ]
+    {{/overArgs}}
+
+{{queryName}} :: {{queryType}}
+{{queryName}} = [query|
+  {{query}}
+|]
+
+{{queryFunction}} :: (MonadIO m, MonadQuery m)
+  => {{argsType}} -> m (Object {{schemaType}})
+{{queryFunction}} = runQuery {{queryName}}
+
+{{queryFunction}}Safe :: (MonadIO m, MonadQuery m)
+  => {{argsType}} -> m (GraphQLResult (Object {{schemaType}}))
+{{queryFunction}}Safe = runQuerySafe {{queryName}}
+{{/operations}}
