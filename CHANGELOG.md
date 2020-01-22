@@ -4,4 +4,5 @@
 
 Initial release:
 
-* Include all features that have been implemented up until now
+* Implement `graphql-client` Haskell library
+* Implement `graphql-codegen-haskell` plugin for `graphql-code-generator`
