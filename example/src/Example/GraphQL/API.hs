@@ -89,7 +89,7 @@ instance GraphQLArgs GetRecordingsArgs where
     ]
 
 getRecordingsQuery :: GetRecordingsQuery
-getRecordingsQuery = [query|
+getRecordingsQuery = UnsafeQuery "getRecordings" [query|
   query getRecordings($query: String!, $first: Int) {
     search {
       recordings(query: $query, first: $first) {
