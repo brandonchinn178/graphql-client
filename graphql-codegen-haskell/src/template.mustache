@@ -67,7 +67,7 @@ instance GraphQLArgs {{argsType}} where
     {{/overArgs}}
 
 {{queryName}} :: {{queryType}}
-{{queryName}} = [query|
+{{queryName}} = UnsafeQuery "{{name}}" [query|
   {{query}}
 |]
 

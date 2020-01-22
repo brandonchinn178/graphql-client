@@ -8,11 +8,9 @@ Definitions needed by GraphQL queries.
 -}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
 
 module Data.GraphQL.Query
-  ( Query
+  ( Query(UnsafeQuery)
   , GraphQLArgs(..)
   , fromQuery
   , queryName
@@ -20,15 +18,12 @@ module Data.GraphQL.Query
   , query
   ) where
 
-import Control.Applicative ((<|>))
 import Data.Aeson (Value)
 import Data.Aeson.Schema (SchemaType)
 import Data.Kind (Type)
-import Data.Maybe (fromMaybe)
 import Data.Text (Text)
-import qualified Data.Text as Text
-import Language.Haskell.TH.Quote (QuasiQuoter(..))
-import Language.Haskell.TH.Syntax (lift)
+import Language.Haskell.TH.Quote (QuasiQuoter)
+import qualified Text.RawString.QQ as RawString
 
 -- | A type class for query arguments.
 class GraphQLArgs args where
@@ -50,18 +45,4 @@ queryName :: Query args r -> Text
 queryName = queryName'
 
 query :: QuasiQuoter
-query = QuasiQuoter
-  { quoteExp = mkQuery . Text.strip . Text.pack
-  , quotePat = error "Cannot use the 'query' QuasiQuoter for patterns"
-  , quoteType = error "Cannot use the 'query' QuasiQuoter for types"
-  , quoteDec = error "Cannot use the 'query' QuasiQuoter for declarations"
-  }
-  where
-    mkQuery s = [| UnsafeQuery $(getName s) $(liftS s) |]
-    liftS s = [| Text.pack $(lift $ Text.unpack s) |]
-    getName = liftS . Text.strip . Text.takeWhile (/= '(') . dropHeader
-
-    dropHeader s =
-      fromMaybe
-        (error $ "Invalid GraphQL query: " ++ Text.unpack s)
-        $ ("query" `Text.stripPrefix` s) <|> ("mutation" `Text.stripPrefix` s)
+query = RawString.r
