@@ -34,7 +34,7 @@ export const renderAPIModule = (
     })),
   })
 
-const renderHaskellType = (type: ParsedType): string => {
+export const renderHaskellType = (type: ParsedType): string => {
   const baseType = type.list ? `[${renderHaskellType(type.inner)}]` : type.name
   return type.nullable ? `Maybe ${baseType}` : baseType
 }
