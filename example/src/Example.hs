@@ -41,7 +41,7 @@ mkGetter "Song" "getSongs" ''GetRecordingsSchema ".search!.recordings!.nodes![]!
 
 searchForSong :: (MonadIO m, MonadQuery m) => String -> m [Song]
 searchForSong song = getSongs <$> runGetRecordingsQuery GetRecordingsArgs
-  { _query = song
+  { _query = Text.pack song
   , _first = Just 5
   }
 
