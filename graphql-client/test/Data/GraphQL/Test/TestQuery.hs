@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
 
 module Data.GraphQL.Test.TestQuery where
@@ -14,7 +15,7 @@ instance GraphQLArgs TestArgs where
   fromArgs _ = object []
 
 testQuery :: TestQuery
-testQuery = [query|
+testQuery = UnsafeQuery "test" [query|
   query test($name: String!) {
     getUser(name: $name) {
       id
