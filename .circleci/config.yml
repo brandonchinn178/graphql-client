@@ -126,13 +126,16 @@ jobs:
             STACK_ARGS=(
                 --test
                 --no-run-tests
-                --ghc-options -Werror
             )
             if [[ -n "${CI_LATEST}" ]]; then
                 STACK_ARGS+=(--haddock)
             fi
 
-            stack build "${STACK_ARGS[@]}"
+            stack build "${STACK_ARGS[@]}" --ghc-options -Werror graphql-client
+
+            # don't error on warnings in the example, because we want the source code to
+            # be clean and easy to read
+            stack build "${STACK_ARGS[@]}" graphql-client-example
 
             if [[ -n "${CI_LATEST}" ]]; then
               mkdir -p .ci/
