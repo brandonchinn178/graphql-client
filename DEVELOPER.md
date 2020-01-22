@@ -30,6 +30,15 @@ The following linters must pass CI in order for your PR to be accepted.
     scripts/stylish-haskell.sh --apply
     ```
 
+* ESLint
+
+    ```bash
+    scripts/eslint.sh
+    ```
+
+You can install [pre-commit](https://pre-commit.com/) to run these linters as
+a git commit hook.
+
 ## Run tests
 
 All tests must pass CI in order for your PR to be accepted.
