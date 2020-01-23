@@ -1,16 +1,17 @@
 import {
+  assertCompositeType,
   FieldNode,
   FragmentSpreadNode,
   GraphQLInterfaceType,
   GraphQLObjectType,
   GraphQLOutputType,
   InlineFragmentNode,
-  isCompositeType,
   isEnumType,
   isLeafType,
   isListType,
   isNonNullType,
   isUnionType,
+  SelectionNode,
   SelectionSetNode,
 } from 'graphql'
 
@@ -76,7 +77,7 @@ class SelectionSetParser {
     schema: GraphQLSelectionSchema
   ): ParsedSelection {
     return mergeObjects(
-      selections.map((node) => {
+      selections.map((node: SelectionNode) => {
         switch (node.kind) {
           case 'Field':
             return this.parseFieldNode(node, schema)
@@ -85,8 +86,6 @@ class SelectionSetParser {
           case 'InlineFragment':
             return this.parseInlineFragmentNode(node, schema)
         }
-
-        throw new Error(`Invalid SelectionSetNode: ${node}`)
       })
     )
   }
@@ -161,24 +160,22 @@ class SelectionSetParser {
       }
     }
 
-    if (isCompositeType(type)) {
-      if (!node.selectionSet) {
-        throw new Error(
-          `Field "${node.name}" of type "${schema.name}" must have a selection of subfields. Did you mean "${node.name} { ... }"?`
-        )
-      }
+    assertCompositeType(type)
 
-      if (isUnionType(type)) {
-        throw new Error('TODO: union type')
-      }
-
-      return {
-        list: false,
-        fields: this.parseSelectionSetNode(node.selectionSet, type),
-        nullable: true,
-      }
+    if (!node.selectionSet) {
+      throw new Error(
+        `Field "${node.name}" of type "${schema.name}" must have a selection of subfields. Did you mean "${node.name} { ... }"?`
+      )
     }
 
-    throw new Error(`Unknown GraphQLOutputType: ${type}`)
+    if (isUnionType(type)) {
+      throw new Error('TODO: union type')
+    }
+
+    return {
+      list: false,
+      fields: this.parseSelectionSetNode(node.selectionSet, type),
+      nullable: true,
+    }
   }
 }
