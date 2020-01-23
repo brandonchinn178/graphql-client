@@ -16,6 +16,11 @@ import {
 
 import { mergeObjects } from '../utils'
 import { ParsedFragments } from './fragments'
+import {
+  ParsedListType,
+  ParsedObjectType,
+  ParsedScalarType,
+} from './graphqlTypes'
 
 export type ParsedSelectionSet = {
   enums: string[]
@@ -26,9 +31,9 @@ export type ParsedSelectionSet = {
 export type ParsedSelection = Record<string, ParsedSelectionType>
 
 export type ParsedSelectionType =
-  | { list: false; name: string; nullable: boolean }
-  | { list: false; fields: ParsedSelection; nullable: boolean }
-  | { list: true; inner: ParsedSelectionType; nullable: boolean }
+  | ParsedScalarType
+  | ParsedListType<ParsedSelectionType>
+  | ParsedObjectType<ParsedSelection>
 
 // GraphQL types that can be selected further into.
 type GraphQLSelectionSchema = GraphQLObjectType | GraphQLInterfaceType
