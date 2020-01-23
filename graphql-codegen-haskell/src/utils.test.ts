@@ -23,6 +23,15 @@ describe('templateOverList', () => {
     expect(() => templateOverList('[ {{foo}}\n]\n!\n', [])).toThrow()
   })
 
+  it('renders no list', () => {
+    const result = templateOverList('[ {{.}}\n]', [])
+    expect(result).toMatchInlineSnapshot(`
+      "[
+      ]
+      "
+    `)
+  })
+
   it('interpolates elements directly', () => {
     const result = templateOverList('[ {{.}}\n]', ['a', 'b', 'c'])
     expect(result).toMatchInlineSnapshot(`

@@ -26,6 +26,10 @@ export const templateOverList = <T>(text: string, list: Array<T>) => {
   const templateRest = templateFirst.replace(/[^\s]/, ',')
   const suffix = templateLines[1]
 
+  if (list.length === 0) {
+    return templateFirst.replace(/(\s*[^\s]).*/, '$1') + '\n' + suffix + '\n'
+  }
+
   const listFirst = list[0]
   const listRest = list.slice(1)
 
