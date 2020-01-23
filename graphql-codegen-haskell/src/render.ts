@@ -42,7 +42,7 @@ export const renderHaskellType = (type: ParsedType): string => {
   return type.nullable ? `Maybe ${baseType}` : baseType
 }
 
-const renderAesonSchema = (selections: ParsedSelection): string => {
+export const renderAesonSchema = (selections: ParsedSelection): string => {
   const renderSelectionType = (selectionType: ParsedSelectionType): string => {
     if (selectionType.nullable) {
       const type = renderSelectionType({

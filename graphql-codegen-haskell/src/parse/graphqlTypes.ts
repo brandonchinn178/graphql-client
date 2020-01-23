@@ -14,3 +14,34 @@ export interface ParsedListType<T> extends BaseParsedType<true> {
 export interface ParsedObjectType<T> extends BaseParsedType<false> {
   fields: T
 }
+
+/** Helpers **/
+
+export const NULLABLE = true
+
+export const graphqlScalar = (
+  name: string,
+  nullable = false
+): ParsedScalarType => ({
+  list: false,
+  name,
+  nullable,
+})
+
+export const graphqlList = <T>(
+  inner: T,
+  nullable = false
+): ParsedListType<T> => ({
+  list: true,
+  inner,
+  nullable,
+})
+
+export const graphqlObject = <T>(
+  fields: T,
+  nullable = false
+): ParsedObjectType<T> => ({
+  list: false,
+  fields,
+  nullable,
+})
