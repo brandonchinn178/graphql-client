@@ -11,8 +11,8 @@
  * ]
  */
 export const templateOverList = <T>(text: string, list: Array<T>) => {
-  const match = text.match(/^\s*\n(.*?)\n(.*?)\n\s*$/)
-  if (!match) {
+  const templateLines = text.split('\n').filter((s) => s.trim() !== '')
+  if (templateLines.length !== 2) {
     throw new Error('templateOverList requires a two-line template')
   }
 
@@ -22,9 +22,9 @@ export const templateOverList = <T>(text: string, list: Array<T>) => {
       .replace(/{{\.}}/g, (_) => elem)
       .replace(/{{(.*?)}}/g, (_, name) => elem[name])
 
-  const templateFirst = match[1]
+  const templateFirst = templateLines[0]
   const templateRest = templateFirst.replace(/[^\s]/, ',')
-  const suffix = match[2]
+  const suffix = templateLines[1]
 
   const listFirst = list[0]
   const listRest = list.slice(1)
