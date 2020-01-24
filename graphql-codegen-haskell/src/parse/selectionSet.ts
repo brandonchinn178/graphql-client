@@ -18,6 +18,9 @@ import {
 import { mergeObjects } from '../utils'
 import { ParsedFragments } from './fragments'
 import {
+  graphqlList,
+  graphqlObject,
+  graphqlScalar,
   ParsedListType,
   ParsedObjectType,
   ParsedScalarType,
@@ -132,32 +135,25 @@ class SelectionSetParser {
   parseSelectionType(
     node: FieldNode,
     type: GraphQLOutputType,
-    schema: GraphQLSelectionSchema
+    schema: GraphQLSelectionSchema,
+    nullable = true
   ): ParsedSelectionType {
     if (isNonNullType(type)) {
-      return {
-        ...this.parseSelectionType(node, type.ofType, schema),
-        nullable: false,
-      }
+      return this.parseSelectionType(node, type.ofType, schema, false)
     }
 
     if (isListType(type)) {
-      return {
-        list: true,
-        inner: this.parseSelectionType(node, type.ofType, schema),
-        nullable: true,
-      }
+      return graphqlList(
+        this.parseSelectionType(node, type.ofType, schema),
+        nullable
+      )
     }
 
     if (isLeafType(type)) {
       if (isEnumType(type)) {
         this._enums.push(type.name)
       }
-      return {
-        list: false,
-        name: type.name,
-        nullable: true,
-      }
+      return graphqlScalar(type.name, nullable)
     }
 
     assertCompositeType(type)
@@ -172,10 +168,9 @@ class SelectionSetParser {
       throw new Error('TODO: union type')
     }
 
-    return {
-      list: false,
-      fields: this.parseSelectionSetNode(node.selectionSet, type),
-      nullable: true,
-    }
+    return graphqlObject(
+      this.parseSelectionSetNode(node.selectionSet, type),
+      nullable
+    )
   }
 }
