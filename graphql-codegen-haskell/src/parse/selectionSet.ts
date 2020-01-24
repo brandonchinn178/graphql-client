@@ -164,7 +164,7 @@ class SelectionSetParser {
 
     if (!node.selectionSet) {
       throw new Error(
-        `Field "${node.name}" of type "${schema.name}" must have a selection of subfields. Did you mean "${node.name} { ... }"?`
+        `Field "${node.name.value}" of type "${schema.name}" must have a selection of subfields. Did you mean "${node.name.value} { ... }"?`
       )
     }
 
