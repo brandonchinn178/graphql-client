@@ -154,6 +154,9 @@ jobs:
             curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
             curl --silent --location https://rpm.nodesource.com/setup_12.x | bash -
             yum install -y yarn
+      - run:
+          name: Install system dependencies
+          command: yum install -y git
       - restore_cache:
           key: *yarn_cache_key
       - run:
