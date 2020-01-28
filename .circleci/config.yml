@@ -11,7 +11,7 @@ aliases:
       default: false
 
   - &stack_cache_key
-    v0-{{ checksum "stack-cache-key.txt" }}
+    v1-{{ checksum "stack-cache-key.txt" }}
 
   - &yarn_cache_key
     v0-{{ checksum "yarn-cache-key.txt" }}
