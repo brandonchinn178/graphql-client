@@ -54,7 +54,8 @@ jobs:
               graphql-client/package.yaml
               example/package.yaml
             )
-            cat "${STACK_FILES[@]}" > stack-cache-key.txt
+            echo "${STACK_YAML}" > stack-cache-key.txt
+            cat "${STACK_FILES[@]}" >> stack-cache-key.txt
             curl -sSL https://get.haskellstack.org/ | sed -n 's/^STACK_VERSION="\(.*\)"/\1/p' >> stack-cache-key.txt
 
       # install stack and dependencies
