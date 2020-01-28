@@ -2,6 +2,7 @@
 
 ![CircleCI](https://img.shields.io/circleci/build/github/LeapYear/graphql-client)
 ![Hackage](https://img.shields.io/hackage/v/graphql-client)
+[![codecov](https://codecov.io/gh/LeapYear/graphql-client/branch/master/graph/badge.svg?token=WIOxotqPTN)](https://codecov.io/gh/LeapYear/graphql-client)
 
 A client for Haskell applications to query GraphQL APIs. This project comes in
 two parts:
