@@ -157,8 +157,11 @@ jobs:
             yarn example codegen
             git --no-pager diff --exit-code example/src/Example/GraphQL/API.hs
       - run:
-          name: Test
+          name: Test Haskell package
           command: stack test
+      - run:
+          name: Test Node package
+          command: yarn graphql test --coverage --runInBand
       - run:
           name: Run example
           command: stack exec graphql-client-example
