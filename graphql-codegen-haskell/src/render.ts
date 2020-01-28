@@ -34,12 +34,15 @@ export const renderAPIModule = (
     })),
   })
 
-const renderHaskellType = (type: ParsedType): string => {
-  const baseType = type.list ? `[${renderHaskellType(type.inner)}]` : type.name
+export const renderHaskellType = (type: ParsedType): string => {
+  const baseType = type.list
+    ? `[${renderHaskellType(type.inner)}]`
+    : renderHaskellScalarType(type.name)
+
   return type.nullable ? `Maybe ${baseType}` : baseType
 }
 
-const renderAesonSchema = (selections: ParsedSelection): string => {
+export const renderAesonSchema = (selections: ParsedSelection): string => {
   const renderSelectionType = (selectionType: ParsedSelectionType): string => {
     if (selectionType.nullable) {
       const type = renderSelectionType({
@@ -55,18 +58,7 @@ const renderAesonSchema = (selections: ParsedSelection): string => {
     }
 
     if ('name' in selectionType) {
-      switch (selectionType.name) {
-        case 'Float':
-          return 'Double'
-        case 'String':
-          return 'Text'
-        case 'Boolean':
-          return 'Bool'
-        case 'ID':
-          return 'Text'
-        default:
-          return selectionType.name
-      }
+      return renderHaskellScalarType(selectionType.name)
     }
 
     return indent(renderAesonSchema(selectionType.fields))
@@ -80,3 +72,17 @@ const renderAesonSchema = (selections: ParsedSelection): string => {
 }
 
 const indent = (s: string) => s.replace(/\n/g, '\n  ')
+
+const renderHaskellScalarType = (name: string) => {
+  switch (name) {
+    case 'Float':
+      return 'Double'
+    case 'String':
+    case 'ID':
+      return 'Text'
+    case 'Boolean':
+      return 'Bool'
+    default:
+      return name
+  }
+}

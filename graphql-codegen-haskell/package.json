@@ -9,7 +9,8 @@
   "scripts": {
     "build": "rollup --config",
     "typecheck": "tsc -p ./tsconfig.json --noEmit",
-    "lint": "eslint --ext .ts,.js"
+    "lint": "eslint --ext .ts,.js",
+    "test": "jest"
   },
   "dependencies": {
     "auto-bind": "^4.0.0",
@@ -23,6 +24,7 @@
   "devDependencies": {
     "@graphql-codegen/cli": "^1.10.0",
     "@graphql-codegen/plugin-helpers": "^1.10.0",
+    "@types/jest": "^24.9.0",
     "@types/mustache": "^0.8.32",
     "@types/yup": "^0.26.27",
     "@typescript-eslint/eslint-plugin": "^2.10.0",
@@ -30,13 +32,19 @@
     "eslint": "^6.7.2",
     "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-cypress": "^2.7.0",
+    "eslint-plugin-graphql": "^3.1.1",
+    "eslint-plugin-jest": "^23.6.0",
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-simple-import-sort": "^5.0.0",
     "graphql": "^14.5.8",
+    "graphql-tag": "^2.10.1",
+    "jest": "^25.1.0",
+    "jest-raw-loader": "^1.0.1",
     "prettier": "^1.19.0",
     "rollup": "^1.28.0",
     "rollup-plugin-string": "^3.0.0",
     "rollup-plugin-typescript2": "^0.25.3",
+    "ts-jest": "^24.3.0",
     "typescript": "^3.7.4"
   }
 }

@@ -14,6 +14,7 @@ import Control.Monad.IO.Class (MonadIO)
 import Data.Aeson (object, (.=))
 import Data.Aeson.Schema.TH (mkEnum)
 import Data.GraphQL
+import Data.Text (Text)
 
 import Example.GraphQL.Scalars
 
@@ -47,7 +48,7 @@ result <- runGetRecordingsQuerySafe GetRecordingsArgs
 type GetRecordingsQuery = Query GetRecordingsArgs GetRecordingsSchema
 
 data GetRecordingsArgs = GetRecordingsArgs
-  { _query :: String
+  { _query :: Text
   , _first :: Maybe Int
   }
   deriving (Show)

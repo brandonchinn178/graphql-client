@@ -1,21 +1,30 @@
 import {
+  assertCompositeType,
   FieldNode,
   FragmentSpreadNode,
   GraphQLInterfaceType,
   GraphQLObjectType,
   GraphQLOutputType,
   InlineFragmentNode,
-  isCompositeType,
   isEnumType,
   isLeafType,
   isListType,
   isNonNullType,
   isUnionType,
+  SelectionNode,
   SelectionSetNode,
 } from 'graphql'
 
 import { mergeObjects } from '../utils'
 import { ParsedFragments } from './fragments'
+import {
+  graphqlList,
+  graphqlObject,
+  graphqlScalar,
+  ParsedListType,
+  ParsedObjectType,
+  ParsedScalarType,
+} from './graphqlTypes'
 
 export type ParsedSelectionSet = {
   enums: string[]
@@ -26,9 +35,9 @@ export type ParsedSelectionSet = {
 export type ParsedSelection = Record<string, ParsedSelectionType>
 
 export type ParsedSelectionType =
-  | { list: false; name: string; nullable: boolean }
-  | { list: false; fields: ParsedSelection; nullable: boolean }
-  | { list: true; inner: ParsedSelectionType; nullable: boolean }
+  | ParsedScalarType
+  | ParsedListType<ParsedSelectionType>
+  | ParsedObjectType<ParsedSelection>
 
 // GraphQL types that can be selected further into.
 type GraphQLSelectionSchema = GraphQLObjectType | GraphQLInterfaceType
@@ -71,7 +80,7 @@ class SelectionSetParser {
     schema: GraphQLSelectionSchema
   ): ParsedSelection {
     return mergeObjects(
-      selections.map((node) => {
+      selections.map((node: SelectionNode) => {
         switch (node.kind) {
           case 'Field':
             return this.parseFieldNode(node, schema)
@@ -80,8 +89,6 @@ class SelectionSetParser {
           case 'InlineFragment':
             return this.parseInlineFragmentNode(node, schema)
         }
-
-        throw new Error(`Invalid SelectionSetNode: ${node}`)
       })
     )
   }
@@ -128,52 +135,42 @@ class SelectionSetParser {
   parseSelectionType(
     node: FieldNode,
     type: GraphQLOutputType,
-    schema: GraphQLSelectionSchema
+    schema: GraphQLSelectionSchema,
+    nullable = true
   ): ParsedSelectionType {
     if (isNonNullType(type)) {
-      return {
-        ...this.parseSelectionType(node, type.ofType, schema),
-        nullable: false,
-      }
+      return this.parseSelectionType(node, type.ofType, schema, false)
     }
 
     if (isListType(type)) {
-      return {
-        list: true,
-        inner: this.parseSelectionType(node, type.ofType, schema),
-        nullable: true,
-      }
+      return graphqlList(
+        this.parseSelectionType(node, type.ofType, schema),
+        nullable
+      )
     }
 
     if (isLeafType(type)) {
       if (isEnumType(type)) {
         this._enums.push(type.name)
       }
-      return {
-        list: false,
-        name: type.name,
-        nullable: true,
-      }
+      return graphqlScalar(type.name, nullable)
     }
 
-    if (isCompositeType(type)) {
-      if (!node.selectionSet) {
-        throw new Error(
-          `Field "${node.name}" of type "${schema.name}" must have a selection of subfields. Did you mean "${node.name} { ... }"?`
-        )
-      }
+    assertCompositeType(type)
 
-      if (isUnionType(type)) {
-        throw new Error('TODO: union type')
-      }
-
-      return {
-        list: false,
-        fields: this.parseSelectionSetNode(node.selectionSet, type),
-        nullable: true,
-      }
+    if (!node.selectionSet) {
+      throw new Error(
+        `Field "${node.name.value}" of type "${schema.name}" must have a selection of subfields. Did you mean "${node.name.value} { ... }"?`
+      )
     }
 
-    throw new Error(`Unknown GraphQLOutputType: ${type}`)
+    if (isUnionType(type)) {
+      throw new Error('TODO: union type')
+    }
+
+    return graphqlObject(
+      this.parseSelectionSetNode(node.selectionSet, type),
+      nullable
+    )
   }
 }

@@ -1,5 +1,12 @@
 import { Kind, TypeNode, VariableDefinitionNode } from 'graphql'
 
+import {
+  graphqlList,
+  graphqlScalar,
+  ParsedListType,
+  ParsedScalarType,
+} from './graphqlTypes'
+
 export type ParsedVariableDefinitions = {
   // The name of the argument
   name: string
@@ -15,28 +22,15 @@ export const parseVariableDefinitions = (
     type: parseType(type),
   }))
 
-export type ParsedType =
-  | { list: false; name: string; nullable: boolean }
-  | { list: true; inner: ParsedType; nullable: boolean }
+export type ParsedType = ParsedScalarType | ParsedListType<ParsedType>
 
-const parseType = (type: TypeNode): ParsedType => {
+const parseType = (type: TypeNode, nullable = true): ParsedType => {
   switch (type.kind) {
     case Kind.NAMED_TYPE:
-      return {
-        list: false,
-        name: type.name.value,
-        nullable: true,
-      }
+      return graphqlScalar(type.name.value, nullable)
     case Kind.LIST_TYPE:
-      return {
-        list: true,
-        inner: parseType(type.type),
-        nullable: true,
-      }
+      return graphqlList(parseType(type.type), nullable)
     case Kind.NON_NULL_TYPE:
-      return {
-        ...parseType(type.type),
-        nullable: false,
-      }
+      return parseType(type.type, false)
   }
 }
