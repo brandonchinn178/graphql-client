@@ -54,11 +54,6 @@ jobs:
             cat "${STACK_FILES[@]}" > stack-cache-key.txt
             curl -sSL https://get.haskellstack.org/ | sed -n 's/^STACK_VERSION="\(.*\)"/\1/p' >> stack-cache-key.txt
 
-            YARN_FILES=(
-              yarn.lock
-            )
-            cat "${YARN_FILES[@]}" > yarn-cache-key.txt
-
       # install stack and dependencies
       - run:
           name: Install stack
@@ -89,23 +84,6 @@ jobs:
           paths:
             - ~/.stack
             - .stack-work
-
-      # install yarn and dependencies
-      - run:
-          name: Install yarn
-          command: |
-            curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
-            curl --silent --location https://rpm.nodesource.com/setup_12.x | bash -
-            yum install -y yarn
-      - restore_cache:
-          key: *yarn_cache_key
-      - run:
-          name: Install yarn dependencies
-          command: yarn --frozen-lockfile
-      - save_cache:
-          key: *yarn_cache_key
-          paths:
-            - node_modules
 
       # build
       - run:
@@ -144,10 +122,57 @@ jobs:
                 command: |
                   set +e
                   STATUS=0
-                  scripts/eslint.sh || STATUS=1
                   scripts/hlint.sh || STATUS=1
                   scripts/stylish-haskell.sh || STATUS=1
                   exit "${STATUS}"
+
+      # test
+      - run:
+          name: Test Haskell package
+          command: stack test
+      - run:
+          name: Run example
+          command: stack exec graphql-client-example
+
+  test_node:
+    executor: centos7
+    steps:
+      # init
+      - checkout
+      - run:
+          name: Build cache keys
+          command: |
+            YARN_FILES=(
+              yarn.lock
+            )
+            cat "${YARN_FILES[@]}" > yarn-cache-key.txt
+
+      # install yarn and dependencies
+      - run:
+          name: Install yarn
+          command: |
+            curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
+            curl --silent --location https://rpm.nodesource.com/setup_12.x | bash -
+            yum install -y yarn
+      - restore_cache:
+          key: *yarn_cache_key
+      - run:
+          name: Install yarn dependencies
+          command: yarn --frozen-lockfile
+      - save_cache:
+          key: *yarn_cache_key
+          paths:
+            - node_modules
+
+      # build
+      - run:
+          name: Build
+          command: yarn graphql build
+
+      # lint
+      - run:
+          name: Lint
+          command: scripts/eslint.sh
 
       # test
       - run:
@@ -157,20 +182,15 @@ jobs:
             yarn example codegen
             git --no-pager diff --exit-code example/src/Example/GraphQL/API.hs
       - run:
-          name: Test Haskell package
-          command: stack test
-      - run:
           name: Test Node package
           command: yarn graphql test --coverage --runInBand
-      - run:
-          name: Run example
-          command: stack exec graphql-client-example
 
 workflows:
   version: 2
 
   build_and_test:
     jobs:
+      - test_node
       - run_build_and_test:
           name: test_latest
           latest: true
