@@ -107,19 +107,7 @@ jobs:
           paths:
             - node_modules
 
-      # lint, build, and test
-      - when:
-          condition: << parameters.latest >>
-          steps:
-            - run:
-                name: Lint
-                command: |
-                  set +e
-                  STATUS=0
-                  scripts/eslint.sh || STATUS=1
-                  scripts/hlint.sh || STATUS=1
-                  scripts/stylish-haskell.sh || STATUS=1
-                  exit "${STATUS}"
+      # build
       - run:
           name: Build
           command: |
@@ -146,6 +134,22 @@ jobs:
           steps:
             - store_artifacts:
                 path: .ci/
+
+      # lint
+      - when:
+          condition: << parameters.latest >>
+          steps:
+            - run:
+                name: Lint
+                command: |
+                  set +e
+                  STATUS=0
+                  scripts/eslint.sh || STATUS=1
+                  scripts/hlint.sh || STATUS=1
+                  scripts/stylish-haskell.sh || STATUS=1
+                  exit "${STATUS}"
+
+      # test
       - run:
           name: Ensure that example API is up to date
           command: |
@@ -155,7 +159,6 @@ jobs:
       - run:
           name: Test
           command: stack test
-
       - run:
           name: Run example
           command: stack exec graphql-client-example
