@@ -79,9 +79,8 @@ jobs:
 
             stack build "${STACK_ARGS[@]}"
 
-            # build hlint/stylish-haskell for cache
             if [[ -n "${CI_LATEST}" ]]; then
-                stack build hlint stylish-haskell
+                stack build hlint stylish-haskell hpc-lcov
             fi
       - save_cache:
           key: *stack_cache_key
@@ -133,7 +132,15 @@ jobs:
       # test
       - run:
           name: Test Haskell package
-          command: stack test
+          command: stack test --coverage
+      - when:
+          condition: << parameters.latest >>
+          steps:
+            - run:
+                name: Convert coverage output
+                command: stack exec hpc-lcov
+            - codecov/upload:
+                file: lcov.info
       - run:
           name: Run example
           command: stack exec graphql-client-example
