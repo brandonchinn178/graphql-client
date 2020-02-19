@@ -145,6 +145,14 @@ jobs:
       - run:
           name: Run example
           command: stack exec graphql-client-example
+      - when:
+          condition: << parameters.latest >>
+          steps:
+            - run:
+                name: Convert coverage output
+                command: stack exec -- hpc-lcov --file graphql-client-example.tix --main-package graphql-client-example -o lcov-example.info
+            - codecov/upload:
+                file: lcov-example.info
 
   test_node:
     executor: centos7
