@@ -88,7 +88,7 @@ jobs:
             - ~/.stack
             - .stack-work
 
-      # build
+      # build graphql-client
       - run:
           name: Build
           command: |
@@ -101,10 +101,6 @@ jobs:
             fi
 
             stack build "${STACK_ARGS[@]}" --ghc-options -Werror graphql-client
-
-            # don't error on warnings in the example, because we want the source code to
-            # be clean and easy to read
-            stack build "${STACK_ARGS[@]}" graphql-client-example
 
             if [[ -n "${CI_LATEST}" ]]; then
               mkdir -p .ci/
@@ -132,7 +128,7 @@ jobs:
       # test
       - run:
           name: Test Haskell package
-          command: stack test --coverage
+          command: stack test --coverage graphql-client
       - when:
           condition: << parameters.latest >>
           steps:
@@ -141,6 +137,11 @@ jobs:
                 command: stack exec hpc-lcov
             - codecov/upload:
                 file: lcov.info
+
+      # build graphql-client-example
+      - run:
+          name: Build and test graphql-client-example
+          command: stack test --coverage graphql-client-example
       - run:
           name: Run example
           command: stack exec graphql-client-example
