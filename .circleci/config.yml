@@ -97,7 +97,7 @@ jobs:
                 --no-run-tests
             )
             if [[ -n "${CI_LATEST}" ]]; then
-                STACK_ARGS+=(--haddock)
+                STACK_ARGS+=(--haddock --coverage)
             fi
 
             stack build "${STACK_ARGS[@]}" --ghc-options -Werror graphql-client
@@ -128,7 +128,12 @@ jobs:
       # test
       - run:
           name: Test Haskell package
-          command: stack test --coverage graphql-client
+          command: |
+            STACK_ARGS=(--test)
+            if [[ -n "${CI_LATEST}" ]]; then
+              STACK_ARGS+=(--haddock --coverage)
+            fi
+            stack build "${STACK_ARGS[@]}" graphql-client
       - when:
           condition: << parameters.latest >>
           steps:
