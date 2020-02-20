@@ -80,7 +80,8 @@ jobs:
             stack build "${STACK_ARGS[@]}"
 
             if [[ -n "${CI_LATEST}" ]]; then
-                stack build hlint stylish-haskell hpc-lcov
+                stack build hlint stylish-haskell
+                stack install hpc-lcov --local-bin-path /usr/local/bin
             fi
       - save_cache:
           key: *stack_cache_key
@@ -139,7 +140,7 @@ jobs:
           steps:
             - run:
                 name: Convert coverage output
-                command: stack exec hpc-lcov
+                command: hpc-lcov
             - codecov/upload:
                 file: lcov.info
 
@@ -155,7 +156,7 @@ jobs:
           steps:
             - run:
                 name: Convert coverage output
-                command: stack exec -- hpc-lcov --file graphql-client-example.tix --main-package graphql-client-example -o lcov-example.info
+                command: hpc-lcov --file graphql-client-example.tix --main-package graphql-client-example -o lcov-example.info
             - codecov/upload:
                 file: lcov-example.info
 
