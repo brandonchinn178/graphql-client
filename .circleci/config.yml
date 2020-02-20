@@ -150,21 +150,40 @@ jobs:
             - store_artifacts:
                 path: .ci/
 
-      # build graphql-client-example
-      - run:
-          name: Build and test graphql-client-example
-          command: stack test --coverage graphql-client-example
-      - run:
-          name: Run example
-          command: stack exec graphql-client-example
+      # build and test graphql-client-example
       - when:
           condition: << parameters.latest >>
           steps:
             - run:
+                name: Build graphql-client-example
+                command: stack build --coverage graphql-client-example
+            - run:
+                name: Run example
+                command: stack exec graphql-client-example
+            - run:
                 name: Convert coverage output
-                command: hpc-lcov --file graphql-client-example.tix --main-package graphql-client-example -o lcov-example.info
+                command: hpc-lcov --file graphql-client-example.tix --main-package graphql-client-example -o lcov-example-exe.info
             - codecov/upload:
-                file: lcov-example.info
+                file: lcov-example-exe.info
+            - run:
+                name: Test graphql-client-example
+                command: |
+                  stack clean graphql-client-example
+                  stack test --coverage graphql-client-example
+            - run:
+                name: Convert coverage output
+                command: hpc-lcov -o lcov-example-test.info
+            - codecov/upload:
+                file: lcov-example-test.info
+      - unless:
+          condition: << parameters.latest >>
+          steps:
+            - run:
+                name: Test graphql-client-example
+                command: stack test graphql-client-example
+            - run:
+                name: Run example
+                command: stack exec graphql-client-example
 
   test_node:
     executor: centos7
