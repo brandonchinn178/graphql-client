@@ -80,7 +80,8 @@ jobs:
             stack build "${STACK_ARGS[@]}"
 
             if [[ -n "${CI_LATEST}" ]]; then
-                stack build hlint stylish-haskell hpc-lcov
+                stack build hlint stylish-haskell
+                stack install hpc-lcov --local-bin-path /usr/local/bin
             fi
       - save_cache:
           key: *stack_cache_key
@@ -88,7 +89,7 @@ jobs:
             - ~/.stack
             - .stack-work
 
-      # build
+      # build graphql-client
       - run:
           name: Build
           command: |
@@ -97,24 +98,10 @@ jobs:
                 --no-run-tests
             )
             if [[ -n "${CI_LATEST}" ]]; then
-                STACK_ARGS+=(--haddock)
+                STACK_ARGS+=(--coverage)
             fi
 
             stack build "${STACK_ARGS[@]}" --ghc-options -Werror graphql-client
-
-            # don't error on warnings in the example, because we want the source code to
-            # be clean and easy to read
-            stack build "${STACK_ARGS[@]}" graphql-client-example
-
-            if [[ -n "${CI_LATEST}" ]]; then
-              mkdir -p .ci/
-              tar czf .ci/haddock-docs.tar.gz -C "$(find graphql-client/.stack-work/dist -regex '.*/doc/html/[^/]*')" .
-            fi
-      - when:
-          condition: << parameters.latest >>
-          steps:
-            - store_artifacts:
-                path: .ci/
 
       # lint
       - when:
@@ -132,18 +119,74 @@ jobs:
       # test
       - run:
           name: Test Haskell package
-          command: stack test --coverage
+          command: |
+            STACK_ARGS=(--test)
+            if [[ -n "${CI_LATEST}" ]]; then
+              STACK_ARGS+=(--coverage)
+            fi
+            stack build "${STACK_ARGS[@]}" graphql-client
       - when:
           condition: << parameters.latest >>
           steps:
             - run:
                 name: Convert coverage output
-                command: stack exec hpc-lcov
+                command: hpc-lcov
             - codecov/upload:
                 file: lcov.info
-      - run:
-          name: Run example
-          command: stack exec graphql-client-example
+
+      # build haddock
+      - when:
+          condition: << parameters.latest >>
+          steps:
+            - run:
+                name: Build haddock
+                command: |
+                  stack build --haddock graphql-client
+            - run:
+                name: Bundle haddock docs
+                command: |
+                  mkdir -p .ci/
+                  tar czf .ci/haddock-docs.tar.gz -C "$(find graphql-client/.stack-work/dist -regex '.*/doc/html/[^/]*')" .
+            - store_artifacts:
+                path: .ci/
+
+      # build and test graphql-client-example
+      - when:
+          condition: << parameters.latest >>
+          steps:
+            - run:
+                name: Remove old Main.mix file (LeapYear/hpc-lcov#12)
+                command: find graphql-client/ -name Main.mix | xargs rm -rf
+            - run:
+                name: Build graphql-client-example
+                command: stack build --coverage graphql-client-example
+            - run:
+                name: Run example
+                command: stack exec graphql-client-example
+            - run:
+                name: Convert coverage output
+                command: hpc-lcov --file graphql-client-example.tix --main-package graphql-client-example -o lcov-example-exe.info
+            - codecov/upload:
+                file: lcov-example-exe.info
+            - run:
+                name: Test graphql-client-example
+                command: |
+                  stack clean graphql-client-example
+                  stack test --coverage graphql-client-example
+            - run:
+                name: Convert coverage output
+                command: hpc-lcov -o lcov-example-test.info
+            - codecov/upload:
+                file: lcov-example-test.info
+      - unless:
+          condition: << parameters.latest >>
+          steps:
+            - run:
+                name: Test graphql-client-example
+                command: stack test graphql-client-example
+            - run:
+                name: Run example
+                command: stack exec graphql-client-example
 
   test_node:
     executor: centos7

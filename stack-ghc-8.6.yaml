@@ -6,5 +6,4 @@ packages:
 
 extra-deps:
   - aeson-schemas-1.0.3
-  - github: LeapYear/hpc-lcov
-    commit: 7473965b71ca23941a9b9b52f096bd3e865f6a1c
+  - hpc-lcov-1.0.0
