@@ -98,20 +98,10 @@ jobs:
                 --no-run-tests
             )
             if [[ -n "${CI_LATEST}" ]]; then
-                STACK_ARGS+=(--haddock --coverage)
+                STACK_ARGS+=(--coverage)
             fi
 
             stack build "${STACK_ARGS[@]}" --ghc-options -Werror graphql-client
-
-            if [[ -n "${CI_LATEST}" ]]; then
-              mkdir -p .ci/
-              tar czf .ci/haddock-docs.tar.gz -C "$(find graphql-client/.stack-work/dist -regex '.*/doc/html/[^/]*')" .
-            fi
-      - when:
-          condition: << parameters.latest >>
-          steps:
-            - store_artifacts:
-                path: .ci/
 
       # lint
       - when:
@@ -132,7 +122,7 @@ jobs:
           command: |
             STACK_ARGS=(--test)
             if [[ -n "${CI_LATEST}" ]]; then
-              STACK_ARGS+=(--haddock --coverage)
+              STACK_ARGS+=(--coverage)
             fi
             stack build "${STACK_ARGS[@]}" graphql-client
       - when:
@@ -143,6 +133,22 @@ jobs:
                 command: hpc-lcov
             - codecov/upload:
                 file: lcov.info
+
+      # build haddock
+      - when:
+          condition: << parameters.latest >>
+          steps:
+            - run:
+                name: Build haddock
+                command: |
+                  stack build --haddock graphql-client
+            - run:
+                name: Bundle haddock docs
+                command: |
+                  mkdir -p .ci/
+                  tar czf .ci/haddock-docs.tar.gz -C "$(find graphql-client/.stack-work/dist -regex '.*/doc/html/[^/]*')" .
+            - store_artifacts:
+                path: .ci/
 
       # build graphql-client-example
       - run:
