@@ -155,6 +155,9 @@ jobs:
           condition: << parameters.latest >>
           steps:
             - run:
+                name: Remove old Main.mix file (LeapYear/hpc-lcov#12)
+                command: find graphql-client/ -name Main.mix | xargs rm -rf
+            - run:
                 name: Build graphql-client-example
                 command: stack build --coverage graphql-client-example
             - run:
