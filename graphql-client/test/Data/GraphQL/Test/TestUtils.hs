@@ -10,7 +10,7 @@ import Data.Aeson (object, (.=))
 import Data.Aeson.Schema (get)
 import Data.Either (isLeft)
 import Test.Tasty (TestTree, testGroup)
-import Test.Tasty.HUnit (testCase, (@?), (@?=))
+import Test.Tasty.HUnit (assertFailure, testCase, (@?), (@?=))
 
 import Data.GraphQL.Monad (runQuery)
 import Data.GraphQL.Test.TestQuery (TestArgs(..), testQuery)
@@ -29,7 +29,9 @@ testTestUtils = testGroup "TestUtils"
       [get| obj.getUser.id |] @?= 20
   , testCase "MockQueryT errors with no matching mock" $ do
       obj <- try @SomeException $ runMockQueryT runTestQuery []
-      isLeft obj @? "MockQueryT did not error"
+      case obj of
+        Right _ -> assertFailure "MockQueryT did not error"
+        Left e -> (head . lines . show) e @?= "No more mocked responses for query: test"
   , testCase "MockQueryT removes mock after use" $ do
       obj <- try @SomeException $ runMockQueryT (runTestQuery >> runTestQuery)
         [ mocked ResultMock
