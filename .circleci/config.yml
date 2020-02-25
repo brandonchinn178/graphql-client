@@ -133,6 +133,14 @@ jobs:
                 command: hpc-lcov
             - codecov/upload:
                 file: lcov.info
+            - run:
+                name: Generate hpc overlay file
+                command: scripts/make_hpc_overlay.py
+            - run:
+                name: Convert overlay file
+                command: hpc-lcov --file overlay.tix -o lcov-overlay.info
+            - codecov/upload:
+                file: lcov-overlay.info
 
       # build haddock
       - when:
