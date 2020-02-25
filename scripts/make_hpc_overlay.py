@@ -19,9 +19,15 @@ OVERLAY_CONTENTS = [
         TickFunction('query', 48, r'query = RawString\.r'),
     ]),
     Module('graphql-client', 'Data.GraphQL.Monad', [
-        # used by RecordWildCards: https://gitlab.haskell.org/ghc/ghc/issues/17834
+        # QueryState fields used by RecordWildCards: https://gitlab.haskell.org/ghc/ghc/issues/17834
         TickFunction('manager', 48, r'manager :: Manager'),
         TickFunction('baseReq', 49, r'baseReq :: Request'),
+        # Instance for MonadUnliftIO for transformer stacks built on top of QueryT
+        TickFunction('askUnliftIO', 79, r'askUnliftIO = QueryT \$'),
+        # QuerySettings fields used by RecordWildCards: https://gitlab.haskell.org/ghc/ghc/issues/17834
+        TickFunction('managerSettings', 115, r'managerSettings :: ManagerSettings'),
+        TickFunction('url', 117, r'url\s+:: String'),
+        TickFunction('modifyReq', 118, r'modifyReq\s+:: Request -> Request'),
     ]),
     Module('graphql-client', 'Data.GraphQL.Monad.Class', [
         # MonadQuery instances for standard monad transformers
