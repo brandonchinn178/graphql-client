@@ -49,11 +49,14 @@ An example usage of the API:
 ```haskell
 import Control.Monad.IO.Class (MonadIO(..))
 import Data.GraphQL (defaultQuerySettings, get, runQueryT)
+import qualified Data.Text as Text
 
 import Example.GraphQL.API
 
 app :: (MonadQuery m, MonadIO m) => m ()
 app = do
+  song <- Text.pack <$> getLine
+
   result <- runGetRecordingsQuery GetRecordingsArgs
     { _query = song
     , _first = Just 5
