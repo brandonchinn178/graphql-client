@@ -36,6 +36,16 @@ describe('templateOverList', () => {
     `)
   })
 
+  it('interpolates with a different delimiter', () => {
+    const result = templateOverList('* {{.}}', ['a', 'b', 'c'], '|')
+    expect(result).toMatchInlineSnapshot(`
+      "* a
+      | b
+      | c
+      "
+    `)
+  })
+
   it('interpolates object keys', () => {
     const result = templateOverList('[ {{foo}} ~ {{bar}}', [
       { foo: 'a', bar: 1 },

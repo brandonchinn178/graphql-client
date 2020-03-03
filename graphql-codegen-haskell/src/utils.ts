@@ -10,7 +10,11 @@
  * , b ~ 2
  * ]
  */
-export const templateOverList = <T>(text: string, list: Array<T>) => {
+export const templateOverList = <T>(
+  text: string,
+  list: Array<T>,
+  sep = ','
+) => {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const render = (template: string, elem: any): string =>
     template
@@ -18,7 +22,7 @@ export const templateOverList = <T>(text: string, list: Array<T>) => {
       .replace(/{{(.*?)}}/g, (_, name) => elem[name])
 
   const templateFirst = removeEmptyLines(text)
-  const templateRest = templateFirst.replace(/[^\s]/, ',')
+  const templateRest = templateFirst.replace(/[^\s]/, sep)
 
   if (list.length === 0) {
     return templateFirst.replace(/(\s*[^\s]).*/, '$1') + '\n'
