@@ -18,40 +18,32 @@ describe('mergeObjects', () => {
 })
 
 describe('templateOverList', () => {
-  it('requires a two-line template', () => {
-    expect(() => templateOverList('[ {{foo}}', [])).toThrow()
-    expect(() => templateOverList('[ {{foo}}\n]\n!\n', [])).toThrow()
-  })
-
   it('renders no list', () => {
-    const result = templateOverList('[ {{.}}\n]', [])
+    const result = templateOverList('[ {{.}}', [])
     expect(result).toMatchInlineSnapshot(`
       "[
-      ]
       "
     `)
   })
 
   it('interpolates elements directly', () => {
-    const result = templateOverList('[ {{.}}\n]', ['a', 'b', 'c'])
+    const result = templateOverList('[ {{.}}', ['a', 'b', 'c'])
     expect(result).toMatchInlineSnapshot(`
       "[ a
       , b
       , c
-      ]
       "
     `)
   })
 
   it('interpolates object keys', () => {
-    const result = templateOverList('[ {{foo}} ~ {{bar}}\n]', [
+    const result = templateOverList('[ {{foo}} ~ {{bar}}', [
       { foo: 'a', bar: 1 },
       { foo: 'b', bar: 2 },
     ])
     expect(result).toMatchInlineSnapshot(`
       "[ a ~ 1
       , b ~ 2
-      ]
       "
     `)
   })

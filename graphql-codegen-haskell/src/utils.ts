@@ -11,23 +11,17 @@
  * ]
  */
 export const templateOverList = <T>(text: string, list: Array<T>) => {
-  const templateLines = text.split('\n').filter((s) => s.trim() !== '')
-  if (templateLines.length !== 2) {
-    throw new Error('templateOverList requires a two-line template')
-  }
-
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const render = (template: string, elem: any): string =>
     template
       .replace(/{{\.}}/g, (_) => elem)
       .replace(/{{(.*?)}}/g, (_, name) => elem[name])
 
-  const templateFirst = templateLines[0]
+  const templateFirst = removeEmptyLines(text)
   const templateRest = templateFirst.replace(/[^\s]/, ',')
-  const suffix = templateLines[1]
 
   if (list.length === 0) {
-    return templateFirst.replace(/(\s*[^\s]).*/, '$1') + '\n' + suffix + '\n'
+    return templateFirst.replace(/(\s*[^\s]).*/, '$1') + '\n'
   }
 
   const listFirst = list[0]
@@ -35,8 +29,7 @@ export const templateOverList = <T>(text: string, list: Array<T>) => {
 
   const lines = ([] as string[]).concat(
     render(templateFirst, listFirst),
-    listRest.map((elem) => render(templateRest, elem)),
-    suffix
+    listRest.map((elem) => render(templateRest, elem))
   )
 
   return lines.map((s) => s + '\n').join('')
@@ -47,3 +40,12 @@ export const templateOverList = <T>(text: string, list: Array<T>) => {
  */
 export const mergeObjects = <T extends object>(objects: T[]): T =>
   objects.reduce((acc, obj) => ({ ...acc, ...obj }), {} as T)
+
+/**
+ * Remove empty lines in the given string.
+ */
+const removeEmptyLines = (s: string) =>
+  s
+    .split('\n')
+    .filter((s) => !s.match(/^\s*$/))
+    .join('\n')

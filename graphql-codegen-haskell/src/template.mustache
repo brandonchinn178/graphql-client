@@ -24,8 +24,8 @@ import {{scalarsModule}}
 mkEnum "{{name}}"
   {{#overValues}}
   [ "{{.}}"
-  ]
   {{/overValues}}
+  ]
 {{/enums}}
 
 {{#operations}}
@@ -36,15 +36,15 @@ mkEnum "{{name}}"
 result <- {{queryFunction}} {{argsType}}
   {{#overArgs}}
   { _{{arg}} = ...
-  }
   {{/overArgs}}
+  }
 
 -- result :: GraphQLResult (Object {{schemaType}})
 result <- {{queryFunction}}Safe {{argsType}}
   {{#overArgs}}
   { _{{arg}} = ...
-  }
   {{/overArgs}}
+  }
 -----------------------------------------------------------------------------}
 
 type {{queryType}} = Query {{argsType}} {{schemaType}}
@@ -52,8 +52,8 @@ type {{queryType}} = Query {{argsType}} {{schemaType}}
 data {{argsType}} = {{argsType}}
   {{#overArgs}}
   { _{{arg}} :: {{type}}
-  }
   {{/overArgs}}
+  }
   deriving (Show)
 
 type {{schemaType}} = [schema|
@@ -64,8 +64,8 @@ instance GraphQLArgs {{argsType}} where
   fromArgs args = object
     {{#overArgs}}
     [ "{{arg}}" .= _{{arg}} args
-    ]
     {{/overArgs}}
+    ]
 
 {{queryName}} :: {{queryType}}
 {{queryName}} = UnsafeQuery "{{name}}" [query|
