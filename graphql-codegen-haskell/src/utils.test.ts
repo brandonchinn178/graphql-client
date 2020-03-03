@@ -46,6 +46,19 @@ describe('templateOverList', () => {
     `)
   })
 
+  it('renders multiline templates', () => {
+    const result = templateOverList('* {{.}}\n  > {{.}}!', ['a', 'b', 'c'])
+    expect(result).toMatchInlineSnapshot(`
+      "* a
+        > a!
+      , b
+        > b!
+      , c
+        > c!
+      "
+    `)
+  })
+
   it('interpolates object keys', () => {
     const result = templateOverList('[ {{foo}} ~ {{bar}}', [
       { foo: 'a', bar: 1 },
