@@ -117,6 +117,7 @@ class OperationDefinitionParser {
     }
 
     const { enums, fragments, selections } = parseSelectionSet(
+      this.schema,
       node.selectionSet,
       schemaRoot,
       this.fragments

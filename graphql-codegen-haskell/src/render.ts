@@ -61,6 +61,14 @@ export const renderAesonSchema = (selections: ParsedSelection): string => {
       return renderHaskellScalarType(selectionType.name)
     }
 
+    if ('subTypes' in selectionType) {
+      return indent(
+        selectionType.subTypes
+          .map((selection) => renderAesonSchema(selection))
+          .join(' | ')
+      )
+    }
+
     return indent(renderAesonSchema(selectionType.fields))
   }
 

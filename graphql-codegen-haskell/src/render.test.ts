@@ -2,8 +2,10 @@ import {
   graphqlList,
   graphqlObject,
   graphqlScalar,
+  graphqlUnion,
   NULLABLE,
 } from './parse/graphqlTypes'
+import { ParsedSelection } from './parse/selectionSet'
 import { renderAesonSchema, renderHaskellType } from './render'
 
 describe('render types for query arguments', () => {
@@ -58,6 +60,16 @@ it('renders a schema as appropriate for aeson-schemas', () => {
       nullInt: graphqlScalar('Int', NULLABLE),
     }),
 
+    // unions
+    union: graphqlUnion<ParsedSelection>([
+      {
+        id: graphqlScalar('ID'),
+        name: graphqlScalar('String'),
+      },
+      { a: graphqlScalar('Int') },
+      { list: graphqlList(graphqlScalar('Bool'), NULLABLE) },
+    ]),
+
     // nullable
     nullInt: graphqlScalar('Int', NULLABLE),
     nullCustom: graphqlScalar('FooScalar', NULLABLE),
@@ -107,6 +119,14 @@ it('renders a schema as appropriate for aeson-schemas', () => {
       object: {
         id: Text,
         nullInt: Maybe Int,
+      },
+      union: {
+        id: Text,
+        name: Text,
+      } | {
+        a: Int,
+      } | {
+        list: Maybe List Bool,
       },
       nullInt: Maybe Int,
       nullCustom: Maybe FooScalar,

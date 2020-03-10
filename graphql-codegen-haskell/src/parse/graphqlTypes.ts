@@ -15,6 +15,10 @@ export interface ParsedObjectType<T> extends BaseParsedType<false> {
   fields: T
 }
 
+export interface ParsedUnionType<T> extends BaseParsedType<false> {
+  subTypes: T[]
+}
+
 /** Helpers **/
 
 export const NULLABLE = true
@@ -44,4 +48,10 @@ export const graphqlObject = <T>(
   list: false,
   fields,
   nullable,
+})
+
+export const graphqlUnion = <T>(subTypes: T[]): ParsedUnionType<T> => ({
+  list: false,
+  subTypes,
+  nullable: false,
 })

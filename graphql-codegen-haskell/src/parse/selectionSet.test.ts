@@ -1,7 +1,7 @@
 import {
   buildASTSchema,
   DocumentNode,
-  GraphQLObjectType,
+  GraphQLSchema,
   Kind,
   OperationDefinitionNode,
 } from 'graphql'
@@ -12,12 +12,13 @@ import {
   graphqlList,
   graphqlObject,
   graphqlScalar,
+  graphqlUnion,
   NULLABLE,
 } from './graphqlTypes'
 import { ParsedSelectionSet, parseSelectionSet } from './selectionSet'
 
 it('parses a simple selection set', () => {
-  const schema = buildSchema(
+  const schema = buildASTSchema(
     gql`
       type Query {
         id: ID!
@@ -69,7 +70,7 @@ it('parses a simple selection set', () => {
 })
 
 it('parses fields with aliases', () => {
-  const schema = buildSchema(
+  const schema = buildASTSchema(
     gql`
       type Query {
         foo: Int!
@@ -94,7 +95,7 @@ it('parses fields with aliases', () => {
 })
 
 it('parses lists', () => {
-  const schema = buildSchema(
+  const schema = buildASTSchema(
     gql`
       type Query {
         list: [Int!]!
@@ -128,7 +129,7 @@ it('parses lists', () => {
 })
 
 it('parses objects', () => {
-  const schema = buildSchema(
+  const schema = buildASTSchema(
     gql`
       type Foo {
         id: ID!
@@ -168,7 +169,7 @@ it('parses objects', () => {
 })
 
 it('parses fragment spreads', () => {
-  const schema = buildSchema(
+  const schema = buildASTSchema(
     gql`
       type Foo {
         id: ID!
@@ -204,8 +205,183 @@ it('parses fragment spreads', () => {
   })
 })
 
+it('parses fragment spreads for interfaces', () => {
+  const schema = buildASTSchema(
+    gql`
+      interface Named {
+        name: String!
+      }
+
+      type Dog implements Named {
+        name: String!
+        color: String
+      }
+
+      type Human implements Named {
+        name: String!
+        age: Int!
+      }
+
+      type Cat implements Named {
+        name: String!
+        speed: Int
+      }
+
+      type Query {
+        named: Named!
+      }
+    `
+  )
+
+  const selectionSet = parseSelectionSetAST(
+    schema,
+    gql`
+      query {
+        named {
+          name
+          ...human
+          ...fullDog
+        }
+      }
+
+      fragment human on Human {
+        age
+      }
+
+      fragment fullDog on Dog {
+        name
+        color
+      }
+    `
+  )
+
+  expect(selectionSet).toMatchObject({
+    selections: {
+      named: graphqlObject({
+        name: graphqlScalar('String'),
+        __subTypes: graphqlUnion([
+          {
+            age: graphqlScalar('Int'),
+          },
+          {
+            name: graphqlScalar('String'),
+            color: graphqlScalar('String', NULLABLE),
+          },
+        ]),
+      }),
+    },
+  })
+})
+
+it('allows __subTypes field', () => {
+  const schema = buildASTSchema(
+    gql`
+      type Foo {
+        __subTypes: Int!
+      }
+
+      type Query {
+        foo: Foo!
+      }
+    `
+  )
+
+  const selectionSet = parseSelectionSetAST(
+    schema,
+    gql`
+      query {
+        foo {
+          __subTypes
+        }
+      }
+    `
+  )
+
+  expect(selectionSet).toMatchObject({
+    selections: {
+      foo: graphqlObject({
+        __subTypes: graphqlScalar('Int'),
+      }),
+    },
+  })
+})
+
+it('allows __subTypes field when using a non-abstract fragment', () => {
+  const schema = buildASTSchema(
+    gql`
+      type Foo {
+        __subTypes: Int!
+      }
+
+      type Query {
+        foo: Foo!
+      }
+    `
+  )
+
+  const selectionSet = parseSelectionSetAST(
+    schema,
+    gql`
+      query {
+        foo {
+          ...foo
+        }
+      }
+
+      fragment foo on Foo {
+        __subTypes
+      }
+    `
+  )
+
+  expect(selectionSet).toMatchObject({
+    selections: {
+      foo: graphqlObject({
+        __subTypes: graphqlScalar('Int'),
+      }),
+    },
+  })
+})
+
+it('disallows __subTypes field when using an abstract fragment', () => {
+  const schema = buildASTSchema(
+    gql`
+      interface Foo {
+        __subTypes: [String]
+      }
+
+      type Bar implements Foo {
+        __subTypes: [String]
+        x: Int!
+      }
+
+      type Query {
+        foo: Foo!
+      }
+    `
+  )
+
+  expect(() => {
+    parseSelectionSetAST(
+      schema,
+      gql`
+        query {
+          foo {
+            __subTypes
+            ...bar
+          }
+        }
+
+        fragment bar on Bar {
+          x
+        }
+      `
+    )
+  }).toThrow()
+})
+
 it('parses inline fragments', () => {
-  const schema = buildSchema(
+  const schema = buildASTSchema(
     gql`
       interface FooLike {
         foo: Int!
@@ -241,7 +417,7 @@ it('parses inline fragments', () => {
 })
 
 it('parses unions', () => {
-  const schema = buildSchema(
+  const schema = buildASTSchema(
     gql`
       type Foo {
         foo: Int
@@ -279,7 +455,7 @@ it('parses unions', () => {
 })
 
 it('errors when parsing an unknown field', () => {
-  const schema = buildSchema(
+  const schema = buildASTSchema(
     gql`
       type Query {
         foo: Int!
@@ -300,7 +476,7 @@ it('errors when parsing an unknown field', () => {
 })
 
 it('errors when parsing an object without a selection', () => {
-  const schema = buildSchema(
+  const schema = buildASTSchema(
     gql`
       type Foo {
         id: ID!
@@ -328,19 +504,15 @@ it('errors when parsing an object without a selection', () => {
 
 /** Helpers **/
 
-/* Build the given schema and return the Query type */
-const buildSchema = (ast: DocumentNode): GraphQLObjectType => {
-  const queryType = buildASTSchema(ast).getQueryType()
-  if (!queryType) {
-    throw new Error('No query type found')
-  }
-  return queryType
-}
-
 const parseSelectionSetAST = (
-  schema: GraphQLObjectType,
+  schema: GraphQLSchema,
   ast: DocumentNode
 ): ParsedSelectionSet => {
+  const schemaRoot = schema.getQueryType()
+  if (!schemaRoot) {
+    throw new Error('No query type found')
+  }
+
   const operations = ast.definitions.filter(
     (node) => node.kind === Kind.OPERATION_DEFINITION
   )
@@ -353,5 +525,5 @@ const parseSelectionSetAST = (
 
   const fragments = parseFragments(ast)
 
-  return parseSelectionSet(selectionSet, schema, fragments)
+  return parseSelectionSet(schema, selectionSet, schemaRoot, fragments)
 }
