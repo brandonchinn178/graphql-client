@@ -80,6 +80,7 @@ it('validates', () => {
 it('renders', () => {
   expect(plugin(schema, documents, fullConfig)).toMatchInlineSnapshot(`
     "{-# LANGUAGE DataKinds #-}
+    {-# LANGUAGE DuplicateRecordFields #-}
     {-# LANGUAGE OverloadedStrings #-}
     {-# LANGUAGE QuasiQuotes #-}
     {-# LANGUAGE RecordWildCards #-}
