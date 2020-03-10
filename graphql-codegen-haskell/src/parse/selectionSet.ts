@@ -1,12 +1,15 @@
 import {
   assertCompositeType,
+  assertObjectType,
   FieldNode,
   FragmentSpreadNode,
   GraphQLInterfaceType,
+  GraphQLNamedType,
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLSchema,
   InlineFragmentNode,
+  isAbstractType,
   isEnumType,
   isLeafType,
   isListType,
@@ -22,9 +25,11 @@ import {
   graphqlList,
   graphqlObject,
   graphqlScalar,
+  graphqlUnion,
   ParsedListType,
   ParsedObjectType,
   ParsedScalarType,
+  ParsedUnionType,
 } from './graphqlTypes'
 
 export type ParsedSelectionSet = {
@@ -39,6 +44,12 @@ export type ParsedSelectionType =
   | ParsedScalarType
   | ParsedListType<ParsedSelectionType>
   | ParsedObjectType<ParsedSelection>
+  | ParsedUnionType<ParsedSelection>
+
+type ParsedFragmentNode = {
+  type: GraphQLNamedType
+  selection: ParsedSelection
+}
 
 // GraphQL types that can be selected further into.
 type GraphQLSelectionSchema = GraphQLObjectType | GraphQLInterfaceType
@@ -84,18 +95,44 @@ class SelectionSetParser {
     { selections }: SelectionSetNode,
     schemaRoot: GraphQLSelectionSchema
   ): ParsedSelection {
-    return mergeObjects(
+    const parsedSubTypes: ParsedSelection[] = []
+    const resolveFragmentNode = ({ type, selection }: ParsedFragmentNode) => {
+      if (
+        isAbstractType(schemaRoot) &&
+        this.schema.isPossibleType(schemaRoot, type as GraphQLObjectType)
+      ) {
+        parsedSubTypes.push(selection)
+        return {}
+      }
+
+      return selection
+    }
+
+    const selectionSet = mergeObjects(
       selections.map((node: SelectionNode) => {
         switch (node.kind) {
           case 'Field':
             return this.parseFieldNode(node, schemaRoot)
           case 'FragmentSpread':
-            return this.parseFragmentSpreadNode(node, schemaRoot)
+            return resolveFragmentNode(this.parseFragmentSpreadNode(node))
           case 'InlineFragment':
             return this.parseInlineFragmentNode(node, schemaRoot)
         }
       })
     )
+
+    if (parsedSubTypes.length > 0) {
+      if ('__subTypes' in selectionSet) {
+        throw new Error('Please rename the "__subTypes" field in query')
+      }
+
+      return {
+        ...selectionSet,
+        __subTypes: graphqlUnion(parsedSubTypes),
+      }
+    } else {
+      return selectionSet
+    }
   }
 
   parseFieldNode(
@@ -116,15 +153,18 @@ class SelectionSetParser {
     }
   }
 
-  parseFragmentSpreadNode(
-    node: FragmentSpreadNode,
-    schemaRoot: GraphQLSelectionSchema
-  ): ParsedSelection {
+  parseFragmentSpreadNode(node: FragmentSpreadNode): ParsedFragmentNode {
     const fragmentName = node.name.value
     this._fragments.push(fragmentName)
 
-    const { selectionSet } = this.allFragments[fragmentName]
-    return this.parseSelectionSetNode(selectionSet, schemaRoot)
+    const { typeCondition, selectionSet } = this.allFragments[fragmentName]
+    const fragmentSchema = assertObjectType(
+      this.schema.getType(typeCondition.name.value)
+    )
+
+    const selection = this.parseSelectionSetNode(selectionSet, fragmentSchema)
+
+    return { type: fragmentSchema, selection }
   }
 
   /* eslint-disable-next-line class-methods-use-this */
