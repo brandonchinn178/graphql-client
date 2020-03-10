@@ -186,11 +186,11 @@ it('parses fragment spreads', () => {
     gql`
       query {
         foo {
-          ...foo
+          ...fooInfo
         }
       }
 
-      fragment foo on Foo {
+      fragment fooInfo on Foo {
         id
       }
     `
