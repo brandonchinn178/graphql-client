@@ -7,7 +7,6 @@ import {
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLSchema,
-  InlineFragmentNode,
   isAbstractType,
   isEnumType,
   isLeafType,
@@ -112,7 +111,7 @@ class SelectionSetParser {
               this.parseFragmentSpreadNode(node, schemaRoot)
             )
           case 'InlineFragment':
-            return this.parseInlineFragmentNode(node, schemaRoot)
+            return resolveFragmentNode(this.parseFragmentNode(node, schemaRoot))
         }
       })
     )
@@ -175,16 +174,6 @@ class SelectionSetParser {
       isAbstractType(schemaRoot) &&
       this.schema.isSubType(schemaRoot, fragmentSchema)
     return [isSubType, selection]
-  }
-
-  /* eslint-disable-next-line class-methods-use-this */
-  parseInlineFragmentNode(
-    node: InlineFragmentNode,
-    schemaRoot: GraphQLSelectionSchema
-  ): ParsedSelection {
-    /* eslint-disable-next-line no-console */
-    console.log(node, schemaRoot)
-    throw new Error('TODO')
   }
 
   parseSelectionType(

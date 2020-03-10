@@ -387,8 +387,15 @@ it('parses inline fragments', () => {
         foo: Int!
       }
 
-      type Foo implements FooLike
-      type Foo2 implements FooLike
+      type Foo implements FooLike {
+        id: ID!
+        foo: Int!
+      }
+
+      type Foo2 implements FooLike {
+        foo: Int!
+        foo2: String!
+      }
 
       type Query {
         foo: FooLike!
@@ -396,24 +403,107 @@ it('parses inline fragments', () => {
     `
   )
 
-  // TODO
-  expect(() =>
-    parseSelectionSetAST(
-      schema,
-      gql`
-        query {
-          foo {
-            ... on Foo {
-              foo1: foo
-            }
-            ... on Foo2 {
-              foo2: foo
-            }
+  const selectionSet = parseSelectionSetAST(
+    schema,
+    gql`
+      query {
+        foo {
+          ... on Foo {
+            id
+          }
+          ... on Foo2 {
+            foo2
           }
         }
-      `
-    )
-  ).toThrow()
+      }
+    `
+  )
+
+  expect(selectionSet).toMatchObject({
+    selections: {
+      foo: graphqlObject({
+        __subTypes: graphqlUnion([
+          { id: graphqlScalar('ID') },
+          { foo2: graphqlScalar('String') },
+        ]),
+      }),
+    },
+  })
+})
+
+it('parses inline fragments without type', () => {
+  const schema = buildASTSchema(
+    gql`
+      type Foo {
+        id: ID!
+      }
+
+      type Query {
+        foo: Foo!
+      }
+    `
+  )
+
+  const selectionSet = parseSelectionSetAST(
+    schema,
+    gql`
+      query {
+        foo {
+          ... {
+            id
+          }
+        }
+      }
+    `
+  )
+
+  expect(selectionSet).toMatchObject({
+    selections: {
+      foo: graphqlObject({
+        id: graphqlScalar('ID'),
+      }),
+    },
+  })
+})
+
+it('parses inline fragments for interface without type', () => {
+  const schema = buildASTSchema(
+    gql`
+      interface Named {
+        name: String!
+      }
+
+      type Foo implements Named {
+        id: ID!
+        name: String!
+      }
+
+      type Query {
+        named: Named!
+      }
+    `
+  )
+
+  const selectionSet = parseSelectionSetAST(
+    schema,
+    gql`
+      query {
+        named {
+          ... {
+            name
+          }
+        }
+      }
+    `
+  )
+
+  expect(selectionSet).toMatchObject({
+    selections: {
+      named: graphqlObject({
+        name: graphqlScalar('String'),
+      }),
+    },
+  })
 })
 
 it('parses unions', () => {
