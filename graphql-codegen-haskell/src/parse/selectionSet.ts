@@ -172,7 +172,11 @@ class SelectionSetParser {
 
     const isSubType =
       isAbstractType(schemaRoot) &&
-      this.schema.isSubType(schemaRoot, fragmentSchema)
+      // FIXME: use isSubType and remove type cast with graphql-js@15.0.0
+      this.schema.isPossibleType(
+        schemaRoot,
+        fragmentSchema as GraphQLObjectType
+      )
     return [isSubType, selection]
   }
 
