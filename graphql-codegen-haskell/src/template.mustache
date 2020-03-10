@@ -26,8 +26,8 @@ mkEnum "{{name}}"
   [ "{{.}}"
   {{/overValues}}
   ]
-{{/enums}}
 
+{{/enums}}
 {{#operations}}
 {-----------------------------------------------------------------------------
 * {{name}}
@@ -79,4 +79,5 @@ instance GraphQLArgs {{argsType}} where
 {{queryFunction}}Safe :: (MonadIO m, MonadQuery m)
   => {{argsType}} -> m (GraphQLResult (Object {{schemaType}}))
 {{queryFunction}}Safe = runQuerySafe {{queryName}}
+
 {{/operations}}

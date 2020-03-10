@@ -106,7 +106,6 @@ it('renders', () => {
       , \\"World\\"
       ]
 
-
     {-----------------------------------------------------------------------------
     * getFoo
 
@@ -153,6 +152,7 @@ it('renders', () => {
     runGetFooQuerySafe :: (MonadIO m, MonadQuery m)
       => GetFooArgs -> m (GraphQLResult (Object GetFooSchema))
     runGetFooQuerySafe = runQuerySafe getFooQuery
+
     {-----------------------------------------------------------------------------
     * getBar
 
@@ -205,6 +205,7 @@ it('renders', () => {
     runGetBarQuerySafe :: (MonadIO m, MonadQuery m)
       => GetBarArgs -> m (GraphQLResult (Object GetBarSchema))
     runGetBarQuerySafe = runQuerySafe getBarQuery
+
     {-----------------------------------------------------------------------------
     * getNamed
 
@@ -270,6 +271,7 @@ it('renders', () => {
     runGetNamedQuerySafe :: (MonadIO m, MonadQuery m)
       => GetNamedArgs -> m (GraphQLResult (Object GetNamedSchema))
     runGetNamedQuerySafe = runQuerySafe getNamedQuery
+
     "
   `)
 })

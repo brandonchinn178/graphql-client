@@ -29,7 +29,6 @@ mkEnum "ReleaseStatus"
   , "PSEUDORELEASE"
   ]
 
-
 {-----------------------------------------------------------------------------
 * getRecordings
 
@@ -128,3 +127,4 @@ runGetRecordingsQuery = runQuery getRecordingsQuery
 runGetRecordingsQuerySafe :: (MonadIO m, MonadQuery m)
   => GetRecordingsArgs -> m (GraphQLResult (Object GetRecordingsSchema))
 runGetRecordingsQuerySafe = runQuerySafe getRecordingsQuery
+
