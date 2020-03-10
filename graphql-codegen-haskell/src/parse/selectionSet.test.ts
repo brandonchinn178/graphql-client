@@ -273,6 +273,113 @@ it('parses fragment spreads for interfaces', () => {
   })
 })
 
+it('allows __subTypes field', () => {
+  const schema = buildASTSchema(
+    gql`
+      type Foo {
+        __subTypes: Int!
+      }
+
+      type Query {
+        foo: Foo!
+      }
+    `
+  )
+
+  const selectionSet = parseSelectionSetAST(
+    schema,
+    gql`
+      query {
+        foo {
+          __subTypes
+        }
+      }
+    `
+  )
+
+  expect(selectionSet).toMatchObject({
+    selections: {
+      foo: graphqlObject({
+        __subTypes: graphqlScalar('Int'),
+      }),
+    },
+  })
+})
+
+it('allows __subTypes field when using a non-abstract fragment', () => {
+  const schema = buildASTSchema(
+    gql`
+      type Foo {
+        __subTypes: Int!
+      }
+
+      type Query {
+        foo: Foo!
+      }
+    `
+  )
+
+  const selectionSet = parseSelectionSetAST(
+    schema,
+    gql`
+      query {
+        foo {
+          ...foo
+        }
+      }
+
+      fragment foo on Foo {
+        __subTypes
+      }
+    `
+  )
+
+  expect(selectionSet).toMatchObject({
+    selections: {
+      foo: graphqlObject({
+        __subTypes: graphqlScalar('Int'),
+      }),
+    },
+  })
+})
+
+it('disallows __subTypes field when using an abstract fragment', () => {
+  const schema = buildASTSchema(
+    gql`
+      interface Foo {
+        __subTypes: [String]
+      }
+
+      type Bar implements Foo {
+        __subTypes: [String]
+        x: Int!
+      }
+
+      type Query {
+        foo: Foo!
+      }
+    `
+  )
+
+  expect(() => {
+    parseSelectionSetAST(
+      schema,
+      gql`
+        query {
+          foo {
+            __subTypes
+            ...bar
+          }
+        }
+
+        fragment bar on Bar {
+          x
+        }
+      `
+    )
+  }).toThrow()
+})
+
 it('parses inline fragments', () => {
   const schema = buildASTSchema(
     gql`

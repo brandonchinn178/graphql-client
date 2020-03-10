@@ -15,14 +15,25 @@ const schema = buildASTSchema(
       World
     }
 
-    type Bar {
+    interface Named {
+      name: String!
+    }
+
+    type Bar implements Named {
       id: ID!
       foo: String
+      name: String!
+    }
+
+    type Baz implements Named {
+      id: ID!
+      name: String!
     }
 
     type Query {
       foo: MyEnum
       bar(x: Int!): Bar
+      getNamed(s: String!): Named
     }
   `
 )
@@ -40,6 +51,23 @@ const documents = [
           id
           foo
         }
+      }
+
+      query getNamed($s: String!) {
+        getNamed(s: $s) {
+          ...bar
+          ...baz
+        }
+      }
+
+      fragment bar on Bar {
+        id
+        foo
+      }
+
+      fragment baz on Baz {
+        id
+        name
       }
     `,
   },
@@ -176,6 +204,71 @@ it('renders', () => {
     runGetBarQuerySafe :: (MonadIO m, MonadQuery m)
       => GetBarArgs -> m (GraphQLResult (Object GetBarSchema))
     runGetBarQuerySafe = runQuerySafe getBarQuery
+    {-----------------------------------------------------------------------------
+    * getNamed
+
+    -- result :: Object GetNamedSchema; throws a GraphQL exception on errors
+    result <- runGetNamedQuery GetNamedArgs
+      { _s = ...
+      }
+
+    -- result :: GraphQLResult (Object GetNamedSchema)
+    result <- runGetNamedQuerySafe GetNamedArgs
+      { _s = ...
+      }
+    -----------------------------------------------------------------------------}
+
+    type GetNamedQuery = Query GetNamedArgs GetNamedSchema
+
+    data GetNamedArgs = GetNamedArgs
+      { _s :: Text
+      }
+      deriving (Show)
+
+    type GetNamedSchema = [schema|
+      {
+        getNamed: Maybe {
+          __subTypes: {
+            id: Text,
+            foo: Maybe Text,
+          } | {
+            id: Text,
+            name: Text,
+          },
+        },
+      }
+    |]
+
+    instance GraphQLArgs GetNamedArgs where
+      fromArgs args = object
+        [ \\"s\\" .= _s args
+        ]
+
+    getNamedQuery :: GetNamedQuery
+    getNamedQuery = UnsafeQuery \\"getNamed\\" [query|
+      query getNamed($s: String!) {
+        getNamed(s: $s) {
+          ...bar
+          ...baz
+        }
+      }
+      fragment bar on Bar {
+        id
+        foo
+      }
+      fragment baz on Baz {
+        id
+        name
+      }
+    |]
+
+    runGetNamedQuery :: (MonadIO m, MonadQuery m)
+      => GetNamedArgs -> m (Object GetNamedSchema)
+    runGetNamedQuery = runQuery getNamedQuery
+
+    runGetNamedQuerySafe :: (MonadIO m, MonadQuery m)
+      => GetNamedArgs -> m (GraphQLResult (Object GetNamedSchema))
+    runGetNamedQuerySafe = runQuerySafe getNamedQuery
     "
   `)
 })
