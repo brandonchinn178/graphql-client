@@ -4,7 +4,6 @@ import {
   FieldNode,
   FragmentSpreadNode,
   GraphQLInterfaceType,
-  GraphQLNamedType,
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLSchema,
@@ -15,6 +14,7 @@ import {
   isListType,
   isNonNullType,
   isUnionType,
+  NamedTypeNode,
   SelectionNode,
   SelectionSetNode,
 } from 'graphql'
@@ -45,11 +45,6 @@ export type ParsedSelectionType =
   | ParsedListType<ParsedSelectionType>
   | ParsedObjectType<ParsedSelection>
   | ParsedUnionType<ParsedSelection>
-
-type ParsedFragmentNode = {
-  type: GraphQLNamedType
-  selection: ParsedSelection
-}
 
 // GraphQL types that can be selected further into.
 type GraphQLSelectionSchema = GraphQLObjectType | GraphQLInterfaceType
@@ -96,15 +91,14 @@ class SelectionSetParser {
     schemaRoot: GraphQLSelectionSchema
   ): ParsedSelection {
     const parsedSubTypes: ParsedSelection[] = []
-    const resolveFragmentNode = ({ type, selection }: ParsedFragmentNode) => {
-      if (
-        isAbstractType(schemaRoot) &&
-        this.schema.isPossibleType(schemaRoot, type as GraphQLObjectType)
-      ) {
+    const resolveFragmentNode = ([isSubType, selection]: [
+      boolean,
+      ParsedSelection
+    ]) => {
+      if (isSubType) {
         parsedSubTypes.push(selection)
         return {}
       }
-
       return selection
     }
 
@@ -114,7 +108,9 @@ class SelectionSetParser {
           case 'Field':
             return this.parseFieldNode(node, schemaRoot)
           case 'FragmentSpread':
-            return resolveFragmentNode(this.parseFragmentSpreadNode(node))
+            return resolveFragmentNode(
+              this.parseFragmentSpreadNode(node, schemaRoot)
+            )
           case 'InlineFragment':
             return this.parseInlineFragmentNode(node, schemaRoot)
         }
@@ -153,18 +149,32 @@ class SelectionSetParser {
     }
   }
 
-  parseFragmentSpreadNode(node: FragmentSpreadNode): ParsedFragmentNode {
+  parseFragmentSpreadNode(
+    node: FragmentSpreadNode,
+    schemaRoot: GraphQLSelectionSchema
+  ): [boolean, ParsedSelection] {
     const fragmentName = node.name.value
     this._fragments.push(fragmentName)
 
-    const { typeCondition, selectionSet } = this.allFragments[fragmentName]
-    const fragmentSchema = assertObjectType(
-      this.schema.getType(typeCondition.name.value)
-    )
+    return this.parseFragmentNode(this.allFragments[fragmentName], schemaRoot)
+  }
+
+  parseFragmentNode(
+    fragment: { typeCondition?: NamedTypeNode; selectionSet: SelectionSetNode },
+    schemaRoot: GraphQLSelectionSchema
+  ): [boolean, ParsedSelection] {
+    const { typeCondition, selectionSet } = fragment
+
+    const fragmentSchema = typeCondition
+      ? assertObjectType(this.schema.getType(typeCondition.name.value))
+      : schemaRoot
 
     const selection = this.parseSelectionSetNode(selectionSet, fragmentSchema)
 
-    return { type: fragmentSchema, selection }
+    const isSubType =
+      isAbstractType(schemaRoot) &&
+      this.schema.isSubType(schemaRoot, fragmentSchema)
+    return [isSubType, selection]
   }
 
   /* eslint-disable-next-line class-methods-use-this */
