@@ -12,6 +12,7 @@ import {
   graphqlList,
   graphqlObject,
   graphqlScalar,
+  graphqlUnion,
   NULLABLE,
 } from './graphqlTypes'
 import { ParsedSelectionSet, parseSelectionSet } from './selectionSet'
@@ -199,6 +200,74 @@ it('parses fragment spreads', () => {
     selections: {
       foo: graphqlObject({
         id: graphqlScalar('ID'),
+      }),
+    },
+  })
+})
+
+it('parses fragment spreads for interfaces', () => {
+  const schema = buildASTSchema(
+    gql`
+      interface Named {
+        name: String!
+      }
+
+      type Dog implements Named {
+        name: String!
+        color: String
+      }
+
+      type Human implements Named {
+        name: String!
+        age: Int!
+      }
+
+      type Cat implements Named {
+        name: String!
+        speed: Int
+      }
+
+      type Query {
+        named: Named!
+      }
+    `
+  )
+
+  const selectionSet = parseSelectionSetAST(
+    schema,
+    gql`
+      query {
+        named {
+          name
+          ...human
+          ...fullDog
+        }
+      }
+
+      fragment human on Human {
+        age
+      }
+
+      fragment fullDog on Dog {
+        name
+        color
+      }
+    `
+  )
+
+  expect(selectionSet).toMatchObject({
+    selections: {
+      named: graphqlObject({
+        name: graphqlScalar('String'),
+        __subTypes: graphqlUnion([
+          {
+            age: graphqlScalar('Int'),
+          },
+          {
+            name: graphqlScalar('String'),
+            color: graphqlScalar('String', NULLABLE),
+          },
+        ]),
       }),
     },
   })
