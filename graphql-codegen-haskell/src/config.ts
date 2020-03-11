@@ -9,13 +9,21 @@ const CONFIG_SCHEMA = yup.object({
   scalarsModule: yup.string().required(),
 })
 
-export type PluginConfig = yup.InferType<typeof CONFIG_SCHEMA>
+export type RawPluginConfig = yup.InferType<typeof CONFIG_SCHEMA>
 
 export const validateConfig = (config: { [key: string]: unknown }) => {
   CONFIG_SCHEMA.validateSync(config)
 }
 
-export const resolveConfig = (config: PluginConfig, outputFile: string) => {
+export type PluginConfig = {
+  apiModule: string
+  scalarsModule: string
+}
+
+export const resolveConfig = (
+  config: RawPluginConfig,
+  outputFile: string
+): PluginConfig => {
   return {
     apiModule: pathToModule(outputFile),
     ...config,

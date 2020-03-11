@@ -4,12 +4,12 @@ import {
 } from '@graphql-codegen/plugin-helpers'
 import { concatAST } from 'graphql'
 
-import { PluginConfig, resolveConfig, validateConfig } from './config'
+import { RawPluginConfig, resolveConfig, validateConfig } from './config'
 import { parseFragments } from './parse/fragments'
 import { parseOperations } from './parse/operation'
 import { renderAPIModule } from './render'
 
-export const plugin: PluginFunction<PluginConfig> = (
+export const plugin: PluginFunction<RawPluginConfig> = (
   schema,
   documents,
   rawConfig,
