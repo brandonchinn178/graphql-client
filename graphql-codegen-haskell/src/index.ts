@@ -7,7 +7,7 @@ import { concatAST } from 'graphql'
 import { RawPluginConfig, resolveConfig, validateConfig } from './config'
 import { parseFragments } from './parse/fragments'
 import { parseOperations } from './parse/operation'
-import { renderAPIModule } from './render'
+import { renderAPIModule } from './render/api'
 
 export const plugin: PluginFunction<RawPluginConfig> = (
   schema,
