@@ -2,12 +2,19 @@ import { resolveConfig, validateConfig } from './config'
 
 const fullConfig = {
   hsSrcDir: 'src/',
-  scalarsModule: 'Example.GraphQL.Scalars',
+  enumsModule: 'Exammple.GraphQL.Enums',
+  scalarsModule: 'Example.GraphQL.Scalarjs',
 }
 
 describe('validateConfig', () => {
   it('validates a valid config', () => {
     expect(() => validateConfig(fullConfig)).not.toThrow()
+  })
+
+  it('requires enumsModule', () => {
+    const config = { ...fullConfig }
+    delete config.enumsModule
+    expect(() => validateConfig(config)).toThrow()
   })
 
   it('requires scalarModule', () => {

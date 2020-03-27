@@ -4,6 +4,7 @@ import gql from 'graphql-tag'
 import { plugin, validate } from './index'
 
 const fullConfig = {
+  enumsModule: 'Example.GraphQL.Enums',
   scalarsModule: 'Example.GraphQL.Scalars',
 }
 
