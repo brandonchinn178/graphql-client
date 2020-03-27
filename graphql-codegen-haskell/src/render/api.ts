@@ -6,7 +6,7 @@ import { ParsedSelection, ParsedSelectionType } from '~/parse/selectionSet'
 import { ParsedType } from '~/parse/variableDefinition'
 import { templateOverList } from '~/utils'
 
-import template from './template.mustache'
+import template from './templates/api.mustache'
 
 export const renderAPIModule = (
   config: PluginConfig,
