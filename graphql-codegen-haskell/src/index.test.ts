@@ -4,7 +4,6 @@ import gql from 'graphql-tag'
 import { plugin, validate } from './index'
 
 const fullConfig = {
-  apiModule: 'Example.GraphQL.API',
   scalarsModule: 'Example.GraphQL.Scalars',
 }
 
@@ -78,7 +77,11 @@ it('validates', () => {
 })
 
 it('renders', () => {
-  expect(plugin(schema, documents, fullConfig)).toMatchInlineSnapshot(`
+  expect(
+    plugin(schema, documents, fullConfig, {
+      outputFile: 'src/Example/GraphQL/API.hs',
+    })
+  ).toMatchInlineSnapshot(`
     "{-# LANGUAGE DataKinds #-}
     {-# LANGUAGE DuplicateRecordFields #-}
     {-# LANGUAGE OverloadedStrings #-}
@@ -275,19 +278,4 @@ it('renders', () => {
 
     "
   `)
-})
-
-it('renders without apiModule in config', () => {
-  const config = { ...fullConfig }
-  delete config.apiModule
-
-  const renderedWithOutputFile = plugin(schema, documents, config, {
-    outputFile: 'path/to/MyModule/Api.hs',
-  })
-  const renderedWithConfig = plugin(schema, documents, {
-    ...config,
-    apiModule: 'MyModule.Api',
-  })
-
-  expect(renderedWithOutputFile).toEqual(renderedWithConfig)
 })
