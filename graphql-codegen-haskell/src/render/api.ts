@@ -40,40 +40,40 @@ export const renderHaskellType = (type: ParsedType): string => {
 }
 
 export const renderAesonSchema = (selections: ParsedSelection): string => {
-  const renderSelectionType = (selectionType: ParsedSelectionType): string => {
-    if (selectionType.nullable) {
-      const type = renderSelectionType({
-        ...selectionType,
-        nullable: false,
-      })
-      return `Maybe ${type}`
-    }
-
-    if (selectionType.list) {
-      const type = renderSelectionType(selectionType.inner)
-      return `List ${type}`
-    }
-
-    if ('name' in selectionType) {
-      return renderHaskellScalarType(selectionType.name)
-    }
-
-    if ('subTypes' in selectionType) {
-      const unionSchemas = selectionType.subTypes.map((selection) =>
-        renderAesonSchema(selection)
-      )
-
-      return indent('(' + indent('\n' + unionSchemas.join(' |\n')) + '\n)')
-    }
-
-    return indent(renderAesonSchema(selectionType.fields))
-  }
-
   const fields = Object.entries(selections).map(
     ([name, selectionType]) => `${name}: ${renderSelectionType(selectionType)}`
   )
 
   return '{\n' + fields.map((field) => `  ${field},`).join('\n') + '\n}'
+}
+
+const renderSelectionType = (selectionType: ParsedSelectionType): string => {
+  if (selectionType.nullable) {
+    const type = renderSelectionType({
+      ...selectionType,
+      nullable: false,
+    })
+    return `Maybe ${type}`
+  }
+
+  if (selectionType.list) {
+    const type = renderSelectionType(selectionType.inner)
+    return `List ${type}`
+  }
+
+  if ('name' in selectionType) {
+    return renderHaskellScalarType(selectionType.name)
+  }
+
+  if ('subTypes' in selectionType) {
+    const unionSchemas = selectionType.subTypes.map((selection) =>
+      renderAesonSchema(selection)
+    )
+
+    return indent('(' + indent('\n' + unionSchemas.join(' |\n')) + '\n)')
+  }
+
+  return indent(renderAesonSchema(selectionType.fields))
 }
 
 const indent = (s: string) => s.replace(/\n/g, '\n  ')
