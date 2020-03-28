@@ -1,3 +1,11 @@
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+type Context = Record<string, any>
+
+type TemplateOptions = {
+  sep?: string
+  context?: Context
+}
+
 /**
  * A mustache function that transforms
  *
@@ -13,13 +21,18 @@
 export const templateOverList = <T>(
   text: string,
   list: Array<T>,
-  sep = ','
+  options: TemplateOptions = {}
 ) => {
+  const { sep = ',', context = {} } = options
+
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const getKey = (elem: Context, key: string): any => elem[key] ?? context[key]
+
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const render = (template: string, elem: any): string =>
     template
       .replace(/{{\.}}/g, (_) => elem)
-      .replace(/{{(.*?)}}/g, (_, name) => elem[name])
+      .replace(/{{(.*?)}}/g, (_, name) => getKey(elem, name))
 
   const templateFirst = removeEmptyLines(text)
   const templateRest = templateFirst.replace(/[^\s]/, sep)

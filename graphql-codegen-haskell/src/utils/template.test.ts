@@ -20,11 +20,25 @@ describe('templateOverList', () => {
   })
 
   it('interpolates with a different delimiter', () => {
-    const result = templateOverList('* {{.}}', ['a', 'b', 'c'], '|')
+    const result = templateOverList('* {{.}}', ['a', 'b', 'c'], { sep: '|' })
     expect(result).toMatchInlineSnapshot(`
       "* a
       | b
       | c
+      "
+    `)
+  })
+
+  it('can also get values from the context', () => {
+    const result = templateOverList(
+      '[ {{foo}} + {{bar}}',
+      [{ foo: 'a' }, { foo: 'b' }],
+      { context: { bar: 1 } }
+    )
+
+    expect(result).toMatchInlineSnapshot(`
+      "[ a + 1
+      , b + 1
       "
     `)
   })
