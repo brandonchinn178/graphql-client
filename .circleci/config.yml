@@ -33,6 +33,79 @@ executors:
 orbs:
   codecov: codecov/codecov@1.0.2
 
+  helpers:
+    commands:
+      install_stack_and_deps:
+        steps:
+          - run:
+              name: Build cache keys
+              command: |
+                STACK_FILES=(
+                  "${STACK_YAML}"
+                  graphql-client/package.yaml
+                  example/package.yaml
+                )
+                echo "${STACK_YAML}" > stack-cache-key.txt
+                cat "${STACK_FILES[@]}" >> stack-cache-key.txt
+                curl -sSL https://get.haskellstack.org/ | sed -n 's/^STACK_VERSION="\(.*\)"/\1/p' >> stack-cache-key.txt
+          - run:
+              name: Install stack
+              command: |
+                curl -sSL https://get.haskellstack.org/ | sh
+                stack --version
+          - run:
+              name: Install system dependencies
+              command: yum install -y zlib-devel
+          - restore_cache:
+              key: *stack_cache_key
+          - run:
+              name: Build external dependencies
+              command: |
+                STACK_ARGS=(--test --only-dependencies)
+                if [[ -n "${CI_LATEST}" ]]; then
+                    STACK_ARGS+=(--haddock)
+                fi
+
+                stack build "${STACK_ARGS[@]}"
+
+                if [[ -n "${CI_LATEST}" ]]; then
+                    stack build hlint stylish-haskell
+                    stack install hpc-lcov --local-bin-path /usr/local/bin
+                fi
+          - save_cache:
+              key: *stack_cache_key
+              paths:
+                - ~/.stack
+                - .stack-work
+
+      install_yarn_and_deps:
+        steps:
+          - run:
+              name: Build cache keys
+              command: |
+                YARN_FILES=(
+                  yarn.lock
+                )
+                cat "${YARN_FILES[@]}" > yarn-cache-key.txt
+          - run:
+              name: Install yarn
+              command: |
+                curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
+                curl --silent --location https://rpm.nodesource.com/setup_12.x | bash -
+                yum install -y yarn
+          - run:
+              name: Install system dependencies
+              command: yum install -y git
+          - restore_cache:
+              key: *yarn_cache_key
+          - run:
+              name: Install yarn dependencies
+              command: yarn --frozen-lockfile
+          - save_cache:
+              key: *yarn_cache_key
+              paths:
+                - node_modules
+
 jobs:
   run_build_and_test:
     parameters:
@@ -46,48 +119,7 @@ jobs:
     steps:
       # init
       - checkout
-      - run:
-          name: Build cache keys
-          command: |
-            STACK_FILES=(
-              "${STACK_YAML}"
-              graphql-client/package.yaml
-              example/package.yaml
-            )
-            echo "${STACK_YAML}" > stack-cache-key.txt
-            cat "${STACK_FILES[@]}" >> stack-cache-key.txt
-            curl -sSL https://get.haskellstack.org/ | sed -n 's/^STACK_VERSION="\(.*\)"/\1/p' >> stack-cache-key.txt
-
-      # install stack and dependencies
-      - run:
-          name: Install stack
-          command: |
-            curl -sSL https://get.haskellstack.org/ | sh
-            stack --version
-      - run:
-          name: Install system dependencies
-          command: yum install -y zlib-devel
-      - restore_cache:
-          key: *stack_cache_key
-      - run:
-          name: Build external dependencies
-          command: |
-            STACK_ARGS=(--test --only-dependencies)
-            if [[ -n "${CI_LATEST}" ]]; then
-                STACK_ARGS+=(--haddock)
-            fi
-
-            stack build "${STACK_ARGS[@]}"
-
-            if [[ -n "${CI_LATEST}" ]]; then
-                stack build hlint stylish-haskell
-                stack install hpc-lcov --local-bin-path /usr/local/bin
-            fi
-      - save_cache:
-          key: *stack_cache_key
-          paths:
-            - ~/.stack
-            - .stack-work
+      - helpers/install_stack_and_deps
 
       # build graphql-client
       - run:
@@ -196,38 +228,27 @@ jobs:
                 name: Run example
                 command: stack exec graphql-client-example
 
+  test_example_api:
+    executor: centos7
+    steps:
+      # init
+      - checkout
+      - helpers/install_stack_and_deps
+      - helpers/install_yarn_and_deps
+
+      - run:
+          name: Ensure that example API is up to date
+          command: |
+            yarn graphql build
+            yarn example codegen
+            git --no-pager diff --exit-code example/src/Example/GraphQL/API.hs
+
   test_node:
     executor: centos7
     steps:
       # init
       - checkout
-      - run:
-          name: Build cache keys
-          command: |
-            YARN_FILES=(
-              yarn.lock
-            )
-            cat "${YARN_FILES[@]}" > yarn-cache-key.txt
-
-      # install yarn and dependencies
-      - run:
-          name: Install yarn
-          command: |
-            curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
-            curl --silent --location https://rpm.nodesource.com/setup_12.x | bash -
-            yum install -y yarn
-      - run:
-          name: Install system dependencies
-          command: yum install -y git
-      - restore_cache:
-          key: *yarn_cache_key
-      - run:
-          name: Install yarn dependencies
-          command: yarn --frozen-lockfile
-      - save_cache:
-          key: *yarn_cache_key
-          paths:
-            - node_modules
+      - helpers/install_yarn_and_deps
 
       # build
       - run:
@@ -241,12 +262,6 @@ jobs:
 
       # test
       - run:
-          name: Ensure that example API is up to date
-          command: |
-            yarn graphql build
-            yarn example codegen
-            git --no-pager diff --exit-code example/src/Example/GraphQL/API.hs
-      - run:
           name: Test Node package
           command: yarn graphql test --coverage --runInBand
       - codecov/upload:
@@ -258,6 +273,7 @@ workflows:
   build_and_test:
     jobs:
       - test_node
+      - test_example_api
       - run_build_and_test:
           name: test_latest
           latest: true
