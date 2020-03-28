@@ -1,7 +1,11 @@
+import * as fs from 'fs'
 import { buildASTSchema } from 'graphql'
 import gql from 'graphql-tag'
 
 import { plugin, validate } from './index'
+
+jest.mock('fs')
+const mockWriteFileSync = fs.writeFileSync as jest.Mock
 
 const fullConfig = {
   enumsModule: 'Example.GraphQL.Enums',
@@ -78,11 +82,11 @@ it('validates', () => {
 })
 
 it('renders', () => {
-  expect(
-    plugin(schema, documents, fullConfig, {
-      outputFile: 'src/Example/GraphQL/API.hs',
-    })
-  ).toMatchInlineSnapshot(`
+  const apiModule = plugin(schema, documents, fullConfig, {
+    outputFile: 'src/Example/GraphQL/API.hs',
+  })
+
+  expect(apiModule).toMatchInlineSnapshot(`
     "{-# LANGUAGE DataKinds #-}
     {-# LANGUAGE DuplicateRecordFields #-}
     {-# LANGUAGE OverloadedStrings #-}
@@ -267,6 +271,24 @@ it('renders', () => {
       => GetNamedArgs -> m (GraphQLResult (Object GetNamedSchema))
     runGetNamedQuerySafe = runQuerySafe getNamedQuery
 
+    "
+  `)
+
+  expect(mockWriteFileSync).toHaveBeenCalledTimes(1)
+
+  const [myEnumModuleName, myEnumModule] = mockWriteFileSync.mock.calls[0]
+  expect(myEnumModuleName).toBe('src/Example/GraphQL/Enums/MyEnum.hs')
+  expect(myEnumModule).toMatchInlineSnapshot(`
+    "{-# LANGUAGE TemplateHaskell #-}
+
+    module Example.GraphQL.Enums.MyEnum where
+
+    import Data.Aeson.Schema.TH (mkEnum)
+
+    mkEnum \\"MyEnum\\"
+      [ \\"Hello\\"
+      , \\"World\\"
+      ]
     "
   `)
 })
