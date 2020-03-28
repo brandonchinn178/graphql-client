@@ -121,14 +121,18 @@ it('renders a schema as appropriate for aeson-schemas', () => {
         id: Text,
         nullInt: Maybe Int,
       },
-      union: {
-        id: Text,
-        name: Text,
-      } | {
-        a: Int,
-      } | {
-        list: Maybe List Bool,
-      },
+      union: (
+        {
+          id: Text,
+          name: Text,
+        } |
+        {
+          a: Int,
+        } |
+        {
+          list: Maybe List Bool,
+        }
+      ),
       nullInt: Maybe Int,
       nullCustom: Maybe FooScalar,
       nullList: Maybe List Text,
