@@ -1,10 +1,9 @@
 {- This file was automatically generated and should not be edited. -}
 
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# OPTIONS_GHC -fno-warn-unused-imports #-}
 
@@ -17,17 +16,7 @@ import Data.GraphQL
 import Data.Text (Text)
 
 import Example.GraphQL.Scalars
-
-{-----------------------------------------------------------------------------
-* ReleaseStatus
------------------------------------------------------------------------------}
-
-mkEnum "ReleaseStatus"
-  [ "OFFICIAL"
-  , "PROMOTION"
-  , "BOOTLEG"
-  , "PSEUDORELEASE"
-  ]
+import Example.GraphQL.Enums.ReleaseStatus
 
 {-----------------------------------------------------------------------------
 * getRecordings
