@@ -1,3 +1,7 @@
+type TemplateOptions = {
+  sep?: string
+}
+
 /**
  * A mustache function that transforms
  *
@@ -13,8 +17,10 @@
 export const templateOverList = <T>(
   text: string,
   list: Array<T>,
-  sep = ','
+  options: TemplateOptions = {}
 ) => {
+  const { sep = ',' } = options
+
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const render = (template: string, elem: any): string =>
     template

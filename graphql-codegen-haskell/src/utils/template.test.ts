@@ -20,7 +20,7 @@ describe('templateOverList', () => {
   })
 
   it('interpolates with a different delimiter', () => {
-    const result = templateOverList('* {{.}}', ['a', 'b', 'c'], '|')
+    const result = templateOverList('* {{.}}', ['a', 'b', 'c'], { sep: '|' })
     expect(result).toMatchInlineSnapshot(`
       "* a
       | b
