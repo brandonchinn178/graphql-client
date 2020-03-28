@@ -29,6 +29,20 @@ describe('templateOverList', () => {
     `)
   })
 
+  it('can also get values from the context', () => {
+    const result = templateOverList(
+      '[ {{foo}} + {{bar}}',
+      [{ foo: 'a' }, { foo: 'b' }],
+      { context: { bar: 1 } }
+    )
+
+    expect(result).toMatchInlineSnapshot(`
+      "[ a + 1
+      , b + 1
+      "
+    `)
+  })
+
   it('renders multiline templates', () => {
     const result = templateOverList('* {{.}}\n  > {{.}}!', ['a', 'b', 'c'])
     expect(result).toMatchInlineSnapshot(`

@@ -1,5 +1,9 @@
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+type Context = Record<string, any>
+
 type TemplateOptions = {
   sep?: string
+  context?: Context
 }
 
 /**
@@ -19,13 +23,16 @@ export const templateOverList = <T>(
   list: Array<T>,
   options: TemplateOptions = {}
 ) => {
-  const { sep = ',' } = options
+  const { sep = ',', context = {} } = options
+
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const getKey = (elem: Context, key: string): any => elem[key] ?? context[key]
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const render = (template: string, elem: any): string =>
     template
       .replace(/{{\.}}/g, (_) => elem)
-      .replace(/{{(.*?)}}/g, (_, name) => elem[name])
+      .replace(/{{(.*?)}}/g, (_, name) => getKey(elem, name))
 
   const templateFirst = removeEmptyLines(text)
   const templateRest = templateFirst.replace(/[^\s]/, sep)
