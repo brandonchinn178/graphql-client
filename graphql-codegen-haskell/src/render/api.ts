@@ -59,11 +59,11 @@ export const renderAesonSchema = (selections: ParsedSelection): string => {
     }
 
     if ('subTypes' in selectionType) {
-      return indent(
-        selectionType.subTypes
-          .map((selection) => renderAesonSchema(selection))
-          .join(' | ')
+      const unionSchemas = selectionType.subTypes.map((selection) =>
+        renderAesonSchema(selection)
       )
+
+      return indent('(' + indent('\n' + unionSchemas.join(' |\n')) + '\n)')
     }
 
     return indent(renderAesonSchema(selectionType.fields))
