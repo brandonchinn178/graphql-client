@@ -2,16 +2,14 @@ import {
   PluginFunction,
   PluginValidateFn,
 } from '@graphql-codegen/plugin-helpers'
-import * as fs from 'fs'
 import { concatAST } from 'graphql'
-import * as path from 'path'
 
 import { RawPluginConfig, resolveConfig, validateConfig } from './config'
 import { parseFragments } from './parse/fragments'
 import { parseOperations } from './parse/operation'
 import { renderAPIModule } from './render/api'
 import { renderEnumModule } from './render/enum'
-import { moduleToPath } from './utils'
+import { moduleToPath, writeFile } from './utils'
 
 export const plugin: PluginFunction<RawPluginConfig> = (
   schema,
@@ -34,12 +32,7 @@ export const plugin: PluginFunction<RawPluginConfig> = (
 
   renderedEnums.forEach(({ enumModuleName, enumModule }) => {
     const enumModulePath = moduleToPath(enumModuleName, config.hsSrcDir)
-
-    try {
-      fs.mkdirSync(path.dirname(enumModulePath), { recursive: true })
-    } catch (_) {}
-
-    fs.writeFileSync(enumModulePath, enumModule)
+    writeFile(enumModulePath, enumModule)
   })
 
   const enumModules = renderedEnums.map(({ enumModuleName }) => enumModuleName)
