@@ -74,8 +74,8 @@ type GetRecordingsSchema = [schema|
 
 instance GraphQLArgs GetRecordingsArgs where
   fromArgs args = object
-    [ "query" .= _query args
-    , "first" .= _first args
+    [ "query" .= _query (args :: GetRecordingsArgs)
+    , "first" .= _first (args :: GetRecordingsArgs)
     ]
 
 getRecordingsQuery :: GetRecordingsQuery
