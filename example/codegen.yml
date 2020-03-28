@@ -10,4 +10,4 @@ generates:
       - graphql-codegen-haskell
     hooks:
       afterOneFileWrite:
-        - ../scripts/stylish-haskell.sh --apply
+        - scripts/format-graphql-codegen.sh

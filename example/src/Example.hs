@@ -19,11 +19,8 @@ import Data.Monoid ((<>))
 import qualified Data.Text as Text
 
 import Example.GraphQL.API
-    ( GetRecordingsArgs(..)
-    , GetRecordingsSchema
-    , ReleaseStatus(..)
-    , runGetRecordingsQuery
-    )
+    (GetRecordingsArgs(..), GetRecordingsSchema, runGetRecordingsQuery)
+import Example.GraphQL.Enums.ReleaseStatus (ReleaseStatus(..))
 import Example.GraphQL.Scalars.Date (showDate)
 import Example.GraphQL.Scalars.Duration (showDuration)
 

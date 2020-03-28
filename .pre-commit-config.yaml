@@ -20,7 +20,6 @@ repos:
         entry: scripts/stylish-haskell.sh
         language: script
         files: '\.hs$'
-        pass_filenames: false
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.3.0

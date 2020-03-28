@@ -9,10 +9,12 @@ set -o nounset -o pipefail
 builtin cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 STYLISH_APPLY=0
+FILES=()
 
 for arg in "$@"; do
     case "$arg" in
         (--apply) STYLISH_APPLY=1 ;;
+        (*) FILES+=("${arg}") ;;
     esac
 done
 
@@ -30,10 +32,11 @@ function check_file_empty() {
     fi
 }
 
-FILES=()
-while read -r -d $'\0'; do
-    FILES+=("${REPLY}")
-done < <(get_files)
+if [[ "${#FILES[@]}" == 0 ]]; then
+    while read -r -d $'\0'; do
+        FILES+=("${REPLY}")
+    done < <(get_files)
+fi
 
 stack build stylish-haskell
 
