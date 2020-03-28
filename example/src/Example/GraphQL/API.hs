@@ -7,10 +7,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# OPTIONS_GHC -fno-warn-unused-imports #-}
 
-module Example.GraphQL.API
-  ( module Example.GraphQL.API
-  , module Example.GraphQL.Enums
-  ) where
+module Example.GraphQL.API where
 
 import Control.Monad.IO.Class (MonadIO)
 import Data.Aeson (object, (.=))
@@ -18,7 +15,7 @@ import Data.Aeson.Schema.TH (mkEnum)
 import Data.GraphQL
 import Data.Text (Text)
 
-import Example.GraphQL.Enums
+import Example.GraphQL.Enums.ReleaseStatus
 import Example.GraphQL.Scalars
 
 {-----------------------------------------------------------------------------
