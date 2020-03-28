@@ -53,7 +53,7 @@ type {{schemaType}} = [schema|
 instance GraphQLArgs {{argsType}} where
   fromArgs args = object
     {{#overArgs}}
-    [ "{{arg}}" .= _{{arg}} args
+    [ "{{arg}}" .= _{{arg}} (args :: {{argsType}})
     {{/overArgs}}
     ]
 

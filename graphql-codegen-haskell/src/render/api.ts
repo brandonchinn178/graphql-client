@@ -25,7 +25,8 @@ export const renderAPIModule = (
         type: renderHaskellType(type),
       })),
       overArgs() {
-        return (text: string) => templateOverList(text, this.args)
+        return (text: string) =>
+          templateOverList(text, this.args, { context: this })
       },
     })),
   })

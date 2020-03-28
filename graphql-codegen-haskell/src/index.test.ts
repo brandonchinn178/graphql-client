@@ -184,7 +184,7 @@ it('renders', () => {
 
     instance GraphQLArgs GetBarArgs where
       fromArgs args = object
-        [ \\"x\\" .= _x args
+        [ \\"x\\" .= _x (args :: GetBarArgs)
         ]
 
     getBarQuery :: GetBarQuery
@@ -242,7 +242,7 @@ it('renders', () => {
 
     instance GraphQLArgs GetNamedArgs where
       fromArgs args = object
-        [ \\"s\\" .= _s args
+        [ \\"s\\" .= _s (args :: GetNamedArgs)
         ]
 
     getNamedQuery :: GetNamedQuery
