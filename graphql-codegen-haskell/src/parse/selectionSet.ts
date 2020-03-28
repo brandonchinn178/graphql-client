@@ -122,13 +122,13 @@ class SelectionSetParser {
     )
 
     if (parsedSubTypes.length > 0) {
-      if ('__subTypes' in selectionSet) {
-        throw new Error('Please rename the "__subTypes" field in query')
+      if ('__fragments' in selectionSet) {
+        throw new Error('Please rename the "__fragments" field in query')
       }
 
       return {
         ...selectionSet,
-        __subTypes: graphqlUnion(parsedSubTypes),
+        __fragments: graphqlUnion(parsedSubTypes, true),
       }
     } else {
       return selectionSet

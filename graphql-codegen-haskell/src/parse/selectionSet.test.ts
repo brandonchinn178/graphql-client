@@ -259,7 +259,7 @@ it('parses fragment spreads for interfaces', () => {
     selections: {
       named: graphqlObject({
         name: graphqlScalar('String'),
-        __subTypes: graphqlUnion([
+        __fragments: graphqlUnion([
           {
             age: graphqlScalar('Int'),
           },
@@ -273,11 +273,11 @@ it('parses fragment spreads for interfaces', () => {
   })
 })
 
-it('allows __subTypes field', () => {
+it('allows __fragments field', () => {
   const schema = buildASTSchema(
     gql`
       type Foo {
-        __subTypes: Int!
+        __fragments: Int!
       }
 
       type Query {
@@ -291,7 +291,7 @@ it('allows __subTypes field', () => {
     gql`
       query {
         foo {
-          __subTypes
+          __fragments
         }
       }
     `
@@ -300,17 +300,17 @@ it('allows __subTypes field', () => {
   expect(selectionSet).toMatchObject({
     selections: {
       foo: graphqlObject({
-        __subTypes: graphqlScalar('Int'),
+        __fragments: graphqlScalar('Int'),
       }),
     },
   })
 })
 
-it('allows __subTypes field when using a non-abstract fragment', () => {
+it('allows __fragments field when using a non-abstract fragment', () => {
   const schema = buildASTSchema(
     gql`
       type Foo {
-        __subTypes: Int!
+        __fragments: Int!
       }
 
       type Query {
@@ -329,7 +329,7 @@ it('allows __subTypes field when using a non-abstract fragment', () => {
       }
 
       fragment foo on Foo {
-        __subTypes
+        __fragments
       }
     `
   )
@@ -337,21 +337,21 @@ it('allows __subTypes field when using a non-abstract fragment', () => {
   expect(selectionSet).toMatchObject({
     selections: {
       foo: graphqlObject({
-        __subTypes: graphqlScalar('Int'),
+        __fragments: graphqlScalar('Int'),
       }),
     },
   })
 })
 
-it('disallows __subTypes field when using an abstract fragment', () => {
+it('disallows __fragments field when using an abstract fragment', () => {
   const schema = buildASTSchema(
     gql`
       interface Foo {
-        __subTypes: [String]
+        __fragments: [String]
       }
 
       type Bar implements Foo {
-        __subTypes: [String]
+        __fragments: [String]
         x: Int!
       }
 
@@ -367,7 +367,7 @@ it('disallows __subTypes field when using an abstract fragment', () => {
       gql`
         query {
           foo {
-            __subTypes
+            __fragments
             ...bar
           }
         }
@@ -422,7 +422,7 @@ it('parses inline fragments', () => {
   expect(selectionSet).toMatchObject({
     selections: {
       foo: graphqlObject({
-        __subTypes: graphqlUnion([
+        __fragments: graphqlUnion([
           { id: graphqlScalar('ID') },
           { foo2: graphqlScalar('String') },
         ]),

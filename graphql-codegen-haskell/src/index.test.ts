@@ -229,7 +229,7 @@ it('renders', () => {
     type GetNamedSchema = [schema|
       {
         getNamed: Maybe {
-          __subTypes: (
+          __fragments: (
             {
               id: Text,
               foo: Maybe Text,
