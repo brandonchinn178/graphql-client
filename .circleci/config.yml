@@ -262,14 +262,12 @@ workflows:
           name: test_latest
           latest: true
       - run_build_and_test:
-          name: test_ghc_8.8
-          stack_yaml: stack-ghc-8.8.yaml
-      - run_build_and_test:
-          name: test_ghc_8.6
-          stack_yaml: stack-ghc-8.6.yaml
-      - run_build_and_test:
-          name: test_ghc_8.4
-          stack_yaml: stack-ghc-8.4.yaml
-      - run_build_and_test:
-          name: test_ghc_8.2
-          stack_yaml: stack-ghc-8.2.yaml
+          name: test_ghc_<< matrix.ghc_version >>
+          stack_yaml: stack-ghc-<< matrix.ghc_version>>.yaml
+          matrix:
+            parameters:
+              ghc_version:
+                - 8.2
+                - 8.4
+                - 8.6
+                - 8.8
