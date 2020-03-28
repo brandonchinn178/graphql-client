@@ -4,7 +4,8 @@ import { PluginConfig } from '~/config'
 import { ParsedEnum } from '~/parse/operation'
 import { templateOverList } from '~/utils'
 
-import template from './templates/enum.mustache'
+import enumTemplate from './templates/enum.mustache'
+import enumParentTemplate from './templates/enumParent.mustache'
 
 export const renderEnumModule = (
   config: PluginConfig,
@@ -14,7 +15,7 @@ export const renderEnumModule = (
   enumModule: string
 } => {
   const enumModuleName = `${config.enumsModule}.${parsedEnum.name}`
-  const enumModule = Mustache.render(template, {
+  const enumModule = Mustache.render(enumTemplate, {
     ...config,
     ...parsedEnum,
     enumModuleName,
@@ -24,3 +25,12 @@ export const renderEnumModule = (
   })
   return { enumModuleName, enumModule }
 }
+
+export const renderEnumParentModule = (
+  config: PluginConfig,
+  enumModules: readonly string[]
+) =>
+  Mustache.render(enumParentTemplate, {
+    ...config,
+    enumModules,
+  })

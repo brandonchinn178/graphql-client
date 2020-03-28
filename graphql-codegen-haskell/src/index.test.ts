@@ -7,6 +7,10 @@ import { plugin, validate } from './index'
 jest.mock('fs')
 const mockWriteFileSync = fs.writeFileSync as jest.Mock
 
+beforeEach(() => {
+  mockWriteFileSync.mockReset()
+})
+
 const fullConfig = {
   enumsModule: 'Example.GraphQL.Enums',
   scalarsModule: 'Example.GraphQL.Scalars',
@@ -94,7 +98,10 @@ it('renders', () => {
     {-# LANGUAGE TypeFamilies #-}
     {-# OPTIONS_GHC -fno-warn-unused-imports #-}
 
-    module Example.GraphQL.API where
+    module Example.GraphQL.API
+      ( module Example.GraphQL.API
+      , module Example.GraphQL.Enums
+      ) where
 
     import Control.Monad.IO.Class (MonadIO)
     import Data.Aeson (object, (.=))
@@ -102,8 +109,8 @@ it('renders', () => {
     import Data.GraphQL
     import Data.Text (Text)
 
+    import Example.GraphQL.Enums
     import Example.GraphQL.Scalars
-    import Example.GraphQL.Enums.MyEnum
 
     {-----------------------------------------------------------------------------
     * getFoo
@@ -274,7 +281,7 @@ it('renders', () => {
     "
   `)
 
-  expect(mockWriteFileSync).toHaveBeenCalledTimes(1)
+  expect(mockWriteFileSync).toHaveBeenCalledTimes(2)
 
   const [myEnumModuleName, myEnumModule] = mockWriteFileSync.mock.calls[0]
   expect(myEnumModuleName).toBe('src/Example/GraphQL/Enums/MyEnum.hs')
@@ -289,6 +296,18 @@ it('renders', () => {
       [ \\"Hello\\"
       , \\"World\\"
       ]
+    "
+  `)
+
+  const [
+    enumParentModuleName,
+    enumParentModule,
+  ] = mockWriteFileSync.mock.calls[1]
+  expect(enumParentModuleName).toBe('src/Example/GraphQL/Enums.hs')
+  expect(enumParentModule).toMatchInlineSnapshot(`
+    "module Example.GraphQL.Enums (module X) where
+
+    import Example.GraphQL.Enums.MyEnum as X
     "
   `)
 })
