@@ -49,6 +49,11 @@ export type ParsedSelectionType =
 // GraphQL types that can be selected further into.
 type GraphQLSelectionSchema = GraphQLObjectType | GraphQLInterfaceType
 
+type FragmentSelectionInfo = {
+  isSubType: boolean
+  selection: ParsedSelection
+}
+
 export const parseSelectionSet = (
   schema: GraphQLSchema,
   selectionSetNode: SelectionSetNode,
@@ -91,10 +96,9 @@ class SelectionSetParser {
     schemaRoot: GraphQLSelectionSchema
   ): ParsedSelection {
     const parsedSubTypes: ParsedSelection[] = []
-    const resolveFragmentNode = ([isSubType, selection]: [
-      boolean,
-      ParsedSelection
-    ]) => {
+    const resolveFragmentNode = (fragment: FragmentSelectionInfo) => {
+      const { isSubType, selection } = fragment
+
       if (isSubType) {
         parsedSubTypes.push(selection)
         return {}
@@ -152,7 +156,7 @@ class SelectionSetParser {
   parseFragmentSpreadNode(
     node: FragmentSpreadNode,
     schemaRoot: GraphQLSelectionSchema
-  ): [boolean, ParsedSelection] {
+  ): FragmentSelectionInfo {
     const fragmentName = node.name.value
     this._fragments.push(fragmentName)
 
@@ -162,7 +166,7 @@ class SelectionSetParser {
   parseFragmentNode(
     fragment: { typeCondition?: NamedTypeNode; selectionSet: SelectionSetNode },
     schemaRoot: GraphQLSelectionSchema
-  ): [boolean, ParsedSelection] {
+  ): FragmentSelectionInfo {
     const { typeCondition, selectionSet } = fragment
 
     const fragmentSchema = typeCondition
@@ -178,7 +182,7 @@ class SelectionSetParser {
         schemaRoot,
         fragmentSchema as GraphQLObjectType
       )
-    return [isSubType, selection]
+    return { isSubType, selection }
   }
 
   parseSelectionType(
