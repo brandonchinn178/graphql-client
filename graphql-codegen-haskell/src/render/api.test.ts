@@ -70,6 +70,12 @@ it('renders a schema as appropriate for aeson-schemas', () => {
       { a: graphqlScalar('Int') },
       { list: graphqlList(graphqlScalar('Bool'), NULLABLE) },
     ]),
+    listOfUnion: graphqlList(
+      graphqlUnion<ParsedSelection>([
+        { id: graphqlScalar('ID') },
+        { int: graphqlScalar('Int') },
+      ])
+    ),
 
     // nullable
     nullInt: graphqlScalar('Int', NULLABLE),
@@ -131,6 +137,14 @@ it('renders a schema as appropriate for aeson-schemas', () => {
         } |
         {
           list: Maybe List Bool,
+        }
+      ),
+      listOfUnion: List (
+        {
+          id: Text,
+        } |
+        {
+          int: Int,
         }
       ),
       nullInt: Maybe Int,
