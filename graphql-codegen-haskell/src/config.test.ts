@@ -1,13 +1,20 @@
-import { pathToModule, resolveConfig, validateConfig } from './config'
+import { resolveConfig, validateConfig } from './config'
 
 const fullConfig = {
-  apiModule: 'Example.GraphQL.API',
-  scalarsModule: 'Example.GraphQL.Scalars',
+  hsSrcDir: 'src/',
+  enumsModule: 'Exammple.GraphQL.Enums',
+  scalarsModule: 'Example.GraphQL.Scalarjs',
 }
 
 describe('validateConfig', () => {
   it('validates a valid config', () => {
     expect(() => validateConfig(fullConfig)).not.toThrow()
+  })
+
+  it('requires enumsModule', () => {
+    const config = { ...fullConfig }
+    delete config.enumsModule
+    expect(() => validateConfig(config)).toThrow()
   })
 
   it('requires scalarModule', () => {
@@ -16,36 +23,53 @@ describe('validateConfig', () => {
     expect(() => validateConfig(config)).toThrow()
   })
 
-  it('does not require apiModule', () => {
+  it('does not require hsSrcDir', () => {
     const config = { ...fullConfig }
-    delete config.apiModule
+    delete config.hsSrcDir
     expect(() => validateConfig(config)).not.toThrow()
   })
 })
 
-describe('pathToModule', () => {
-  it.each`
-    filepath                                | moduleName
-    ${'MyModule/GraphQL/API.hs'}            | ${'MyModule.GraphQL.API'}
-    ${'foo/bar/src/Example/GraphQL/API.hs'} | ${'Example.GraphQL.API'}
-  `('$filepath => $moduleName', ({ filepath, moduleName }) => {
-    expect(pathToModule(filepath)).toBe(moduleName)
-  })
-})
-
 describe('resolveConfig', () => {
-  it('provides a default for apiModule', () => {
+  it('parses hsSrcDir and apiModule from the output file', () => {
     const config = { ...fullConfig }
-    delete config.apiModule
-
-    expect(resolveConfig(config, 'path/to/MyModule/API.hs')).toMatchObject({
-      apiModule: 'MyModule.API',
+    delete config.hsSrcDir
+    expect(
+      resolveConfig(config, 'foo/src/Example/GraphQL/API.hs')
+    ).toMatchObject({
+      hsSrcDir: 'foo/src',
+      apiModule: 'Example.GraphQL.API',
     })
   })
 
-  it('keeps a set apiModule', () => {
-    expect(resolveConfig(fullConfig, 'path/to/MyModule/API.hs')).toMatchObject({
-      apiModule: fullConfig.apiModule,
+  it('parses apiModule from the output file without inferrable hsSrcDir', () => {
+    const config = { ...fullConfig }
+    delete config.hsSrcDir
+    expect(resolveConfig(config, 'Example/GraphQL/API.hs')).toMatchObject({
+      hsSrcDir: '',
+      apiModule: 'Example.GraphQL.API',
+    })
+  })
+
+  it('parses hsSrcDir and apiModule from a provided hsSrcDir', () => {
+    const config = {
+      ...fullConfig,
+      hsSrcDir: 'src/Example/',
+    }
+    expect(resolveConfig(config, 'src/Example/GraphQL/API.hs')).toMatchObject({
+      hsSrcDir: 'src/Example/',
+      apiModule: 'GraphQL.API',
+    })
+  })
+
+  it('allows specifying hsSrcDir without trailing slash', () => {
+    const config = {
+      ...fullConfig,
+      hsSrcDir: 'src/Example',
+    }
+    expect(resolveConfig(config, 'src/Example/GraphQL/API.hs')).toMatchObject({
+      hsSrcDir: 'src/Example',
+      apiModule: 'GraphQL.API',
     })
   })
 })

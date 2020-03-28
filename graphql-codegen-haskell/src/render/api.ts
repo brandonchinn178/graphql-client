@@ -1,25 +1,21 @@
 import * as Mustache from 'mustache'
 
-import { PluginConfig } from './config'
-import { ParsedEnum, ParsedOperation } from './parse/operation'
-import { ParsedSelection, ParsedSelectionType } from './parse/selectionSet'
-import { ParsedType } from './parse/variableDefinition'
-import template from './template.mustache'
-import { templateOverList } from './utils'
+import { PluginConfig } from '~/config'
+import { ParsedOperation } from '~/parse/operation'
+import { ParsedSelection, ParsedSelectionType } from '~/parse/selectionSet'
+import { ParsedType } from '~/parse/variableDefinition'
+import { templateOverList } from '~/utils'
+
+import template from './templates/api.mustache'
 
 export const renderAPIModule = (
   config: PluginConfig,
-  enums: readonly ParsedEnum[],
+  enumModules: readonly string[],
   operations: readonly ParsedOperation[]
 ) =>
   Mustache.render(template, {
     ...config,
-    enums: enums.map((parsedEnum) => ({
-      ...parsedEnum,
-      overValues() {
-        return (text: string) => templateOverList(text, this.values)
-      },
-    })),
+    enumModules,
     operations: operations.map((operation) => ({
       ...operation,
       query: indent(operation.query),

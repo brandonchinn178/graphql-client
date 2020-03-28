@@ -40,12 +40,6 @@ export const templateOverList = <T>(
 }
 
 /**
- * Loosely based on lodash's assign.
- */
-export const mergeObjects = <T extends object>(objects: T[]): T =>
-  objects.reduce((acc, obj) => ({ ...acc, ...obj }), {} as T)
-
-/**
  * Remove empty lines in the given string.
  */
 const removeEmptyLines = (s: string) =>

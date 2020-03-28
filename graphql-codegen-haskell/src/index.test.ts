@@ -1,10 +1,18 @@
+import * as fs from 'fs'
 import { buildASTSchema } from 'graphql'
 import gql from 'graphql-tag'
 
 import { plugin, validate } from './index'
 
+jest.mock('fs')
+const mockWriteFileSync = fs.writeFileSync as jest.Mock
+
+beforeEach(() => {
+  mockWriteFileSync.mockReset()
+})
+
 const fullConfig = {
-  apiModule: 'Example.GraphQL.API',
+  enumsModule: 'Example.GraphQL.Enums',
   scalarsModule: 'Example.GraphQL.Scalars',
 }
 
@@ -78,16 +86,22 @@ it('validates', () => {
 })
 
 it('renders', () => {
-  expect(plugin(schema, documents, fullConfig)).toMatchInlineSnapshot(`
+  const apiModule = plugin(schema, documents, fullConfig, {
+    outputFile: 'src/Example/GraphQL/API.hs',
+  })
+
+  expect(apiModule).toMatchInlineSnapshot(`
     "{-# LANGUAGE DataKinds #-}
+    {-# LANGUAGE DuplicateRecordFields #-}
     {-# LANGUAGE OverloadedStrings #-}
     {-# LANGUAGE QuasiQuotes #-}
-    {-# LANGUAGE RecordWildCards #-}
-    {-# LANGUAGE TemplateHaskell #-}
     {-# LANGUAGE TypeFamilies #-}
     {-# OPTIONS_GHC -fno-warn-unused-imports #-}
 
-    module Example.GraphQL.API where
+    module Example.GraphQL.API
+      ( module Example.GraphQL.API
+      , module Example.GraphQL.Enums
+      ) where
 
     import Control.Monad.IO.Class (MonadIO)
     import Data.Aeson (object, (.=))
@@ -95,16 +109,8 @@ it('renders', () => {
     import Data.GraphQL
     import Data.Text (Text)
 
+    import Example.GraphQL.Enums
     import Example.GraphQL.Scalars
-
-    {-----------------------------------------------------------------------------
-    * MyEnum
-    -----------------------------------------------------------------------------}
-
-    mkEnum \\"MyEnum\\"
-      [ \\"Hello\\"
-      , \\"World\\"
-      ]
 
     {-----------------------------------------------------------------------------
     * getFoo
@@ -274,19 +280,34 @@ it('renders', () => {
 
     "
   `)
-})
 
-it('renders without apiModule in config', () => {
-  const config = { ...fullConfig }
-  delete config.apiModule
+  expect(mockWriteFileSync).toHaveBeenCalledTimes(2)
 
-  const renderedWithOutputFile = plugin(schema, documents, config, {
-    outputFile: 'path/to/MyModule/Api.hs',
-  })
-  const renderedWithConfig = plugin(schema, documents, {
-    ...config,
-    apiModule: 'MyModule.Api',
-  })
+  const [myEnumModuleName, myEnumModule] = mockWriteFileSync.mock.calls[0]
+  expect(myEnumModuleName).toBe('src/Example/GraphQL/Enums/MyEnum.hs')
+  expect(myEnumModule).toMatchInlineSnapshot(`
+    "{-# LANGUAGE TemplateHaskell #-}
 
-  expect(renderedWithOutputFile).toEqual(renderedWithConfig)
+    module Example.GraphQL.Enums.MyEnum where
+
+    import Data.Aeson.Schema.TH (mkEnum)
+
+    mkEnum \\"MyEnum\\"
+      [ \\"Hello\\"
+      , \\"World\\"
+      ]
+    "
+  `)
+
+  const [
+    enumParentModuleName,
+    enumParentModule,
+  ] = mockWriteFileSync.mock.calls[1]
+  expect(enumParentModuleName).toBe('src/Example/GraphQL/Enums.hs')
+  expect(enumParentModule).toMatchInlineSnapshot(`
+    "module Example.GraphQL.Enums (module X) where
+
+    import Example.GraphQL.Enums.MyEnum as X
+    "
+  `)
 })

@@ -26,6 +26,9 @@ documents: path/to/files/*.graphql
 generates:
   src/Example/GraphQL/API.hs:
     config:
+      # The Haskell module that will contain generated modules for GraphQL enums
+      enumsModule: Example.GraphQL.Enums
+
       # The Haskell module containing the data types to use for GraphQL Scalars
       scalarsModule: Example.GraphQL.Scalars
     plugins:

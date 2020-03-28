@@ -18,7 +18,8 @@ import {
   SelectionSetNode,
 } from 'graphql'
 
-import { mergeObjects } from '../utils'
+import { mergeObjects } from '~/utils'
+
 import { ParsedFragments } from './fragments'
 import {
   graphqlList,

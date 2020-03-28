@@ -1,8 +1,17 @@
+const jest = require('ts-jest/utils')
+
+const tsconfig = require('./tsconfig')
+
 module.exports = {
   testEnvironment: 'node',
   transform: {
     '^.+\\.ts$': 'ts-jest',
     '\\.mustache$': 'jest-raw-loader',
+  },
+  moduleNameMapper: {
+    ...jest.pathsToModuleNameMapper(tsconfig.compilerOptions.paths, {
+      prefix: '<rootDir>/',
+    }),
   },
   globals: {
     'ts-jest': {

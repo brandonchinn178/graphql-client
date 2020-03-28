@@ -1,6 +1,6 @@
 import { DocumentNode, FragmentDefinitionNode, Kind } from 'graphql'
 
-import { mergeObjects } from '../utils'
+import { mergeObjects } from '~/utils'
 
 export type ParsedFragments = Record<string, FragmentDefinitionNode>
 

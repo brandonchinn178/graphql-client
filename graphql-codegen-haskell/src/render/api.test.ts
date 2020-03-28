@@ -4,9 +4,10 @@ import {
   graphqlScalar,
   graphqlUnion,
   NULLABLE,
-} from './parse/graphqlTypes'
-import { ParsedSelection } from './parse/selectionSet'
-import { renderAesonSchema, renderHaskellType } from './render'
+} from '~/parse/graphqlTypes'
+import { ParsedSelection } from '~/parse/selectionSet'
+
+import { renderAesonSchema, renderHaskellType } from './api'
 
 describe('render types for query arguments', () => {
   it.each`
