@@ -25,17 +25,18 @@ export const plugin: PluginFunction<RawPluginConfig> = (
 
   const parsedFragments = parseFragments(ast)
   const { enums, operations } = parseOperations(ast, schema, parsedFragments)
+  const enumModules = [] as string[]
 
-  const renderedEnums = enums.map((parsedEnum) =>
-    renderEnumModule(config, parsedEnum)
-  )
+  // Generate the module for each enum
+  enums.forEach((parsedEnum) => {
+    const { enumModuleName, enumModule } = renderEnumModule(config, parsedEnum)
 
-  renderedEnums.forEach(({ enumModuleName, enumModule }) => {
     const enumModulePath = moduleToPath(enumModuleName, config.hsSrcDir)
     writeFile(enumModulePath, enumModule)
+
+    enumModules.push(enumModuleName)
   })
 
-  const enumModules = renderedEnums.map(({ enumModuleName }) => enumModuleName)
   return renderAPIModule(config, enumModules, operations)
 }
 
