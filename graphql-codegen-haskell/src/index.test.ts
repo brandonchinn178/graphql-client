@@ -229,13 +229,16 @@ it('renders', () => {
     type GetNamedSchema = [schema|
       {
         getNamed: Maybe {
-          __subTypes: {
-            id: Text,
-            foo: Maybe Text,
-          } | {
-            id: Text,
-            name: Text,
-          },
+          __subTypes: (
+            {
+              id: Text,
+              foo: Maybe Text,
+            } |
+            {
+              id: Text,
+              name: Text,
+            }
+          ),
         },
       }
     |]
