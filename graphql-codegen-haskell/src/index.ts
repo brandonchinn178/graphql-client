@@ -8,6 +8,7 @@ import { RawPluginConfig, resolveConfig, validateConfig } from './config'
 import { parseFragments } from './parse/fragments'
 import { parseOperations } from './parse/operation'
 import { renderAPIModule } from './render/api'
+import { renderEnumModule } from './render/enum'
 
 export const plugin: PluginFunction<RawPluginConfig> = (
   schema,
@@ -24,7 +25,12 @@ export const plugin: PluginFunction<RawPluginConfig> = (
   const parsedFragments = parseFragments(ast)
   const { enums, operations } = parseOperations(ast, schema, parsedFragments)
 
-  return renderAPIModule(config, enums, operations)
+  const renderedEnums = enums.map((parsedEnum) =>
+    renderEnumModule(config, parsedEnum)
+  )
+
+  const enumModules = renderedEnums.map(({ enumModuleName }) => enumModuleName)
+  return renderAPIModule(config, enumModules, operations)
 }
 
 export const validate: PluginValidateFn = (_schema, _documents, config) => {

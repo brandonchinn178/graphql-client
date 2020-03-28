@@ -87,8 +87,6 @@ it('renders', () => {
     {-# LANGUAGE DuplicateRecordFields #-}
     {-# LANGUAGE OverloadedStrings #-}
     {-# LANGUAGE QuasiQuotes #-}
-    {-# LANGUAGE RecordWildCards #-}
-    {-# LANGUAGE TemplateHaskell #-}
     {-# LANGUAGE TypeFamilies #-}
     {-# OPTIONS_GHC -fno-warn-unused-imports #-}
 
@@ -101,15 +99,7 @@ it('renders', () => {
     import Data.Text (Text)
 
     import Example.GraphQL.Scalars
-
-    {-----------------------------------------------------------------------------
-    * MyEnum
-    -----------------------------------------------------------------------------}
-
-    mkEnum \\"MyEnum\\"
-      [ \\"Hello\\"
-      , \\"World\\"
-      ]
+    import Example.GraphQL.Enums.MyEnum
 
     {-----------------------------------------------------------------------------
     * getFoo

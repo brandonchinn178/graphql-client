@@ -1,0 +1,11 @@
+{-# LANGUAGE TemplateHaskell #-}
+
+module {{enumModuleName}} where
+
+import Data.Aeson.Schema.TH (mkEnum)
+
+mkEnum "{{name}}"
+  {{#overValues}}
+  [ "{{.}}"
+  {{/overValues}}
+  ]

@@ -2,8 +2,6 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# OPTIONS_GHC -fno-warn-unused-imports #-}
 
@@ -16,19 +14,10 @@ import Data.GraphQL
 import Data.Text (Text)
 
 import {{scalarsModule}}
+{{#enumModules}}
+import {{.}}
+{{/enumModules}}
 
-{{#enums}}
-{-----------------------------------------------------------------------------
-* {{name}}
------------------------------------------------------------------------------}
-
-mkEnum "{{name}}"
-  {{#overValues}}
-  [ "{{.}}"
-  {{/overValues}}
-  ]
-
-{{/enums}}
 {{#operations}}
 {-----------------------------------------------------------------------------
 * {{name}}
