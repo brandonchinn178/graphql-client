@@ -8,3 +8,6 @@ generates:
     plugins:
       - add: '{- This file was automatically generated and should not be edited. -}'
       - graphql-codegen-haskell
+    hooks:
+      afterOneFileWrite:
+        - ../scripts/stylish-haskell.sh --apply

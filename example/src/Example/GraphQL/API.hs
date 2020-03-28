@@ -15,8 +15,8 @@ import Data.Aeson.Schema.TH (mkEnum)
 import Data.GraphQL
 import Data.Text (Text)
 
-import Example.GraphQL.Scalars
 import Example.GraphQL.Enums.ReleaseStatus
+import Example.GraphQL.Scalars
 
 {-----------------------------------------------------------------------------
 * getRecordings
