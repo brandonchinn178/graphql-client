@@ -50,7 +50,10 @@ export type ParsedSelectionType =
 type GraphQLSelectionSchema = GraphQLObjectType | GraphQLInterfaceType
 
 type FragmentSelectionInfo = {
-  isSubType: boolean
+  fragment: null | {
+    name: string
+    isSubType: boolean
+  }
   selection: ParsedSelection
 }
 
@@ -95,11 +98,16 @@ class SelectionSetParser {
     { selections }: SelectionSetNode,
     schemaRoot: GraphQLSelectionSchema
   ): ParsedSelection {
+    const parsedSubTypeNames: string[] = []
     const parsedSubTypes: ParsedSelection[] = []
-    const resolveFragmentNode = (fragment: FragmentSelectionInfo) => {
-      const { isSubType, selection } = fragment
 
-      if (isSubType) {
+    const resolveFragmentNode = (fragmentInfo: FragmentSelectionInfo) => {
+      const { fragment, selection } = fragmentInfo
+
+      if (fragment?.isSubType) {
+        if (parsedSubTypeNames.indexOf(fragment.name) === -1) {
+          parsedSubTypeNames.push(fragment.name)
+        }
         parsedSubTypes.push(selection)
         return {}
       }
@@ -126,9 +134,13 @@ class SelectionSetParser {
         throw new Error('Please rename the "__fragments" field in query')
       }
 
+      const comprehensive =
+        parsedSubTypeNames.length ===
+        this.schema.getPossibleTypes(schemaRoot as GraphQLInterfaceType).length
+
       return {
         ...selectionSet,
-        __fragments: graphqlUnion(parsedSubTypes, true),
+        __fragments: graphqlUnion(parsedSubTypes, comprehensive),
       }
     } else {
       return selectionSet
@@ -169,20 +181,26 @@ class SelectionSetParser {
   ): FragmentSelectionInfo {
     const { typeCondition, selectionSet } = fragment
 
-    const fragmentSchema = typeCondition
-      ? assertObjectType(this.schema.getType(typeCondition.name.value))
-      : schemaRoot
+    const fragmentName = typeCondition?.name.value
 
-    const selection = this.parseSelectionSetNode(selectionSet, fragmentSchema)
+    if (!fragmentName) {
+      return {
+        fragment: null,
+        selection: this.parseSelectionSetNode(selectionSet, schemaRoot),
+      }
+    }
 
-    const isSubType =
-      isAbstractType(schemaRoot) &&
-      // FIXME: use isSubType and remove type cast with graphql-js@15.0.0
-      this.schema.isPossibleType(
-        schemaRoot,
-        fragmentSchema as GraphQLObjectType
-      )
-    return { isSubType, selection }
+    const fragmentSchema = assertObjectType(this.schema.getType(fragmentName))
+
+    return {
+      fragment: {
+        name: fragmentName,
+        isSubType:
+          isAbstractType(schemaRoot) &&
+          this.schema.isSubType(schemaRoot, fragmentSchema),
+      },
+      selection: this.parseSelectionSetNode(selectionSet, fragmentSchema),
+    }
   }
 
   parseSelectionType(

@@ -9,6 +9,7 @@ import gql from 'graphql-tag'
 
 import { parseFragments } from './fragments'
 import {
+  COMPREHENSIVE,
   graphqlList,
   graphqlObject,
   graphqlScalar,
@@ -205,7 +206,7 @@ it('parses fragment spreads', () => {
   })
 })
 
-it('parses fragment spreads for interfaces', () => {
+it('parses fragment spreads for interfaces without complete type coverage', () => {
   const schema = buildASTSchema(
     gql`
       interface Named {
@@ -259,15 +260,69 @@ it('parses fragment spreads for interfaces', () => {
     selections: {
       named: graphqlObject({
         name: graphqlScalar('String'),
-        __fragments: graphqlUnion([
-          {
-            age: graphqlScalar('Int'),
-          },
-          {
-            name: graphqlScalar('String'),
-            color: graphqlScalar('String', NULLABLE),
-          },
-        ]),
+        __fragments: graphqlUnion(
+          [
+            {
+              age: graphqlScalar('Int'),
+            },
+            {
+              name: graphqlScalar('String'),
+              color: graphqlScalar('String', NULLABLE),
+            },
+          ],
+          !COMPREHENSIVE
+        ),
+      }),
+    },
+  })
+})
+
+it('parses fragment spreads for interfaces with complete type coverage', () => {
+  const schema = buildASTSchema(
+    gql`
+      interface Named {
+        name: String!
+      }
+
+      type Human implements Named {
+        name: String!
+        age: Int!
+      }
+
+      type Query {
+        named: Named!
+      }
+    `
+  )
+
+  const selectionSet = parseSelectionSetAST(
+    schema,
+    gql`
+      query {
+        named {
+          name
+          ...human
+        }
+      }
+
+      fragment human on Human {
+        age
+      }
+    `
+  )
+
+  expect(selectionSet).toMatchObject({
+    selections: {
+      named: graphqlObject({
+        name: graphqlScalar('String'),
+        __fragments: graphqlUnion(
+          [
+            {
+              age: graphqlScalar('Int'),
+            },
+          ],
+          COMPREHENSIVE
+        ),
       }),
     },
   })
@@ -422,10 +477,10 @@ it('parses inline fragments', () => {
   expect(selectionSet).toMatchObject({
     selections: {
       foo: graphqlObject({
-        __fragments: graphqlUnion([
-          { id: graphqlScalar('ID') },
-          { foo2: graphqlScalar('String') },
-        ]),
+        __fragments: graphqlUnion(
+          [{ id: graphqlScalar('ID') }, { foo2: graphqlScalar('String') }],
+          true
+        ),
       }),
     },
   })

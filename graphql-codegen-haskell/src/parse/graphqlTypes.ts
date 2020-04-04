@@ -50,8 +50,14 @@ export const graphqlObject = <T>(
   nullable,
 })
 
-export const graphqlUnion = <T>(subTypes: T[]): ParsedUnionType<T> => ({
+export const COMPREHENSIVE = true
+
+export const graphqlUnion = <T>(
+  subTypes: T[],
+  // if the given subtypes cover all possible types
+  comprehensive: boolean
+): ParsedUnionType<T> => ({
   list: false,
   subTypes,
-  nullable: false,
+  nullable: !comprehensive,
 })

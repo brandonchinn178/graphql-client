@@ -62,19 +62,22 @@ it('renders a schema as appropriate for aeson-schemas', () => {
     }),
 
     // unions
-    union: graphqlUnion<ParsedSelection>([
-      {
-        id: graphqlScalar('ID'),
-        name: graphqlScalar('String'),
-      },
-      { a: graphqlScalar('Int') },
-      { list: graphqlList(graphqlScalar('Bool'), NULLABLE) },
-    ]),
+    union: graphqlUnion<ParsedSelection>(
+      [
+        {
+          id: graphqlScalar('ID'),
+          name: graphqlScalar('String'),
+        },
+        { a: graphqlScalar('Int') },
+        { list: graphqlList(graphqlScalar('Bool'), NULLABLE) },
+      ],
+      true
+    ),
     listOfUnion: graphqlList(
-      graphqlUnion<ParsedSelection>([
-        { id: graphqlScalar('ID') },
-        { int: graphqlScalar('Int') },
-      ])
+      graphqlUnion<ParsedSelection>(
+        [{ id: graphqlScalar('ID') }, { int: graphqlScalar('Int') }],
+        true
+      )
     ),
 
     // nullable
