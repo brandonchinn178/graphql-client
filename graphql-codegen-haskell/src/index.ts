@@ -21,7 +21,9 @@ export const plugin: PluginFunction<RawPluginConfig> = (
 
   const config = resolveConfig(rawConfig, outputFile)
 
-  const ast = concatAST(documents.map(({ content }) => content))
+  const ast = concatAST(
+    documents.flatMap((v) => (v.document ? [v.document] : []))
+  )
 
   const parsedFragments = parseFragments(ast)
   const { enums, operations } = parseOperations(ast, schema, parsedFragments)

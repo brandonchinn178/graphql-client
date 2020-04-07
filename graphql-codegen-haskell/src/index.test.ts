@@ -44,8 +44,8 @@ const schema = buildASTSchema(
 
 const documents = [
   {
-    filePath: 'foo.graphql',
-    content: gql`
+    location: 'foo.graphql',
+    document: gql`
       query getFoo {
         foo
       }
