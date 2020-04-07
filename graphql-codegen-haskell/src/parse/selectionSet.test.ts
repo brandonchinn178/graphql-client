@@ -9,6 +9,7 @@ import gql from 'graphql-tag'
 
 import { parseFragments } from './fragments'
 import {
+  COMPREHENSIVE,
   graphqlList,
   graphqlObject,
   graphqlScalar,
@@ -205,7 +206,7 @@ it('parses fragment spreads', () => {
   })
 })
 
-it('parses fragment spreads for interfaces', () => {
+it('parses fragment spreads for interfaces without complete type coverage', () => {
   const schema = buildASTSchema(
     gql`
       interface Named {
@@ -259,25 +260,150 @@ it('parses fragment spreads for interfaces', () => {
     selections: {
       named: graphqlObject({
         name: graphqlScalar('String'),
-        __subTypes: graphqlUnion([
-          {
-            age: graphqlScalar('Int'),
-          },
-          {
-            name: graphqlScalar('String'),
-            color: graphqlScalar('String', NULLABLE),
-          },
-        ]),
+        __fragments: graphqlUnion(
+          [
+            {
+              age: graphqlScalar('Int'),
+            },
+            {
+              name: graphqlScalar('String'),
+              color: graphqlScalar('String', NULLABLE),
+            },
+          ],
+          !COMPREHENSIVE
+        ),
       }),
     },
   })
 })
 
-it('allows __subTypes field', () => {
+it('parses fragment spreads for interfaces with complete type coverage', () => {
+  const schema = buildASTSchema(
+    gql`
+      interface Named {
+        name: String!
+      }
+
+      type Dog implements Named {
+        name: String!
+        color: String
+      }
+
+      type Human implements Named {
+        name: String!
+        age: Int!
+      }
+
+      type Query {
+        named: Named!
+      }
+    `
+  )
+
+  const selectionSet = parseSelectionSetAST(
+    schema,
+    gql`
+      query {
+        named {
+          name
+          ...human
+          ...fullDog
+        }
+      }
+
+      fragment human on Human {
+        age
+      }
+
+      fragment fullDog on Dog {
+        name
+        color
+      }
+    `
+  )
+
+  expect(selectionSet).toMatchObject({
+    selections: {
+      named: graphqlObject({
+        name: graphqlScalar('String'),
+        __fragments: graphqlUnion(
+          [
+            {
+              age: graphqlScalar('Int'),
+            },
+            {
+              name: graphqlScalar('String'),
+              color: graphqlScalar('String', NULLABLE),
+            },
+          ],
+          COMPREHENSIVE
+        ),
+      }),
+    },
+  })
+})
+
+it('parses a single fragment spread for an interface', () => {
+  const schema = buildASTSchema(
+    gql`
+      interface Named {
+        name: String!
+      }
+
+      type Dog implements Named {
+        name: String!
+        color: String
+      }
+
+      type Human implements Named {
+        name: String!
+        age: Int!
+      }
+
+      type Query {
+        named: Named!
+      }
+    `
+  )
+
+  const selectionSet = parseSelectionSetAST(
+    schema,
+    gql`
+      query {
+        named {
+          name
+          ...human
+        }
+      }
+
+      fragment human on Human {
+        age
+      }
+    `
+  )
+
+  expect(selectionSet).toMatchObject({
+    selections: {
+      named: graphqlObject({
+        name: graphqlScalar('String'),
+        __fragment: graphqlUnion(
+          [
+            {
+              age: graphqlScalar('Int'),
+            },
+          ],
+          !COMPREHENSIVE
+        ),
+      }),
+    },
+  })
+})
+
+it('allows __fragments field', () => {
   const schema = buildASTSchema(
     gql`
       type Foo {
-        __subTypes: Int!
+        __fragments: Int!
       }
 
       type Query {
@@ -291,7 +417,7 @@ it('allows __subTypes field', () => {
     gql`
       query {
         foo {
-          __subTypes
+          __fragments
         }
       }
     `
@@ -300,17 +426,17 @@ it('allows __subTypes field', () => {
   expect(selectionSet).toMatchObject({
     selections: {
       foo: graphqlObject({
-        __subTypes: graphqlScalar('Int'),
+        __fragments: graphqlScalar('Int'),
       }),
     },
   })
 })
 
-it('allows __subTypes field when using a non-abstract fragment', () => {
+it('allows __fragments field when using a non-abstract fragment', () => {
   const schema = buildASTSchema(
     gql`
       type Foo {
-        __subTypes: Int!
+        __fragments: Int!
       }
 
       type Query {
@@ -329,7 +455,7 @@ it('allows __subTypes field when using a non-abstract fragment', () => {
       }
 
       fragment foo on Foo {
-        __subTypes
+        __fragments
       }
     `
   )
@@ -337,22 +463,27 @@ it('allows __subTypes field when using a non-abstract fragment', () => {
   expect(selectionSet).toMatchObject({
     selections: {
       foo: graphqlObject({
-        __subTypes: graphqlScalar('Int'),
+        __fragments: graphqlScalar('Int'),
       }),
     },
   })
 })
 
-it('disallows __subTypes field when using an abstract fragment', () => {
+it('disallows __fragments field when using an abstract fragment', () => {
   const schema = buildASTSchema(
     gql`
       interface Foo {
-        __subTypes: [String]
+        __fragments: [String]
       }
 
       type Bar implements Foo {
-        __subTypes: [String]
+        __fragments: [String]
         x: Int!
+      }
+
+      type Baz implements Foo {
+        __fragments: [String]
+        y: String!
       }
 
       type Query {
@@ -367,7 +498,54 @@ it('disallows __subTypes field when using an abstract fragment', () => {
       gql`
         query {
           foo {
-            __subTypes
+            __fragments
+            ...bar
+            ...baz
+          }
+        }
+
+        fragment bar on Bar {
+          x
+        }
+
+        fragment baz on Baz {
+          y
+        }
+      `
+    )
+  }).toThrow()
+})
+
+it('disallows __fragment field', () => {
+  const schema = buildASTSchema(
+    gql`
+      interface Foo {
+        __fragment: [String]
+      }
+
+      type Bar implements Foo {
+        __fragment: [String]
+        x: Int!
+      }
+
+      type Baz implements Foo {
+        __fragment: [String]
+        y: String!
+      }
+
+      type Query {
+        foo: Foo!
+      }
+    `
+  )
+
+  expect(() => {
+    parseSelectionSetAST(
+      schema,
+      gql`
+        query {
+          foo {
+            __fragment
             ...bar
           }
         }
@@ -422,10 +600,10 @@ it('parses inline fragments', () => {
   expect(selectionSet).toMatchObject({
     selections: {
       foo: graphqlObject({
-        __subTypes: graphqlUnion([
-          { id: graphqlScalar('ID') },
-          { foo2: graphqlScalar('String') },
-        ]),
+        __fragments: graphqlUnion(
+          [{ id: graphqlScalar('ID') }, { foo2: graphqlScalar('String') }],
+          true
+        ),
       }),
     },
   })

@@ -44,8 +44,8 @@ const schema = buildASTSchema(
 
 const documents = [
   {
-    filePath: 'foo.graphql',
-    content: gql`
+    location: 'foo.graphql',
+    document: gql`
       query getFoo {
         foo
       }
@@ -229,13 +229,16 @@ it('renders', () => {
     type GetNamedSchema = [schema|
       {
         getNamed: Maybe {
-          __subTypes: {
-            id: Text,
-            foo: Maybe Text,
-          } | {
-            id: Text,
-            name: Text,
-          },
+          __fragments: (
+            {
+              id: Text,
+              foo: Maybe Text,
+            } |
+            {
+              id: Text,
+              name: Text,
+            }
+          ),
         },
       }
     |]
