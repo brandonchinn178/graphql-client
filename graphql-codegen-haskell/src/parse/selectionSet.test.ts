@@ -284,6 +284,77 @@ it('parses fragment spreads for interfaces with complete type coverage', () => {
         name: String!
       }
 
+      type Dog implements Named {
+        name: String!
+        color: String
+      }
+
+      type Human implements Named {
+        name: String!
+        age: Int!
+      }
+
+      type Query {
+        named: Named!
+      }
+    `
+  )
+
+  const selectionSet = parseSelectionSetAST(
+    schema,
+    gql`
+      query {
+        named {
+          name
+          ...human
+          ...fullDog
+        }
+      }
+
+      fragment human on Human {
+        age
+      }
+
+      fragment fullDog on Dog {
+        name
+        color
+      }
+    `
+  )
+
+  expect(selectionSet).toMatchObject({
+    selections: {
+      named: graphqlObject({
+        name: graphqlScalar('String'),
+        __fragments: graphqlUnion(
+          [
+            {
+              age: graphqlScalar('Int'),
+            },
+            {
+              name: graphqlScalar('String'),
+              color: graphqlScalar('String', NULLABLE),
+            },
+          ],
+          COMPREHENSIVE
+        ),
+      }),
+    },
+  })
+})
+
+it('parses a single fragment spread for an interface', () => {
+  const schema = buildASTSchema(
+    gql`
+      interface Named {
+        name: String!
+      }
+
+      type Dog implements Named {
+        name: String!
+        color: String
+      }
+
       type Human implements Named {
         name: String!
         age: Int!
@@ -315,13 +386,13 @@ it('parses fragment spreads for interfaces with complete type coverage', () => {
     selections: {
       named: graphqlObject({
         name: graphqlScalar('String'),
-        __fragments: graphqlUnion(
+        __fragment: graphqlUnion(
           [
             {
               age: graphqlScalar('Int'),
             },
           ],
-          COMPREHENSIVE
+          !COMPREHENSIVE
         ),
       }),
     },
@@ -410,6 +481,11 @@ it('disallows __fragments field when using an abstract fragment', () => {
         x: Int!
       }
 
+      type Baz implements Foo {
+        __fragments: [String]
+        y: String!
+      }
+
       type Query {
         foo: Foo!
       }
@@ -423,6 +499,53 @@ it('disallows __fragments field when using an abstract fragment', () => {
         query {
           foo {
             __fragments
+            ...bar
+            ...baz
+          }
+        }
+
+        fragment bar on Bar {
+          x
+        }
+
+        fragment baz on Baz {
+          y
+        }
+      `
+    )
+  }).toThrow()
+})
+
+it('disallows __fragment field', () => {
+  const schema = buildASTSchema(
+    gql`
+      interface Foo {
+        __fragment: [String]
+      }
+
+      type Bar implements Foo {
+        __fragment: [String]
+        x: Int!
+      }
+
+      type Baz implements Foo {
+        __fragment: [String]
+        y: String!
+      }
+
+      type Query {
+        foo: Foo!
+      }
+    `
+  )
+
+  expect(() => {
+    parseSelectionSetAST(
+      schema,
+      gql`
+        query {
+          foo {
+            __fragment
             ...bar
           }
         }

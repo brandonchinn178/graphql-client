@@ -130,17 +130,20 @@ class SelectionSetParser {
     )
 
     if (parsedSubTypes.length > 0) {
-      if ('__fragments' in selectionSet) {
-        throw new Error('Please rename the "__fragments" field in query')
-      }
-
       const comprehensive =
         parsedSubTypeNames.length ===
         this.schema.getPossibleTypes(schemaRoot as GraphQLInterfaceType).length
 
+      const fragmentKey =
+        parsedSubTypes.length === 1 ? '__fragment' : '__fragments'
+
+      if (fragmentKey in selectionSet) {
+        throw new Error(`Please rename the "${fragmentKey}" field in query`)
+      }
+
       return {
         ...selectionSet,
-        __fragments: graphqlUnion(parsedSubTypes, comprehensive),
+        [fragmentKey]: graphqlUnion(parsedSubTypes, comprehensive),
       }
     } else {
       return selectionSet
