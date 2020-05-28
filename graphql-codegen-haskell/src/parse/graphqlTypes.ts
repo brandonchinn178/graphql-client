@@ -17,6 +17,7 @@ export interface ParsedObjectType<T> extends BaseParsedType<false> {
 
 export interface ParsedUnionType<T> extends BaseParsedType<false> {
   subTypes: T[]
+  comprehensive: boolean
 }
 
 /** Helpers **/
@@ -58,6 +59,7 @@ export const graphqlUnion = <T>(
   comprehensive: boolean
 ): ParsedUnionType<T> => ({
   list: false,
+  nullable: false,
   subTypes,
-  nullable: !comprehensive,
+  comprehensive,
 })
