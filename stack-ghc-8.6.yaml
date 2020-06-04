@@ -5,6 +5,5 @@ packages:
   - example/
 
 extra-deps:
-  - github: LeapYear/aeson-schemas
-    commit: c9f870fd2231f3467004d98a63b3cd97722631ac
+  - aeson-schemas-1.2.0
   - hpc-lcov-1.0.0

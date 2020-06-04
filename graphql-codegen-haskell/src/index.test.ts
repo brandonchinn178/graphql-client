@@ -34,10 +34,25 @@ const schema = buildASTSchema(
       name: String!
     }
 
+    interface Named2 {
+      name: String!
+    }
+
+    type Bar2 implements Named2 {
+      id: ID!
+      name: String!
+    }
+
+    type Baz2 implements Named2 {
+      id: ID!
+      name: String!
+    }
+
     type Query {
       foo: MyEnum
       bar(x: Int!): Bar
       getNamed(s: String!): Named
+      getNamed2(s: String!): Named2
     }
   `
 )
@@ -72,6 +87,16 @@ const documents = [
       fragment baz on Baz {
         id
         name
+      }
+
+      query getNamed2($s: String!) {
+        getNamed2(s: $s) {
+          ...bar2
+        }
+      }
+
+      fragment bar2 on Bar2 {
+        id
       }
     `,
   },
@@ -229,7 +254,7 @@ it('renders', () => {
     type GetNamedSchema = [schema|
       {
         getNamed: Maybe {
-          __fragments: (
+          [__fragments]: (
             {
               id: Text,
               foo: Maybe Text,
@@ -273,6 +298,64 @@ it('renders', () => {
     runGetNamedQuerySafe :: (MonadIO m, MonadQuery m)
       => GetNamedArgs -> m (GraphQLResult (Object GetNamedSchema))
     runGetNamedQuerySafe = runQuerySafe getNamedQuery
+
+    {-----------------------------------------------------------------------------
+    * getNamed2
+
+    -- result :: Object GetNamed2Schema; throws a GraphQL exception on errors
+    result <- runGetNamed2Query GetNamed2Args
+      { _s = ...
+      }
+
+    -- result :: GraphQLResult (Object GetNamed2Schema)
+    result <- runGetNamed2QuerySafe GetNamed2Args
+      { _s = ...
+      }
+    -----------------------------------------------------------------------------}
+
+    type GetNamed2Query = Query GetNamed2Args GetNamed2Schema
+
+    data GetNamed2Args = GetNamed2Args
+      { _s :: Text
+      }
+      deriving (Show)
+
+    type GetNamed2Schema = [schema|
+      {
+        getNamed2: Maybe {
+          [__fragment]: Try (
+            {
+              id: Text,
+            }
+          ),
+        },
+      }
+    |]
+
+    instance GraphQLArgs GetNamed2Args where
+      fromArgs args = object
+        [ \\"s\\" .= _s (args :: GetNamed2Args)
+        ]
+
+    getNamed2Query :: GetNamed2Query
+    getNamed2Query = UnsafeQuery \\"getNamed2\\" [query|
+      query getNamed2($s: String!) {
+        getNamed2(s: $s) {
+          ...bar2
+        }
+      }
+      fragment bar2 on Bar2 {
+        id
+      }
+    |]
+
+    runGetNamed2Query :: (MonadIO m, MonadQuery m)
+      => GetNamed2Args -> m (Object GetNamed2Schema)
+    runGetNamed2Query = runQuery getNamed2Query
+
+    runGetNamed2QuerySafe :: (MonadIO m, MonadQuery m)
+      => GetNamed2Args -> m (GraphQLResult (Object GetNamed2Schema))
+    runGetNamed2QuerySafe = runQuerySafe getNamed2Query
 
     "
   `)

@@ -143,7 +143,7 @@ class SelectionSetParser {
 
       return {
         ...selectionSet,
-        [fragmentKey]: graphqlUnion(parsedSubTypes, comprehensive),
+        [`[${fragmentKey}]`]: graphqlUnion(parsedSubTypes, comprehensive),
       }
     } else {
       return selectionSet

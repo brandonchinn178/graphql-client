@@ -70,7 +70,11 @@ const renderSelectionType = (selectionType: ParsedSelectionType): string => {
       renderAesonSchema(selection)
     )
 
-    return indent('(' + indent('\n' + unionSchemas.join(' |\n')) + '\n)')
+    const sumType = indent(
+      '(' + indent('\n' + unionSchemas.join(' |\n')) + '\n)'
+    )
+
+    return selectionType.comprehensive ? sumType : `Try ${sumType}`
   }
 
   return indent(renderAesonSchema(selectionType.fields))

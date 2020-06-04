@@ -259,8 +259,8 @@ it('parses fragment spreads for interfaces without complete type coverage', () =
   expect(selectionSet).toMatchObject({
     selections: {
       named: graphqlObject({
-        name: graphqlScalar('String'),
-        __fragments: graphqlUnion(
+        'name': graphqlScalar('String'),
+        '[__fragments]': graphqlUnion(
           [
             {
               age: graphqlScalar('Int'),
@@ -325,8 +325,8 @@ it('parses fragment spreads for interfaces with complete type coverage', () => {
   expect(selectionSet).toMatchObject({
     selections: {
       named: graphqlObject({
-        name: graphqlScalar('String'),
-        __fragments: graphqlUnion(
+        'name': graphqlScalar('String'),
+        '[__fragments]': graphqlUnion(
           [
             {
               age: graphqlScalar('Int'),
@@ -385,8 +385,8 @@ it('parses a single fragment spread for an interface', () => {
   expect(selectionSet).toMatchObject({
     selections: {
       named: graphqlObject({
-        name: graphqlScalar('String'),
-        __fragment: graphqlUnion(
+        'name': graphqlScalar('String'),
+        '[__fragment]': graphqlUnion(
           [
             {
               age: graphqlScalar('Int'),
@@ -600,7 +600,7 @@ it('parses inline fragments', () => {
   expect(selectionSet).toMatchObject({
     selections: {
       foo: graphqlObject({
-        __fragments: graphqlUnion(
+        '[__fragments]': graphqlUnion(
           [{ id: graphqlScalar('ID') }, { foo2: graphqlScalar('String') }],
           true
         ),
