@@ -15,31 +15,75 @@ two parts:
 
 ## Quickstart
 
-First, write the `.graphql` queries you wish to use.
+Pre-requisites: Have NodeJS installed, with `npm` or `yarn` also installed.
 
-Then install `graphql-code-generator` and run `graphql-codegen` after writing
-an appropriate `codegen.yml` configuration. It should look something like:
+1. Write the `.graphql` queries you wish to use.
 
-```yaml
-schema: https://example.com/graphql
-documents: path/to/files/*.graphql
-generates:
-  src/Example/GraphQL/API.hs:
-    config:
-      # The Haskell module that will contain generated modules for GraphQL enums
-      enumsModule: Example.GraphQL.Enums
+1. Add a `package.json` file like the following:
 
-      # The Haskell module containing the data types to use for GraphQL Scalars
-      scalarsModule: Example.GraphQL.Scalars
-    plugins:
-      - graphql-codegen-haskell
-```
+    ```json
+    {
+      "name": "my-example",
+      "version": "0.0.1",
+      "private": true,
+      "scripts": {
+        "generate": "graphql-codegen"
+      },
+      "devDependencies": {
+        "@graphql-codegen/cli": "latest",
+        "graphql": "latest",
+        "graphql-codegen-haskell": "latest"
+      }
+    }
+    ```
 
-See `example/` for more details. After running `graphql-codegen`, the Haskell
-file specified (e.g. `src/Example/GraphQL/API.hs`) should've been generated
-with the types and functions needed to run your `.graphql` queries.
+1. `npm install` or `yarn install`
 
-The generated API created a function for each GraphQL query of the form
+1. Write an appropriate `codegen.yml` configuration. It should look something like:
+
+    ```yaml
+    schema: https://example.com/graphql
+    documents: path/to/files/*.graphql
+    generates:
+      src/Example/GraphQL/API.hs:
+        config:
+          enumsModule: Example.GraphQL.Enums
+          scalarsModule: Example.GraphQL.Scalars
+        plugins:
+          - graphql-codegen-haskell
+    ```
+
+    See `example/codegen.yml` as an example.
+
+1. Write the module specified in `scalarsModule` (e.g.
+   `src/Example/GraphQL/Scalars.hs`), which should export Haskell types
+   corresponding to any scalars used in your queries.
+
+   For example, if your queries use a `Date` scalar, you should implement a
+   data type named `Date` with a proper `FromJSON` instance in
+   `Example.GraphQL.Scalars`. You may also implement each scalar in a separate
+   module, if you wish, and then re-export them in `Example.GraphQL.Scalars`.
+
+   If you're not using any scalars in your queries, this module can be empty.
+
+1. `npm run generate` or `yarn generate`
+
+1. The Haskell file specified (e.g. `src/Example/GraphQL/API.hs`) should have
+   been generated with the Haskell types and functions needed to run your
+   `.graphql` queries.
+
+   If any of your GraphQL queries use enums, corresponding modules will also be
+   generated in `enumsModule`. For example, if your queries use a `Color` enum,
+   the module `Example.GraphQL.Enums.Color` would be automatically generated at
+   `src/Example/GraphQL/Enums/Color.hs`.
+
+1. Add the following dependencies to your `package.yaml` or Cabal file:
+    * `aeson`
+    * `aeson-schemas`
+    * `graphql-client`
+    * `text`
+
+The generated API has a function for each GraphQL query of the form
 `run{queryName}Query` (or `run{queryName}Mutation` for mutations). For example,
 for a query named `getRecording`:
 

@@ -9,7 +9,7 @@ import { parseFragments } from './parse/fragments'
 import { parseOperations } from './parse/operation'
 import { renderAPIModule } from './render/api'
 import { renderEnumModule } from './render/enum'
-import { moduleToPath, writeFile } from './utils'
+import { compact, moduleToPath, writeFile } from './utils'
 
 export const plugin: PluginFunction<RawPluginConfig> = (
   schema,
@@ -21,9 +21,7 @@ export const plugin: PluginFunction<RawPluginConfig> = (
 
   const config = resolveConfig(rawConfig, outputFile)
 
-  const ast = concatAST(
-    documents.flatMap((v) => (v.document ? [v.document] : []))
-  )
+  const ast = concatAST(compact(documents.map((v) => v.document)))
 
   const parsedFragments = parseFragments(ast)
   const { enums, operations } = parseOperations(ast, schema, parsedFragments)
