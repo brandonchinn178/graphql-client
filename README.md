@@ -64,6 +64,8 @@ Pre-requisites: Have NodeJS installed, with `npm` or `yarn` also installed.
    `Example.GraphQL.Scalars`. You may also implement each scalar in a separate
    module, if you wish, and then re-export them in `Example.GraphQL.Scalars`.
 
+   If you're not using any scalars in your queries, this module can be empty.
+
 1. `npm run generate` or `yarn generate`
 
 1. The Haskell file specified (e.g. `src/Example/GraphQL/API.hs`) should have
