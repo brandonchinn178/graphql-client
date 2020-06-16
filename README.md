@@ -75,7 +75,13 @@ Pre-requisites: Have NodeJS installed, with `npm` or `yarn` also installed.
    the module `Example.GraphQL.Enums.Color` would be automatically generated at
    `src/Example/GraphQL/Enums/Color.hs`.
 
-The generated API created a function for each GraphQL query of the form
+1. Add the following dependencies to your `package.yaml` or Cabal file:
+    * `aeson`
+    * `aeson-schemas`
+    * `graphql-client`
+    * `text`
+
+The generated API has a function for each GraphQL query of the form
 `run{queryName}Query` (or `run{queryName}Mutation` for mutations). For example,
 for a query named `getRecording`:
 
