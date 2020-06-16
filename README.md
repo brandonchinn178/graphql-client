@@ -15,29 +15,33 @@ two parts:
 
 ## Quickstart
 
-First, write the `.graphql` queries you wish to use.
+1. Write the `.graphql` queries you wish to use.
 
-Then install `graphql-code-generator` and run `graphql-codegen` after writing
-an appropriate `codegen.yml` configuration. It should look something like:
+1. Install `graphql-code-generator` and run `graphql-codegen` after writing an
+   appropriate `codegen.yml` configuration. It should look something like:
 
-```yaml
-schema: https://example.com/graphql
-documents: path/to/files/*.graphql
-generates:
-  src/Example/GraphQL/API.hs:
-    config:
-      # The Haskell module that will contain generated modules for GraphQL enums
-      enumsModule: Example.GraphQL.Enums
+    ```yaml
+    schema: https://example.com/graphql
+    documents: path/to/files/*.graphql
+    generates:
+      src/Example/GraphQL/API.hs:
+        config:
+          # The Haskell module that will contain generated modules for GraphQL enums
+          enumsModule: Example.GraphQL.Enums
 
-      # The Haskell module containing the data types to use for GraphQL Scalars
-      scalarsModule: Example.GraphQL.Scalars
-    plugins:
-      - graphql-codegen-haskell
-```
+          # The Haskell module containing the data types to use for GraphQL Scalars
+          scalarsModule: Example.GraphQL.Scalars
+        plugins:
+          - graphql-codegen-haskell
+    ```
 
-See `example/` for more details. After running `graphql-codegen`, the Haskell
-file specified (e.g. `src/Example/GraphQL/API.hs`) should've been generated
-with the types and functions needed to run your `.graphql` queries.
+    See `example/` for more details.
+
+1. Run `graphql-codegen`
+
+1. The Haskell file specified (e.g. `src/Example/GraphQL/API.hs`) should have
+   been generated with the Haskell types and functions needed to run your
+   `.graphql` queries.
 
 The generated API created a function for each GraphQL query of the form
 `run{queryName}Query` (or `run{queryName}Mutation` for mutations). For example,
