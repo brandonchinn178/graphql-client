@@ -38,6 +38,11 @@ orbs:
       install_stack_and_deps:
         steps:
           - run:
+              name: Install stack
+              command: |
+                curl -sSL https://get.haskellstack.org/ | sh
+                stack --version
+          - run:
               name: Build cache keys
               command: |
                 STACK_FILES=(
@@ -47,12 +52,8 @@ orbs:
                 )
                 echo "${STACK_YAML}" > stack-cache-key.txt
                 cat "${STACK_FILES[@]}" >> stack-cache-key.txt
-                curl -sSL https://get.haskellstack.org/ | sed -n 's/^STACK_VERSION="\(.*\)"/\1/p' >> stack-cache-key.txt
-          - run:
-              name: Install stack
-              command: |
-                curl -sSL https://get.haskellstack.org/ | sh
-                stack --version
+                stack --version >> stack-cache-key.txt
+                cat stack-cache-key.txt
           - run:
               name: Install system dependencies
               command: yum install -y zlib-devel
