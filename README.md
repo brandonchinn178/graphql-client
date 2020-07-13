@@ -79,12 +79,14 @@ Pre-requisites: Have NodeJS installed, with `npm` or `yarn` also installed.
 
 1. Add `graphql-client` as a dependency to your `package.yaml` or Cabal file
 
-The generated API has a function for each GraphQL query of the form
-`run{queryName}Query` (or `run{queryName}Mutation` for mutations). For example,
-for a query named `getRecording`:
+The generated API creates a data type for each GraphQL query of the form
+`{queryName}Query` (or `{queryName}Mutation` for mutations). For example,
+for a query named `getRecordings`:
 
 ```haskell
-runGetRecordingsQuery :: MonadQuery m => GetRecordingsArgs -> m (Object GetRecordingsSchema)
+data GetRecordingsQuery = GetRecordingsQuery
+  { ...
+  }
 ```
 
 An example usage of the API:
@@ -95,7 +97,14 @@ An example usage of the API:
 {-# LANGUAGE TypeApplications #-}
 
 import Control.Monad.IO.Class (MonadIO(..))
-import Data.GraphQL (MonadQuery, QuerySettings(..), defaultQuerySettings, get, runQueryT)
+import Data.GraphQL
+    ( MonadQuery
+    , QuerySettings(..)
+    , defaultQuerySettings
+    , get
+    , runQuery
+    , runQueryT
+    )
 import qualified Data.Text as Text
 
 import Example.GraphQL.API
@@ -104,7 +113,7 @@ app :: (MonadQuery m, MonadIO m) => m ()
 app = do
   song <- Text.pack <$> liftIO getLine
 
-  result <- runGetRecordingsQuery GetRecordingsArgs
+  result <- runQuery GetRecordingsQuery
     { _query = song
     , _first = Just 5
     }
@@ -141,8 +150,7 @@ import Example.GraphQL.API
 main :: IO ()
 main = do
   let mockedGetRecordings = mocked ResultMock
-        { query = getRecordingsQuery
-        , args = GetRecordingsArgs
+        { query = GetRecordingsQuery
             { _query = "My Song"
             , _first = Just 5
             }
