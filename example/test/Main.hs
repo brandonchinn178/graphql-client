@@ -10,7 +10,7 @@ import Test.Tasty (defaultMain, testGroup)
 import Test.Tasty.Golden (goldenVsString)
 
 import Example (searchForSong)
-import Example.GraphQL.API (GetRecordingsArgs(..), getRecordingsQuery)
+import Example.GraphQL.API (GetRecordingsQuery(..))
 import Example.GraphQL.Enums.ReleaseStatus (ReleaseStatus(..))
 
 main :: IO ()
@@ -36,8 +36,7 @@ main = defaultMain $ testGroup "searchForSong"
         fp = "test/goldens/" ++ name ++ ".golden"
 
     mockedGetRecordings searchQuery recordings = mocked ResultMock
-      { query = getRecordingsQuery
-      , args = GetRecordingsArgs
+      { query = GetRecordingsQuery
           { _query = searchQuery
           , _first = Just 5
           }

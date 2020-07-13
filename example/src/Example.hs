@@ -18,8 +18,7 @@ import Data.Maybe (fromMaybe)
 import Data.Monoid ((<>))
 import qualified Data.Text as Text
 
-import Example.GraphQL.API
-    (GetRecordingsArgs(..), GetRecordingsSchema, runGetRecordingsQuery)
+import Example.GraphQL.API (GetRecordingsQuery(..), GetRecordingsSchema)
 import Example.GraphQL.Enums.ReleaseStatus (ReleaseStatus(..))
 import Example.GraphQL.Scalars.Date (showDate)
 import Example.GraphQL.Scalars.Duration (showDuration)
@@ -37,7 +36,7 @@ runApp = runQueryT querySettings . unApp
 mkGetter "Song" "getSongs" ''GetRecordingsSchema ".search!.recordings!.nodes![]!"
 
 searchForSong :: (MonadIO m, MonadQuery m) => String -> m [Song]
-searchForSong song = getSongs <$> runGetRecordingsQuery GetRecordingsArgs
+searchForSong song = getSongs <$> runQuery GetRecordingsQuery
   { _query = Text.pack song
   , _first = Just 5
   }
