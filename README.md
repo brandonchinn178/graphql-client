@@ -94,15 +94,19 @@ runGetRecordingsQuery :: MonadQuery m => GetRecordingsArgs -> m (Object GetRecor
 An example usage of the API:
 
 ```haskell
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE TypeApplications #-}
+
 import Control.Monad.IO.Class (MonadIO(..))
-import Data.GraphQL (defaultQuerySettings, get, runQueryT)
+import Data.GraphQL (MonadQuery, QuerySettings(..), defaultQuerySettings, get, runQueryT)
 import qualified Data.Text as Text
 
 import Example.GraphQL.API
 
 app :: (MonadQuery m, MonadIO m) => m ()
 app = do
-  song <- Text.pack <$> getLine
+  song <- Text.pack <$> liftIO getLine
 
   result <- runGetRecordingsQuery GetRecordingsArgs
     { _query = song
@@ -117,6 +121,7 @@ main :: IO ()
 main = do
   let querySettings = defaultQuerySettings
         { url = "https://graphbrainz.herokuapp.com/"
+          -- ^ Most GraphQL APIs are at the path `/graphql`, but not this one
         }
 
   runQueryT querySettings app
@@ -129,6 +134,8 @@ mocking the GraphQL endpoints. For example, you might test the `app` function
 from the Quickstart with the following:
 
 ```haskell
+{-# LANGAUGE QuasiQuotes #-}
+
 import Data.Aeson.QQ (aesonQQ)
 import Data.GraphQL.TestUtils (ResultMock(..), mocked, runMockQueryT)
 
