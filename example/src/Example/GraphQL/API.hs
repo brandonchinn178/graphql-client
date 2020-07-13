@@ -5,15 +5,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TypeFamilies #-}
-{-# OPTIONS_GHC -fno-warn-unused-imports #-}
+{-# OPTIONS_GHC -w #-}
 
 module Example.GraphQL.API where
 
-import Control.Monad.IO.Class (MonadIO)
-import Data.Aeson (object, (.=))
-import Data.Aeson.Schema.TH (mkEnum)
 import Data.GraphQL
-import Data.Text (Text)
+import Data.GraphQL.Bootstrap
 
 import Example.GraphQL.Enums.ReleaseStatus
 import Example.GraphQL.Scalars
@@ -22,21 +19,19 @@ import Example.GraphQL.Scalars
 * getRecordings
 
 -- result :: Object GetRecordingsSchema; throws a GraphQL exception on errors
-result <- runGetRecordingsQuery GetRecordingsArgs
+result <- runQuery GetRecordingsQuery
   { _query = ...
   , _first = ...
   }
 
 -- result :: GraphQLResult (Object GetRecordingsSchema)
-result <- runGetRecordingsQuerySafe GetRecordingsArgs
+result <- runQuerySafe GetRecordingsQuery
   { _query = ...
   , _first = ...
   }
 -----------------------------------------------------------------------------}
 
-type GetRecordingsQuery = Query GetRecordingsArgs GetRecordingsSchema
-
-data GetRecordingsArgs = GetRecordingsArgs
+data GetRecordingsQuery = GetRecordingsQuery
   { _query :: Text
   , _first :: Maybe Int
   }
@@ -72,48 +67,43 @@ type GetRecordingsSchema = [schema|
   }
 |]
 
-instance GraphQLArgs GetRecordingsArgs where
-  fromArgs args = object
-    [ "query" .= _query (args :: GetRecordingsArgs)
-    , "first" .= _first (args :: GetRecordingsArgs)
-    ]
+instance GraphQLQuery GetRecordingsQuery where
+  type ResultSchema GetRecordingsQuery = GetRecordingsSchema
 
-getRecordingsQuery :: GetRecordingsQuery
-getRecordingsQuery = UnsafeQuery "getRecordings" [query|
-  query getRecordings($query: String!, $first: Int) {
-    search {
-      recordings(query: $query, first: $first) {
-        nodes {
-          title
-          artists {
-            nodes {
-              name
+  getQueryName _ = "getRecordings"
+
+  getQueryText _ = [query|
+    query getRecordings($query: String!, $first: Int) {
+      search {
+        recordings(query: $query, first: $first) {
+          nodes {
+            title
+            artists {
+              nodes {
+                name
+              }
             }
-          }
-          video
-          length
-          rating {
-            voteCount
-            value
-          }
-          releases {
-            nodes {
-              title
-              date
-              status
+            video
+            length
+            rating {
+              voteCount
+              value
+            }
+            releases {
+              nodes {
+                title
+                date
+                status
+              }
             }
           }
         }
       }
     }
-  }
-|]
+  |]
 
-runGetRecordingsQuery :: (MonadIO m, MonadQuery m)
-  => GetRecordingsArgs -> m (Object GetRecordingsSchema)
-runGetRecordingsQuery = runQuery getRecordingsQuery
-
-runGetRecordingsQuerySafe :: (MonadIO m, MonadQuery m)
-  => GetRecordingsArgs -> m (GraphQLResult (Object GetRecordingsSchema))
-runGetRecordingsQuerySafe = runQuerySafe getRecordingsQuery
+  getArgs query = object
+    [ "query" .= _query (query :: GetRecordingsQuery)
+    , "first" .= _first (query :: GetRecordingsQuery)
+    ]
 
