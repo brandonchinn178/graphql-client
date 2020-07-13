@@ -36,23 +36,23 @@ import Data.Aeson.Schema (IsSchemaObject, Object, SchemaType)
 import Data.Maybe (fromJust)
 
 import Data.GraphQL.Error (GraphQLException(..))
-import Data.GraphQL.Query (GraphQLArgs(..), Query)
+import Data.GraphQL.Query (GraphQLQuery(..))
 import Data.GraphQL.Result (GraphQLResult, getErrors, getResult)
 
 -- | A type class for monads that can run queries.
 class Monad m => MonadQuery m where
   runQuerySafe
-    :: forall args (schema :: SchemaType)
-     . (GraphQLArgs args, IsSchemaObject schema)
-    => Query args schema -> args -> m (GraphQLResult (Object schema))
+    :: forall query (schema :: SchemaType)
+     . (GraphQLQuery query, schema ~ ResultSchema query, IsSchemaObject schema)
+    => query -> m (GraphQLResult (Object schema))
 
 -- | Runs the given query and returns the result, erroring if the query returned errors.
 runQuery
-  :: forall m args (schema :: SchemaType)
-   . (MonadIO m, MonadQuery m, GraphQLArgs args, IsSchemaObject schema)
-  => Query args schema -> args -> m (Object schema)
-runQuery query args = do
-  result <- runQuerySafe query args
+  :: forall m query (schema :: SchemaType)
+   . (MonadIO m, MonadQuery m, GraphQLQuery query, schema ~ ResultSchema query, IsSchemaObject schema)
+  => query -> m (Object schema)
+runQuery query = do
+  result <- runQuerySafe query
   case getErrors result of
     [] -> return $ fromJust $ getResult result
     errors -> liftIO $ throwIO $ GraphQLException errors
@@ -60,31 +60,31 @@ runQuery query args = do
 {- Instances for common monad transformers -}
 
 instance MonadQuery m => MonadQuery (ReaderT r m) where
-  runQuerySafe query = lift . runQuerySafe query
+  runQuerySafe = lift . runQuerySafe
 
 instance MonadQuery m => MonadQuery (ExceptT e m) where
-  runQuerySafe query = lift . runQuerySafe query
+  runQuerySafe = lift . runQuerySafe
 
 instance MonadQuery m => MonadQuery (IdentityT m) where
-  runQuerySafe query = lift . runQuerySafe query
+  runQuerySafe = lift . runQuerySafe
 
 instance MonadQuery m => MonadQuery (MaybeT m) where
-  runQuerySafe query = lift . runQuerySafe query
+  runQuerySafe = lift . runQuerySafe
 
 instance (Monoid w, MonadQuery m) => MonadQuery (Lazy.RWST r w s m) where
-  runQuerySafe query = lift . runQuerySafe query
+  runQuerySafe = lift . runQuerySafe
 
 instance (Monoid w, MonadQuery m) => MonadQuery (Strict.RWST r w s m) where
-  runQuerySafe query = lift . runQuerySafe query
+  runQuerySafe = lift . runQuerySafe
 
 instance MonadQuery m => MonadQuery (Lazy.StateT s m) where
-  runQuerySafe query = lift . runQuerySafe query
+  runQuerySafe = lift . runQuerySafe
 
 instance MonadQuery m => MonadQuery (Strict.StateT s m) where
-  runQuerySafe query = lift . runQuerySafe query
+  runQuerySafe = lift . runQuerySafe
 
 instance (Monoid w, MonadQuery m) => MonadQuery (Lazy.WriterT w m) where
-  runQuerySafe query = lift . runQuerySafe query
+  runQuerySafe = lift . runQuerySafe
 
 instance (Monoid w, MonadQuery m) => MonadQuery (Strict.WriterT w m) where
-  runQuerySafe query = lift . runQuerySafe query
+  runQuerySafe = lift . runQuerySafe

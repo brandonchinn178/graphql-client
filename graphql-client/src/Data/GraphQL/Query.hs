@@ -8,41 +8,41 @@ Definitions needed by GraphQL queries.
 -}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module Data.GraphQL.Query
-  ( Query(UnsafeQuery)
-  , GraphQLArgs(..)
-  , fromQuery
-  , queryName
-  -- * Instantiating a query
+  ( GraphQLQuery(..)
   , query
   ) where
 
 import Data.Aeson (Value)
 import Data.Aeson.Schema (SchemaType)
-import Data.Kind (Type)
 import Data.Text (Text)
-import Language.Haskell.TH.Quote (QuasiQuoter)
-import qualified Text.RawString.QQ as RawString
+import qualified Data.Text as Text
+import Language.Haskell.TH.Quote (QuasiQuoter(..))
+import Language.Haskell.TH.Syntax (lift)
 
--- | A type class for query arguments.
-class GraphQLArgs args where
-  fromArgs :: args -> Value
+-- | A type class for defining GraphQL queries.
+--
+-- Should be generated via graphql-codegen-haskell. Any manual instances needs
+-- to be certain that `getArgs query` satisfies the arguments defined in
+-- `getQueryText query`, and that the result adheres to `ResultSchema query`.
+class GraphQLQuery query where
+  type ResultSchema query :: SchemaType
+  getQueryName :: query -> Text
+  getQueryText :: query -> Text
+  getArgs :: query -> Value
 
--- | A GraphQL Query that is validated at compile-time.
-data Query (args :: Type) (schema :: SchemaType) = UnsafeQuery
-  { queryName' :: Text
-  , queryText  :: Text
-  }
-  deriving (Show)
-
--- | Extract the text of the Query.
-fromQuery :: Query args r -> Text
-fromQuery = queryText
-
--- | Get the name of the Query.
-queryName :: Query args r -> Text
-queryName = queryName'
-
+-- | A quasiquoter that interpolates the given string as raw text.
+--
+-- Trying to avoid a dependency on raw-strings-qq
 query :: QuasiQuoter
-query = RawString.r
+query = QuasiQuoter
+  { quoteExp = liftText . Text.strip . Text.pack
+  , quotePat = error "Cannot use the 'query' QuasiQuoter for patterns"
+  , quoteType = error "Cannot use the 'query' QuasiQuoter for types"
+  , quoteDec = error "Cannot use the 'query' QuasiQuoter for declarations"
+  }
+  where
+    liftText s = [| Text.pack $(lift $ Text.unpack s) |]

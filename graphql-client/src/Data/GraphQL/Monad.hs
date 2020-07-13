@@ -41,7 +41,7 @@ import Network.HTTP.Client.TLS (tlsManagerSettings)
 import Network.HTTP.Types (hContentType)
 
 import Data.GraphQL.Monad.Class
-import Data.GraphQL.Query (GraphQLArgs(..), fromQuery)
+import Data.GraphQL.Query (GraphQLQuery(..))
 
 -- | The state for running QueryT.
 data QueryState = QueryState
@@ -81,13 +81,13 @@ instance MonadUnliftIO m => MonadUnliftIO (QueryT m) where
       return $ UnliftIO (unliftIO u . unQueryT)
 
 instance MonadIO m => MonadQuery (QueryT m) where
-  runQuerySafe query args = do
+  runQuerySafe query = do
     QueryState{..} <- ask
 
     let request = baseReq
           { requestBody = RequestBodyLBS $ Aeson.encode $ Aeson.object
-              [ "query" .= fromQuery query
-              , "variables" .= fromArgs args
+              [ "query" .= getQueryText query
+              , "variables" .= getArgs query
               ]
           }
 
@@ -95,7 +95,7 @@ instance MonadIO m => MonadQuery (QueryT m) where
 
 -- | Run a QueryT stack.
 runQueryT :: MonadIO m => QuerySettings -> QueryT m a -> m a
-runQueryT QuerySettings{..} query = do
+runQueryT QuerySettings{..} queryT = do
   state <- liftIO $ do
     manager <- newManager managerSettings
     baseReq <- modifyReq . modifyReq' <$> parseUrlThrow url
@@ -103,7 +103,7 @@ runQueryT QuerySettings{..} query = do
 
   (`runReaderT` state)
     . unQueryT
-    $ query
+    $ queryT
   where
     modifyReq' req = req
       { method = "POST"
