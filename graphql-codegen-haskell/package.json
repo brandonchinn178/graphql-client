@@ -13,12 +13,12 @@
     "test": "jest"
   },
   "dependencies": {
-    "auto-bind": "^4.0.0",
     "mustache": "^3.2.1",
     "yup": "^0.28.0"
   },
   "peerDependencies": {
     "@graphql-codegen/cli": "^1.13.0",
+    "@graphql-codegen/plugin-helpers": "^1.13.0",
     "graphql": "^15.0.0"
   },
   "devDependencies": {
