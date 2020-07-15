@@ -117,15 +117,12 @@ it('renders', () => {
     {-# LANGUAGE OverloadedStrings #-}
     {-# LANGUAGE QuasiQuotes #-}
     {-# LANGUAGE TypeFamilies #-}
-    {-# OPTIONS_GHC -fno-warn-unused-imports #-}
+    {-# OPTIONS_GHC -w #-}
 
     module Example.GraphQL.API where
 
-    import Control.Monad.IO.Class (MonadIO)
-    import Data.Aeson (object, (.=))
-    import Data.Aeson.Schema.TH (mkEnum)
     import Data.GraphQL
-    import Data.Text (Text)
+    import Data.GraphQL.Bootstrap
 
     import Example.GraphQL.Scalars
     import Example.GraphQL.Enums.MyEnum
@@ -134,19 +131,17 @@ it('renders', () => {
     * getFoo
 
     -- result :: Object GetFooSchema; throws a GraphQL exception on errors
-    result <- runGetFooQuery GetFooArgs
+    result <- runQuery GetFooQuery
       {
       }
 
     -- result :: GraphQLResult (Object GetFooSchema)
-    result <- runGetFooQuerySafe GetFooArgs
+    result <- runQuerySafe GetFooQuery
       {
       }
     -----------------------------------------------------------------------------}
 
-    type GetFooQuery = Query GetFooArgs GetFooSchema
-
-    data GetFooArgs = GetFooArgs
+    data GetFooQuery = GetFooQuery
       {
       }
       deriving (Show)
@@ -157,43 +152,36 @@ it('renders', () => {
       }
     |]
 
-    instance GraphQLArgs GetFooArgs where
-      fromArgs args = object
+    instance GraphQLQuery GetFooQuery where
+      type ResultSchema GetFooQuery = GetFooSchema
+
+      getQueryName _ = \\"getFoo\\"
+
+      getQueryText _ = [query|
+        query getFoo {
+          foo
+        }
+      |]
+
+      getArgs query = object
         [
         ]
-
-    getFooQuery :: GetFooQuery
-    getFooQuery = UnsafeQuery \\"getFoo\\" [query|
-      query getFoo {
-        foo
-      }
-    |]
-
-    runGetFooQuery :: (MonadIO m, MonadQuery m)
-      => GetFooArgs -> m (Object GetFooSchema)
-    runGetFooQuery = runQuery getFooQuery
-
-    runGetFooQuerySafe :: (MonadIO m, MonadQuery m)
-      => GetFooArgs -> m (GraphQLResult (Object GetFooSchema))
-    runGetFooQuerySafe = runQuerySafe getFooQuery
 
     {-----------------------------------------------------------------------------
     * getBar
 
     -- result :: Object GetBarSchema; throws a GraphQL exception on errors
-    result <- runGetBarQuery GetBarArgs
+    result <- runQuery GetBarQuery
       { _x = ...
       }
 
     -- result :: GraphQLResult (Object GetBarSchema)
-    result <- runGetBarQuerySafe GetBarArgs
+    result <- runQuerySafe GetBarQuery
       { _x = ...
       }
     -----------------------------------------------------------------------------}
 
-    type GetBarQuery = Query GetBarArgs GetBarSchema
-
-    data GetBarArgs = GetBarArgs
+    data GetBarQuery = GetBarQuery
       { _x :: Int
       }
       deriving (Show)
@@ -207,46 +195,39 @@ it('renders', () => {
       }
     |]
 
-    instance GraphQLArgs GetBarArgs where
-      fromArgs args = object
-        [ \\"x\\" .= _x (args :: GetBarArgs)
-        ]
+    instance GraphQLQuery GetBarQuery where
+      type ResultSchema GetBarQuery = GetBarSchema
 
-    getBarQuery :: GetBarQuery
-    getBarQuery = UnsafeQuery \\"getBar\\" [query|
-      query getBar($x: Int!) {
-        bar(x: $x) {
-          id
-          foo
+      getQueryName _ = \\"getBar\\"
+
+      getQueryText _ = [query|
+        query getBar($x: Int!) {
+          bar(x: $x) {
+            id
+            foo
+          }
         }
-      }
-    |]
+      |]
 
-    runGetBarQuery :: (MonadIO m, MonadQuery m)
-      => GetBarArgs -> m (Object GetBarSchema)
-    runGetBarQuery = runQuery getBarQuery
-
-    runGetBarQuerySafe :: (MonadIO m, MonadQuery m)
-      => GetBarArgs -> m (GraphQLResult (Object GetBarSchema))
-    runGetBarQuerySafe = runQuerySafe getBarQuery
+      getArgs query = object
+        [ \\"x\\" .= _x (query :: GetBarQuery)
+        ]
 
     {-----------------------------------------------------------------------------
     * getNamed
 
     -- result :: Object GetNamedSchema; throws a GraphQL exception on errors
-    result <- runGetNamedQuery GetNamedArgs
+    result <- runQuery GetNamedQuery
       { _s = ...
       }
 
     -- result :: GraphQLResult (Object GetNamedSchema)
-    result <- runGetNamedQuerySafe GetNamedArgs
+    result <- runQuerySafe GetNamedQuery
       { _s = ...
       }
     -----------------------------------------------------------------------------}
 
-    type GetNamedQuery = Query GetNamedArgs GetNamedSchema
-
-    data GetNamedArgs = GetNamedArgs
+    data GetNamedQuery = GetNamedQuery
       { _s :: Text
       }
       deriving (Show)
@@ -268,54 +249,47 @@ it('renders', () => {
       }
     |]
 
-    instance GraphQLArgs GetNamedArgs where
-      fromArgs args = object
-        [ \\"s\\" .= _s (args :: GetNamedArgs)
-        ]
+    instance GraphQLQuery GetNamedQuery where
+      type ResultSchema GetNamedQuery = GetNamedSchema
 
-    getNamedQuery :: GetNamedQuery
-    getNamedQuery = UnsafeQuery \\"getNamed\\" [query|
-      query getNamed($s: String!) {
-        getNamed(s: $s) {
-          ...bar
-          ...baz
+      getQueryName _ = \\"getNamed\\"
+
+      getQueryText _ = [query|
+        query getNamed($s: String!) {
+          getNamed(s: $s) {
+            ...bar
+            ...baz
+          }
         }
-      }
-      fragment bar on Bar {
-        id
-        foo
-      }
-      fragment baz on Baz {
-        id
-        name
-      }
-    |]
+        fragment bar on Bar {
+          id
+          foo
+        }
+        fragment baz on Baz {
+          id
+          name
+        }
+      |]
 
-    runGetNamedQuery :: (MonadIO m, MonadQuery m)
-      => GetNamedArgs -> m (Object GetNamedSchema)
-    runGetNamedQuery = runQuery getNamedQuery
-
-    runGetNamedQuerySafe :: (MonadIO m, MonadQuery m)
-      => GetNamedArgs -> m (GraphQLResult (Object GetNamedSchema))
-    runGetNamedQuerySafe = runQuerySafe getNamedQuery
+      getArgs query = object
+        [ \\"s\\" .= _s (query :: GetNamedQuery)
+        ]
 
     {-----------------------------------------------------------------------------
     * getNamed2
 
     -- result :: Object GetNamed2Schema; throws a GraphQL exception on errors
-    result <- runGetNamed2Query GetNamed2Args
+    result <- runQuery GetNamed2Query
       { _s = ...
       }
 
     -- result :: GraphQLResult (Object GetNamed2Schema)
-    result <- runGetNamed2QuerySafe GetNamed2Args
+    result <- runQuerySafe GetNamed2Query
       { _s = ...
       }
     -----------------------------------------------------------------------------}
 
-    type GetNamed2Query = Query GetNamed2Args GetNamed2Schema
-
-    data GetNamed2Args = GetNamed2Args
+    data GetNamed2Query = GetNamed2Query
       { _s :: Text
       }
       deriving (Show)
@@ -332,30 +306,25 @@ it('renders', () => {
       }
     |]
 
-    instance GraphQLArgs GetNamed2Args where
-      fromArgs args = object
-        [ \\"s\\" .= _s (args :: GetNamed2Args)
-        ]
+    instance GraphQLQuery GetNamed2Query where
+      type ResultSchema GetNamed2Query = GetNamed2Schema
 
-    getNamed2Query :: GetNamed2Query
-    getNamed2Query = UnsafeQuery \\"getNamed2\\" [query|
-      query getNamed2($s: String!) {
-        getNamed2(s: $s) {
-          ...bar2
+      getQueryName _ = \\"getNamed2\\"
+
+      getQueryText _ = [query|
+        query getNamed2($s: String!) {
+          getNamed2(s: $s) {
+            ...bar2
+          }
         }
-      }
-      fragment bar2 on Bar2 {
-        id
-      }
-    |]
+        fragment bar2 on Bar2 {
+          id
+        }
+      |]
 
-    runGetNamed2Query :: (MonadIO m, MonadQuery m)
-      => GetNamed2Args -> m (Object GetNamed2Schema)
-    runGetNamed2Query = runQuery getNamed2Query
-
-    runGetNamed2QuerySafe :: (MonadIO m, MonadQuery m)
-      => GetNamed2Args -> m (GraphQLResult (Object GetNamed2Schema))
-    runGetNamed2QuerySafe = runQuerySafe getNamed2Query
+      getArgs query = object
+        [ \\"s\\" .= _s (query :: GetNamed2Query)
+        ]
 
     "
   `)
@@ -369,7 +338,7 @@ it('renders', () => {
 
     module Example.GraphQL.Enums.MyEnum where
 
-    import Data.Aeson.Schema.TH (mkEnum)
+    import Data.GraphQL.Bootstrap
 
     mkEnum \\"MyEnum\\"
       [ \\"Hello\\"

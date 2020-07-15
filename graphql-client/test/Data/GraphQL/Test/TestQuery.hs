@@ -1,27 +1,14 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module Data.GraphQL.Test.TestQuery where
 
 import Data.Aeson (object)
 import Data.GraphQL
 
-type TestQuery = Query TestArgs TestSchema
-
-data TestArgs = TestArgs
-
-instance GraphQLArgs TestArgs where
-  fromArgs _ = object []
-
-testQuery :: TestQuery
-testQuery = UnsafeQuery "test" [query|
-  query test($name: String!) {
-    getUser(name: $name) {
-      id
-    }
-  }
-|]
+data TestQuery = TestQuery
 
 type TestSchema = [schema|
   {
@@ -30,3 +17,15 @@ type TestSchema = [schema|
     }
   }
 |]
+
+instance GraphQLQuery TestQuery where
+  type ResultSchema TestQuery = TestSchema
+  getQueryName _ = "test"
+  getQueryText _ = [query|
+    query test($name: String!) {
+      getUser(name: $name) {
+        id
+      }
+    }
+  |]
+  getArgs _ = object []

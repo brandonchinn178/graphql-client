@@ -15,7 +15,6 @@ when:
 
 dependencies:
 - aeson
-- aeson-schemas
 - base
 - graphql-client
 - text

@@ -13,7 +13,7 @@ import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (assertFailure, testCase, (@?), (@?=))
 
 import Data.GraphQL.Monad (runQuery)
-import Data.GraphQL.Test.TestQuery (TestArgs(..), testQuery)
+import Data.GraphQL.Test.TestQuery (TestQuery(..))
 import Data.GraphQL.TestUtils (ResultMock(..), mocked, runMockQueryT)
 
 testTestUtils :: TestTree
@@ -21,8 +21,7 @@ testTestUtils = testGroup "TestUtils"
   [ testCase "MockQueryT returns a mock" $ do
       obj <- runMockQueryT runTestQuery
         [ mocked ResultMock
-            { query = testQuery
-            , args = TestArgs
+            { query = TestQuery
             , result = object [ "getUser" .= object [ "id" .= (20 :: Int) ] ]
             }
         ]
@@ -35,12 +34,11 @@ testTestUtils = testGroup "TestUtils"
   , testCase "MockQueryT removes mock after use" $ do
       obj <- try @SomeException $ runMockQueryT (runTestQuery >> runTestQuery)
         [ mocked ResultMock
-            { query = testQuery
-            , args = TestArgs
+            { query = TestQuery
             , result = object [ "getUser" .= object [ "id" .= (20 :: Int) ] ]
             }
         ]
       isLeft obj @? "MockQueryT did not error"
   ]
   where
-    runTestQuery = runQuery testQuery TestArgs
+    runTestQuery = runQuery TestQuery

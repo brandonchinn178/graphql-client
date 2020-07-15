@@ -26,26 +26,22 @@ import qualified Data.Text as Text
 
 import Data.GraphQL.Error (GraphQLError)
 import Data.GraphQL.Monad (MonadQuery(..))
-import Data.GraphQL.Query (GraphQLArgs(..), Query, fromQuery, queryName)
+import Data.GraphQL.Query (GraphQLQuery(..))
 
-data ResultMock args schema = ResultMock
-  { query  :: Query args schema
-  , args   :: args
+data ResultMock query = ResultMock
+  { query  :: query
   , result :: Value
   } deriving (Show)
 
-mocked :: GraphQLArgs args => ResultMock args schema -> AnyResultMock
+mocked :: GraphQLQuery query => ResultMock query -> AnyResultMock
 mocked = AnyResultMock
 
 {- AnyResultMock -}
 
-data AnyResultMock = forall args schema. GraphQLArgs args => AnyResultMock (ResultMock args schema)
+data AnyResultMock = forall query. GraphQLQuery query => AnyResultMock (ResultMock query)
 
-isMatch :: GraphQLArgs args => Query args schema -> args -> AnyResultMock -> Bool
-isMatch testQuery testArgs (AnyResultMock mock) = matchesQuery && matchesArgs
-  where
-    matchesQuery = fromQuery (query mock) == fromQuery testQuery
-    matchesArgs = fromArgs (args mock) == fromArgs testArgs
+isMatch :: GraphQLQuery query => query -> AnyResultMock -> Bool
+isMatch testQuery (AnyResultMock mock) = getArgs (query mock) == getArgs testQuery
 
 getResult :: AnyResultMock -> Value
 getResult (AnyResultMock mock) = result mock
@@ -56,7 +52,7 @@ newtype MockQueryT m a = MockQueryT { unMockQueryT :: StateT [AnyResultMock] m a
   deriving (Functor, Applicative, Monad, MonadIO, MonadState [AnyResultMock])
 
 instance Monad m => MonadQuery (MockQueryT m) where
-  runQuerySafe testQuery testArgs = toGraphQLResult <$> lookupMock
+  runQuerySafe testQuery = toGraphQLResult <$> lookupMock
     where
       takeWhere :: (a -> Bool) -> [a] -> Maybe (a, [a])
       takeWhere f xs = case break f xs of
@@ -66,9 +62,9 @@ instance Monad m => MonadQuery (MockQueryT m) where
       -- Find the first matching mock and remove it from the state
       lookupMock :: MockQueryT m Value
       lookupMock = state $ \mocks ->
-        case takeWhere (isMatch testQuery testArgs) mocks of
+        case takeWhere (isMatch testQuery) mocks of
           Just (mock, mocks') -> (getResult mock, mocks')
-          Nothing -> error $ "No more mocked responses for query: " ++ Text.unpack (queryName testQuery)
+          Nothing -> error $ "No more mocked responses for query: " ++ Text.unpack (getQueryName testQuery)
 
       toGraphQLResult :: FromJSON a => Value -> a
       toGraphQLResult mockData = either error id . Aeson.parseEither Aeson.parseJSON $ object

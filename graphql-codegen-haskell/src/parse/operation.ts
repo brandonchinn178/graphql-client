@@ -32,16 +32,10 @@ export type ParsedOperation = {
   name: string
 
   // The query document, e.g. "query getUser($id: Int!) { user(id: $id) { name } }"
-  query: string
-  // The name of the Haskell value of type Query, e.g. "getUserQuery"
+  queryText: string
+  // The name of the Haskell query, e.g. "GetUserQuery" or "CreateUserMutation"
   queryName: string
-  // The name of the Haskell type, e.g. "GetUserQuery"
-  queryType: string
-  // The name of the Haskell function that runs the query, e.g. "runGetUserQuery"
-  queryFunction: string
 
-  // The name of the Haskell query args type, e.g. "GetUserArgs"
-  argsType: string
   // The GraphQL arguments
   args: Array<ParsedVariableDefinitions>
 
@@ -127,16 +121,13 @@ class OperationDefinitionParser {
 
     return {
       name,
-      query: [
+      queryText: [
         renderGraphQLNode(node),
         ...fragments.map((fragment) =>
           renderGraphQLNode(this.fragments[fragment])
         ),
       ].join('\n'),
-      queryName: `${name}${opType}`,
-      queryType: `${capitalName}${opType}`,
-      queryFunction: `run${capitalName}${opType}`,
-      argsType: `${capitalName}Args`,
+      queryName: `${capitalName}${opType}`,
       args,
       schemaType: `${capitalName}Schema`,
       schema: selections,

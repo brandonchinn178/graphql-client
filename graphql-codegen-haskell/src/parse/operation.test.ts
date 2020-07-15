@@ -19,12 +19,9 @@ it('parses a query operation', () => {
       {
         name: 'getFoo',
 
-        query: query.trim().replace(/\n\s{4}/g, '\n'),
-        queryName: 'getFooQuery',
-        queryType: 'GetFooQuery',
-        queryFunction: 'runGetFooQuery',
+        queryText: query.trim().replace(/\n\s{4}/g, '\n'),
+        queryName: 'GetFooQuery',
 
-        argsType: 'GetFooArgs',
         args: [
           {
             name: 'arg1',
@@ -62,12 +59,9 @@ it('parses a mutation operation', () => {
       {
         name: 'doFoo',
 
-        query: query.trim().replace(/\n\s{4}/g, '\n'),
-        queryName: 'doFooMutation',
-        queryType: 'DoFooMutation',
-        queryFunction: 'runDoFooMutation',
+        queryText: query.trim().replace(/\n\s{4}/g, '\n'),
+        queryName: 'DoFooMutation',
 
-        argsType: 'DoFooArgs',
         args: [
           {
             name: 'arg1',
@@ -105,12 +99,9 @@ it('parses a subscription operation', () => {
       {
         name: 'getFoo',
 
-        query: query.trim().replace(/\n\s{4}/g, '\n'),
-        queryName: 'getFooSubscription',
-        queryType: 'GetFooSubscription',
-        queryFunction: 'runGetFooSubscription',
+        queryText: query.trim().replace(/\n\s{4}/g, '\n'),
+        queryName: 'GetFooSubscription',
 
-        argsType: 'GetFooArgs',
         args: [
           {
             name: 'arg1',
@@ -188,10 +179,7 @@ it('generates unique names for unnamed queries', () => {
     operations: [
       expect.objectContaining({
         name: 'unnamed0',
-        queryName: 'unnamed0Query',
-        queryType: 'Unnamed0Query',
-        queryFunction: 'runUnnamed0Query',
-        argsType: 'Unnamed0Args',
+        queryName: 'Unnamed0Query',
         schemaType: 'Unnamed0Schema',
       }),
       expect.objectContaining({
@@ -199,10 +187,7 @@ it('generates unique names for unnamed queries', () => {
       }),
       expect.objectContaining({
         name: 'unnamed1',
-        queryName: 'unnamed1Mutation',
-        queryType: 'Unnamed1Mutation',
-        queryFunction: 'runUnnamed1Mutation',
-        argsType: 'Unnamed1Args',
+        queryName: 'Unnamed1Mutation',
         schemaType: 'Unnamed1Schema',
       }),
     ],
@@ -236,7 +221,7 @@ it('renders fragments in query document', () => {
   const { operations } = parseOperations(ast, TEST_SCHEMA, fragments)
 
   expect(operations).toHaveLength(1)
-  expect(operations[0].query).toMatchInlineSnapshot(`
+  expect(operations[0].queryText).toMatchInlineSnapshot(`
     "query getFoo {
       ...field1Fragment
     }

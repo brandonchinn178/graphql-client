@@ -14,10 +14,6 @@ Module = namedtuple('Module', ['package', 'name', 'overlays'])
 TickFunction = namedtuple('TickFunction', ['name', 'line_num', 'pattern'])
 
 OVERLAY_CONTENTS = [
-    Module('graphql-client', 'Data.GraphQL.Query', [
-        # used in Template Haskell at compile time, so it wouldn't be hit during a coverage run
-        TickFunction('query', 48, r'query = RawString\.r'),
-    ]),
     Module('graphql-client', 'Data.GraphQL.Monad', [
         # QueryState fields used by RecordWildCards: https://gitlab.haskell.org/ghc/ghc/issues/17834
         TickFunction('manager', 48, r'manager :: Manager'),
@@ -31,7 +27,7 @@ OVERLAY_CONTENTS = [
     ]),
     Module('graphql-client', 'Data.GraphQL.Monad.Class', [
         # MonadQuery instances for standard monad transformers
-        TickFunction('runQuerySafe', line_num, r'lift \. runQuerySafe query')
+        TickFunction('runQuerySafe', line_num, r'lift \. runQuerySafe')
         for line_num in [63, 66, 69, 72, 75, 78, 81, 84, 87, 90]
     ]),
 ]

@@ -2,7 +2,7 @@
 
 module Example.GraphQL.Enums.ReleaseStatus where
 
-import Data.Aeson.Schema.TH (mkEnum)
+import Data.GraphQL.Bootstrap
 
 mkEnum "ReleaseStatus"
   [ "OFFICIAL"

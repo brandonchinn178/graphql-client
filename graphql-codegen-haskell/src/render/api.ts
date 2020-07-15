@@ -18,7 +18,7 @@ export const renderAPIModule = (
     enumModules,
     operations: operations.map((operation) => ({
       ...operation,
-      query: indent(operation.query),
+      queryText: indent(indent(operation.queryText)),
       schema: indent(renderAesonSchema(operation.schema)),
       args: operation.args.map(({ name, type }) => ({
         arg: name,
