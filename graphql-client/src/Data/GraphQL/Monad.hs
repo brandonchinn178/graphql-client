@@ -22,7 +22,7 @@ module Data.GraphQL.Monad
   ) where
 
 import Control.Monad.IO.Class (MonadIO(..))
-import Control.Monad.IO.Unlift (MonadUnliftIO(..), UnliftIO(..), withUnliftIO)
+import Control.Monad.IO.Unlift (MonadUnliftIO(..))
 import Control.Monad.Reader (MonadReader, ReaderT, ask, runReaderT)
 import Control.Monad.Trans.Class (MonadTrans)
 import Data.Aeson ((.=))
@@ -76,9 +76,7 @@ newtype QueryT m a = QueryT { unQueryT :: ReaderT QueryState m a }
     )
 
 instance MonadUnliftIO m => MonadUnliftIO (QueryT m) where
-  askUnliftIO = QueryT $
-    withUnliftIO $ \u ->
-      return $ UnliftIO (unliftIO u . unQueryT)
+  withRunInIO inner = QueryT $ withRunInIO $ \run -> inner (run . unQueryT)
 
 instance MonadIO m => MonadQuery (QueryT m) where
   runQuerySafe query = do
