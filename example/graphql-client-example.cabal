@@ -1,0 +1,78 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 6c296d7469c272f87a1f82fcf9f102fc6addf16ae44dc2cd90a3baf6679cd196
+
+name:           graphql-client-example
+version:        0.1.0
+build-type:     Simple
+
+library
+  exposed-modules:
+      Example
+      Example.GraphQL.API
+      Example.GraphQL.Enums.ReleaseStatus
+      Example.GraphQL.Scalars
+      Example.GraphQL.Scalars.Date
+      Example.GraphQL.Scalars.Duration
+  other-modules:
+      Paths_graphql_client_example
+  hs-source-dirs:
+      src
+  ghc-options: -Wall
+  build-depends:
+      aeson
+    , base
+    , graphql-client
+    , text
+  if impl(ghc >= 8.0)
+    ghc-options: -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
+  if impl(ghc < 8.8)
+    ghc-options: -Wnoncanonical-monadfail-instances
+  default-language: Haskell2010
+
+executable graphql-client-example
+  main-is: Main.hs
+  other-modules:
+      Paths_graphql_client_example
+  hs-source-dirs:
+      exe
+  ghc-options: -Wall
+  build-depends:
+      aeson
+    , base
+    , graphql-client
+    , graphql-client-example
+    , text
+  if impl(ghc >= 8.0)
+    ghc-options: -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
+  if impl(ghc < 8.8)
+    ghc-options: -Wnoncanonical-monadfail-instances
+  default-language: Haskell2010
+
+test-suite graphql-example-test
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  other-modules:
+      Paths_graphql_client_example
+  hs-source-dirs:
+      test
+  ghc-options: -Wall
+  build-depends:
+      aeson
+    , aeson-qq
+    , base
+    , bytestring
+    , graphql-client
+    , graphql-client-example
+    , tasty
+    , tasty-golden
+    , text
+  if impl(ghc >= 8.0)
+    ghc-options: -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
+  if impl(ghc < 8.8)
+    ghc-options: -Wnoncanonical-monadfail-instances
+  default-language: Haskell2010
