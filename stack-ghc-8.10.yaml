@@ -6,3 +6,7 @@ packages:
 
 extra-deps:
   - aeson-schemas-1.2.0
+
+flags:
+  cryptonite:
+    use_target_attributes: false
