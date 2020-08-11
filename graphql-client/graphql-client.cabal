@@ -1,10 +1,10 @@
 cabal-version: >= 1.10
 
--- This file has been generated from package.yaml by hpack version 0.31.1.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 81808b8471bd31bdacabcc7cbf30efd3151f93d6cfe0a7ae4ced992e51e66444
+-- hash: 90a8bb61698eb1aa8ba5cb520c289f8e37dbf1356a0db91c866f369849922731
 
 name:           graphql-client
 version:        0.1.0
@@ -52,7 +52,7 @@ library
     , template-haskell >=2.12.0.0 && <3
     , text >=1.2.3.0 && <1.3
     , transformers >=0.5.2.0 && <0.6
-    , unliftio-core >=0.1.1.0 && <0.2
+    , unliftio-core >=0.1.1.0 && <0.3
   if impl(ghc >= 8.0)
     ghc-options: -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
   if impl(ghc < 8.8)
@@ -84,7 +84,7 @@ test-suite graphql-client-test
     , template-haskell >=2.12.0.0 && <3
     , text >=1.2.3.0 && <1.3
     , transformers >=0.5.2.0 && <0.6
-    , unliftio-core >=0.1.1.0 && <0.2
+    , unliftio-core >=0.1.1.0 && <0.3
   if impl(ghc >= 8.0)
     ghc-options: -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
   if impl(ghc < 8.8)
