@@ -90,6 +90,6 @@ Follow these steps to release this project:
        section for this version
 
 1. Upload the package to Hackage
-    1. `stack sdist`
+    1. `stack sdist graphql-client`
     1. Find the tarbell Stack created
     1. Upload tarbell to Hackage

@@ -1,0 +1,12 @@
+resolver: nightly-2020-08-11
+
+packages:
+  - graphql-client/
+  - example/
+
+extra-deps:
+  - aeson-schemas-1.2.0
+
+flags:
+  cryptonite:
+    use_target_attributes: false
