@@ -4,7 +4,7 @@ cabal-version: >= 1.10
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 90a8bb61698eb1aa8ba5cb520c289f8e37dbf1356a0db91c866f369849922731
+-- hash: 1eb49eb9e8cd0c6456c2dda57838fec170b0e9143cad22cf7b0f4b464d80ea6b
 
 name:           graphql-client
 version:        0.1.0
@@ -16,11 +16,11 @@ bug-reports:    https://github.com/LeapYear/graphql-client/issues
 author:         Brandon Chinn <brandon@leapyear.io>
 maintainer:     Brandon Chinn <brandon@leapyear.io>
 license:        BSD3
-license-file:   ../LICENSE
+license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
-    ../README.md
-    ../CHANGELOG.md
+    README.md
+    CHANGELOG.md
 
 source-repository head
   type: git
