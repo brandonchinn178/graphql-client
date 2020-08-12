@@ -23,7 +23,7 @@ module Data.GraphQL.Monad.Class
 import Control.Exception (throwIO)
 import Control.Monad.IO.Class (MonadIO(..))
 import Control.Monad.Trans.Class (MonadTrans(..))
-import Data.Aeson.Schema (Object, SchemaType)
+import Data.Aeson.Schema (Object)
 import Data.Maybe (fromJust)
 
 import Data.GraphQL.Error (GraphQLException(..))
@@ -33,14 +33,12 @@ import Data.GraphQL.Result (GraphQLResult, getErrors, getResult)
 -- | A type class for monads that can run queries.
 class Monad m => MonadQuery m where
   runQuerySafe
-    :: forall query (schema :: SchemaType)
-     . (GraphQLQuery query, schema ~ ResultSchema query)
+    :: (GraphQLQuery query, schema ~ ResultSchema query)
     => query -> m (GraphQLResult (Object schema))
 
 -- | Runs the given query and returns the result, erroring if the query returned errors.
 runQuery
-  :: forall m query (schema :: SchemaType)
-   . (MonadIO m, MonadQuery m, GraphQLQuery query, schema ~ ResultSchema query)
+  :: (MonadIO m, MonadQuery m, GraphQLQuery query, schema ~ ResultSchema query)
   => query -> m (Object schema)
 runQuery query = do
   result <- runQuerySafe query
