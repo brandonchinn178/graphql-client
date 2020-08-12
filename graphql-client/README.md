@@ -11,7 +11,7 @@ two parts:
 * `graphql-codegen-haskell`: A NodeJS library that implements a
   [`graphql-code-generator`](https://graphql-code-generator.com/) plugin to
   generate a Haskell module containing Haskell types and functions that work
-  with the `graphql-client` library
+  with the `graphql-client` library. The generated code uses the [`aeson-schemas`](http://hackage.haskell.org/package/aeson-schemas) package to define GraphQL response types, and you'd need to use the package to extract data from the response.
 
 ## Quickstart
 
