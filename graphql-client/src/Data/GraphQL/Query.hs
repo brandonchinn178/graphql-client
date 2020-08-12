@@ -7,6 +7,7 @@ Portability :  portable
 Definitions needed by GraphQL queries.
 -}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 
@@ -16,7 +17,7 @@ module Data.GraphQL.Query
   ) where
 
 import Data.Aeson (Value)
-import Data.Aeson.Schema (SchemaType)
+import Data.Aeson.Schema (IsSchemaObject, SchemaType)
 import Data.Text (Text)
 import qualified Data.Text as Text
 import Language.Haskell.TH.Quote (QuasiQuoter(..))
@@ -27,7 +28,7 @@ import Language.Haskell.TH.Syntax (lift)
 -- Should be generated via graphql-codegen-haskell. Any manual instances needs
 -- to be certain that `getArgs query` satisfies the arguments defined in
 -- `getQueryText query`, and that the result adheres to `ResultSchema query`.
-class GraphQLQuery query where
+class IsSchemaObject (ResultSchema query) => GraphQLQuery query where
   type ResultSchema query :: SchemaType
   getQueryName :: query -> Text
   getQueryText :: query -> Text
