@@ -9,7 +9,7 @@ import * as path from 'path'
  *
  *   writeFile('foo/bar/asdf.txt', 'contents')
  */
-export const writeFile = (filepath: string, content: string) => {
+export const writeFile = (filepath: string, content: string): void => {
   try {
     fs.mkdirSync(path.dirname(filepath), { recursive: true })
   } catch (_) {}

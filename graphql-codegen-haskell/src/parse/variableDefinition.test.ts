@@ -1,3 +1,4 @@
+import { OperationDefinitionNode } from 'graphql'
 import gql from 'graphql-tag'
 
 import { parseVariableDefinitions } from './variableDefinition'
@@ -21,8 +22,10 @@ it('parses variable definitions', () => {
     }
   `
 
+  const [definition] = query.definitions as OperationDefinitionNode[]
+
   expect(
-    parseVariableDefinitions(query.definitions[0].variableDefinitions)
+    parseVariableDefinitions(definition.variableDefinitions ?? [])
   ).toStrictEqual([
     {
       name: 'int',
