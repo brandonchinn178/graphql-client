@@ -2,17 +2,19 @@ import * as yup from 'yup'
 
 import { pathToModule } from './utils'
 
-const CONFIG_SCHEMA = yup.object({
-  // The directory where Haskell source files live. By default tries to infer it
-  // from the output file path.
-  hsSrcDir: yup.string().notRequired(),
+const CONFIG_SCHEMA = yup
+  .object({
+    // The directory where Haskell source files live. By default tries to infer it
+    // from the output file path.
+    hsSrcDir: yup.string().notRequired(),
 
-  // The Haskell module where GraphQL enum modules will be generated
-  enumsModule: yup.string().required(),
+    // The Haskell module where GraphQL enum modules will be generated
+    enumsModule: yup.string().required(),
 
-  // The Haskell module containing all the scalar definitions
-  scalarsModule: yup.string().required(),
-})
+    // The Haskell module containing all the scalar definitions
+    scalarsModule: yup.string().required(),
+  })
+  .defined()
 
 export type RawPluginConfig = yup.InferType<typeof CONFIG_SCHEMA>
 
