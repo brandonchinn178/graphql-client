@@ -12,7 +12,7 @@ export const renderAPIModule = (
   config: PluginConfig,
   enumModules: readonly string[],
   operations: readonly ParsedOperation[]
-) =>
+): string =>
   Mustache.render(template, {
     ...config,
     enumModules,

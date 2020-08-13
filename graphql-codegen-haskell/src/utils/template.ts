@@ -22,7 +22,7 @@ export const templateOverList = <T>(
   text: string,
   list: Array<T>,
   options: TemplateOptions = {}
-) => {
+): string => {
   const { sep = ',', context = {} } = options
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */

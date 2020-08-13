@@ -6,7 +6,7 @@
  *
  * Errors if the given source directory is not a prefix of the given path.
  */
-export const pathToModule = (modulePath: string, srcDirRaw: string) => {
+export const pathToModule = (modulePath: string, srcDirRaw: string): string => {
   const srcDir = ensureTrailingSlash(srcDirRaw)
 
   if (modulePath.indexOf(srcDir) !== 0) {
@@ -27,7 +27,7 @@ export const pathToModule = (modulePath: string, srcDirRaw: string) => {
  * moduleToPath("Example.GraphQL.API", "src/")
  * => "src/Example/GraphQL/API.hs"
  */
-export const moduleToPath = (moduleName: string, srcDir: string) => {
+export const moduleToPath = (moduleName: string, srcDir: string): string => {
   const modulePath = moduleName.replace(/\./g, '/')
   return ensureTrailingSlash(srcDir) + modulePath + '.hs'
 }

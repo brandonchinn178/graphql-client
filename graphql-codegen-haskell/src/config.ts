@@ -18,7 +18,7 @@ const CONFIG_SCHEMA = yup
 
 export type RawPluginConfig = yup.InferType<typeof CONFIG_SCHEMA>
 
-export const validateConfig = (config: { [key: string]: unknown }) => {
+export const validateConfig = (config: { [key: string]: unknown }): void => {
   CONFIG_SCHEMA.validateSync(config)
 }
 

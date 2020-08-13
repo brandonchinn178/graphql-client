@@ -76,7 +76,7 @@ module.exports = {
         ],
       },
     ],
-    '@typescript-eslint/ban-ts-ignore': 'error',
+    '@typescript-eslint/ban-ts-comment': 'error',
     '@typescript-eslint/camelcase': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/member-delimiter-style': [
@@ -89,7 +89,7 @@ module.exports = {
     ],
     '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/no-non-null-assertion': 'error',
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: "^_" }],
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/no-use-before-define': 'off',
     '@typescript-eslint/no-var-requires': 'off',
   },
