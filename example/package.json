@@ -6,10 +6,10 @@
     "codegen": "graphql-codegen"
   },
   "devDependencies": {
-    "@graphql-codegen/add": "^1.13.2",
-    "@graphql-codegen/cli": "^1.13.2",
-    "graphql": "^15.0.0",
+    "@graphql-codegen/add": "^2.0.1",
+    "@graphql-codegen/cli": "^1.17.8",
+    "graphql": "^15.3.0",
     "graphql-codegen-haskell": "0.0.1",
-    "typescript": "^2.7.4"
+    "typescript": "^3.9.7"
   }
 }
