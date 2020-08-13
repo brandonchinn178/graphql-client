@@ -6,7 +6,10 @@ generates:
       enumsModule: Example.GraphQL.Enums
       scalarsModule: Example.GraphQL.Scalars
     plugins:
-      - add: '{- This file was automatically generated and should not be edited. -}'
+      - add:
+          content:
+            - '{- This file was automatically generated and should not be edited. -}'
+            - ' '
       - graphql-codegen-haskell
     hooks:
       afterOneFileWrite:
