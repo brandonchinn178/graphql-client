@@ -4,8 +4,7 @@ Maintainer  :  Brandon Chinn <brandon@leapyear.io>
 Stability   :  experimental
 Portability :  portable
 
-Defines the 'MonadQuery' type class, which allows GraphQL
-queries to be run and mocked.
+Defines the 'MonadGraphQLQuery' type class, which defines how GraphQL queries should be run.
 -}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
@@ -16,7 +15,7 @@ queries to be run and mocked.
 {-# LANGUAGE UndecidableInstances #-}
 
 module Data.GraphQL.Monad.Class
-  ( MonadQuery(..)
+  ( MonadGraphQLQuery(..)
   , runQuery
   ) where
 
@@ -30,15 +29,15 @@ import Data.GraphQL.Error (GraphQLException(..))
 import Data.GraphQL.Query (GraphQLQuery(..))
 import Data.GraphQL.Result (GraphQLResult, getErrors, getResult)
 
--- | A type class for monads that can run queries.
-class Monad m => MonadQuery m where
+-- | A type class for monads that can run GraphQL queries.
+class Monad m => MonadGraphQLQuery m where
   runQuerySafe
     :: (GraphQLQuery query, schema ~ ResultSchema query)
     => query -> m (GraphQLResult (Object schema))
 
 -- | Runs the given query and returns the result, erroring if the query returned errors.
 runQuery
-  :: (MonadIO m, MonadQuery m, GraphQLQuery query, schema ~ ResultSchema query)
+  :: (MonadIO m, MonadGraphQLQuery m, GraphQLQuery query, schema ~ ResultSchema query)
   => query -> m (Object schema)
 runQuery query = do
   result <- runQuerySafe query
@@ -48,5 +47,5 @@ runQuery query = do
 
 {- Instances for common monad transformers -}
 
-instance {-# OVERLAPPABLE #-} (Monad (t m), MonadTrans t, MonadQuery m) => MonadQuery (t m) where
+instance {-# OVERLAPPABLE #-} (Monad (t m), MonadTrans t, MonadGraphQLQuery m) => MonadGraphQLQuery (t m) where
   runQuerySafe = lift . runQuerySafe

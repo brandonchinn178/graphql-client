@@ -19,7 +19,7 @@ import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
 
 import Data.GraphQL.Error (GraphQLError(..), GraphQLException(..))
-import Data.GraphQL.Monad (MonadQuery(..), runQuery)
+import Data.GraphQL.Monad (MonadGraphQLQuery(..), runQuery)
 import Data.GraphQL.Result (GraphQLResult(..))
 import Data.GraphQL.Test.TestQuery (TestQuery(..))
 
@@ -29,7 +29,7 @@ newtype MockQueryM a = MockQueryM { unMock :: ReaderT (Either GraphQLError Value
 runMockQueryM :: Either GraphQLError Value -> MockQueryM a -> IO a
 runMockQueryM mockedResult = (`runReaderT` mockedResult) . unMock
 
-instance MonadQuery MockQueryM where
+instance MonadGraphQLQuery MockQueryM where
   runQuerySafe _ = asks toGraphQLResult
     where
       toGraphQLResult = \case

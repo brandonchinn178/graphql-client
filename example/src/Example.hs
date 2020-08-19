@@ -23,19 +23,19 @@ import Example.GraphQL.Enums.ReleaseStatus (ReleaseStatus(..))
 import Example.GraphQL.Scalars.Date (showDate)
 import Example.GraphQL.Scalars.Duration (showDuration)
 
-newtype App a = App { unApp :: QueryT IO a }
-  deriving (Functor,Applicative,Monad,MonadIO,MonadQuery)
+newtype App a = App { unApp :: GraphQLQueryT IO a }
+  deriving (Functor,Applicative,Monad,MonadIO,MonadGraphQLQuery)
 
 runApp :: App a -> IO a
-runApp = runQueryT querySettings . unApp
+runApp = runGraphQLQueryT graphQLSettings . unApp
   where
-    querySettings = defaultQuerySettings
+    graphQLSettings = defaultGraphQLSettings
       { url = "https://graphbrainz.herokuapp.com/"
       }
 
 mkGetter "Song" "getSongs" ''GetRecordingsSchema ".search!.recordings!.nodes![]!"
 
-searchForSong :: (MonadIO m, MonadQuery m) => String -> m [Song]
+searchForSong :: (MonadIO m, MonadGraphQLQuery m) => String -> m [Song]
 searchForSong song = getSongs <$> runQuery GetRecordingsQuery
   { _query = Text.pack song
   , _first = Just 5
