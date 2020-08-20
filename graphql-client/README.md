@@ -4,7 +4,7 @@
 ![Hackage](https://img.shields.io/hackage/v/graphql-client)
 [![codecov](https://codecov.io/gh/LeapYear/graphql-client/branch/master/graph/badge.svg?token=WIOxotqPTN)](https://codecov.io/gh/LeapYear/graphql-client)
 
-A client for Haskell applications to query GraphQL APIs. This project comes in
+A client for Haskell applications to query [GraphQL](https://graphql.org) APIs. This project comes in
 two parts:
 
 * `graphql-client`: The Haskell package that can query GraphQL APIs
@@ -15,7 +15,7 @@ two parts:
 
 ## Quickstart
 
-Pre-requisites: Have NodeJS installed, with `npm` or `yarn` also installed.
+Pre-requisites: Have [NodeJS](https://node.js) installed, with `npm` or [`yarn`](https://yarnpkg.com) also installed.
 
 1. Write the `.graphql` queries you wish to use.
 
@@ -27,7 +27,7 @@ Pre-requisites: Have NodeJS installed, with `npm` or `yarn` also installed.
       "version": "0.0.1",
       "private": true,
       "scripts": {
-        "generate": "graphql-codegen"
+        "generate-hs-from-gql": "graphql-codegen"
       },
       "devDependencies": {
         "@graphql-codegen/cli": "latest",
@@ -53,7 +53,7 @@ Pre-requisites: Have NodeJS installed, with `npm` or `yarn` also installed.
           - graphql-codegen-haskell
     ```
 
-    See `example/codegen.yml` as an example.
+    See `example/codegen.yml` as an example. The full specification for this file can be found in [the docs for `graphql-code-generator`](https://graphql-code-generator.com/docs/getting-started/codegen-config)
 
 1. Write the module specified in `scalarsModule` (e.g.
    `src/Example/GraphQL/Scalars.hs`), which should export Haskell types
@@ -66,7 +66,7 @@ Pre-requisites: Have NodeJS installed, with `npm` or `yarn` also installed.
 
    If you're not using any scalars in your queries, this module can be empty.
 
-1. `npm run generate` or `yarn generate`
+1. `npm run generate-hs-from-gql` or `yarn generate-hs-from-gql`
 
 1. The Haskell file specified (e.g. `src/Example/GraphQL/API.hs`) should have
    been generated with the Haskell types and functions needed to run your
@@ -80,16 +80,42 @@ Pre-requisites: Have NodeJS installed, with `npm` or `yarn` also installed.
 1. Add `graphql-client` as a dependency to your `package.yaml` or Cabal file
 
 The generated API creates a data type for each GraphQL query of the form
-`{queryName}Query` (or `{queryName}Mutation` for mutations). For example,
-for a query named `getRecordings`:
+`{queryName}Query` (or `{queryName}Mutation` for mutations). For example, the following GraphQL query would generate the following Haskell code:
+
+```graphql
+query getRecordings($query: String!, $first: Int) {
+  search {
+    recordings(query: $query, first: $first) {
+      nodes {
+        title
+      }
+    }
+  }
+}
+```
 
 ```haskell
 data GetRecordingsQuery = GetRecordingsQuery
-  { ...
+  { _query :: Text
+  , _first :: Maybe Int
   }
+
+type GetRecordingsSchema = [schema|
+  {
+    search: Maybe {
+      recordings: Maybe {
+        nodes: Maybe List Maybe {
+          title: Maybe Text,
+        },
+      },
+    },
+  }
+|]
 ```
 
-An example usage of the API:
+`Data.GraphQL` exports a function `runQuery` which takes in one of the Query or Mutation data types and returns the response, throwing an error if the GraphQL server returns an error.
+
+A full example of the API in action:
 
 ```haskell
 {-# LANGUAGE DataKinds #-}
