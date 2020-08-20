@@ -15,7 +15,7 @@ two parts:
 
 ## Quickstart
 
-Pre-requisites: Have [NodeJS](https://node.js) installed, with `npm` or [`yarn`](https://yarnpkg.com) also installed.
+Pre-requisites: Have [Node.js](https://nodejs.org/) installed, with `npm` or [`yarn`](https://yarnpkg.com) also installed.
 
 1. Write the `.graphql` queries you wish to use.
 
