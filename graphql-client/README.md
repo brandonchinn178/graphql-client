@@ -165,7 +165,7 @@ mocking the GraphQL endpoints. For example, you might test the `app` function
 from the Quickstart with the following:
 
 ```haskell
-{-# LANGAUGE QuasiQuotes #-}
+{-# LANGUAGE QuasiQuotes #-}
 
 import Data.Aeson.QQ (aesonQQ)
 import Data.GraphQL.TestUtils (ResultMock(..), mocked, runMockQueryT)
