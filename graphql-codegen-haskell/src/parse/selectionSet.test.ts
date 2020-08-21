@@ -68,7 +68,7 @@ it('parses a simple selection set', () => {
     },
   })
 
-  expect(selectionSet.enums).toHaveLength(1)
+  expect(selectionSet.enums).toHaveProperty('size', 1)
   expect(selectionSet.enums).toContain('MyEnum')
 })
 
@@ -174,7 +174,7 @@ it('parses enums', () => {
     bar: graphqlScalar('Bar'),
   })
 
-  expect(enums).toHaveLength(2)
+  expect(enums).toHaveProperty('size', 2)
   expect(enums).toContain('Foo')
   expect(enums).toContain('Bar')
 })

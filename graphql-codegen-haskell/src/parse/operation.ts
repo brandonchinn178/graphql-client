@@ -16,6 +16,7 @@ import {
 } from './variableDefinition'
 
 export type ParsedOperations = {
+  // Sorted alphabetically and contains no duplicates
   enums: ParsedEnum[]
   operations: ParsedOperation[]
 }
@@ -58,30 +59,32 @@ export const parseOperations = (
   const operations = operationNodes.map((operation) =>
     parser.parseOperation(operation)
   )
-  const enums = parser.getEnums().map((enumName) => {
-    const enumType = assertEnumType(schema.getType(enumName))
-    return {
-      name: enumName,
-      values: enumType.getValues().map(({ name }) => name),
-    }
-  })
+  const enums = Array.from(parser.getEnums())
+    .sort()
+    .map((enumName) => {
+      const enumType = assertEnumType(schema.getType(enumName))
+      return {
+        name: enumName,
+        values: enumType.getValues().map(({ name }) => name),
+      }
+    })
 
   return { enums, operations }
 }
 
 class OperationDefinitionParser {
-  private _enums: string[]
+  private _enums: Set<string>
   private _unnamedCounter: number
 
   constructor(
     readonly schema: GraphQLSchema,
     readonly fragments: ParsedFragments
   ) {
-    this._enums = []
+    this._enums = new Set()
     this._unnamedCounter = 0
   }
 
-  getEnums(): readonly string[] {
+  getEnums(): Set<string> {
     return this._enums
   }
 
@@ -117,7 +120,9 @@ class OperationDefinitionParser {
       this.fragments
     )
 
-    this._enums.push(...enums)
+    enums.forEach((e) => {
+      this._enums.add(e)
+    })
 
     return {
       name,
