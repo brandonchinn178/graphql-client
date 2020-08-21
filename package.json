@@ -8,6 +8,20 @@
   },
   "scripts": {
     "example": "yarn workspace graphql-client-example",
-    "graphql": "yarn workspace graphql-codegen-haskell"
+    "graphql": "yarn workspace graphql-codegen-haskell",
+    "lint": "eslint --ext .ts,.js"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^3.9.0",
+    "@typescript-eslint/parser": "^3.9.0",
+    "eslint": "^7.6.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-cypress": "^2.11.1",
+    "eslint-plugin-graphql": "^4.0.0",
+    "eslint-plugin-jest": "^23.20.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-simple-import-sort": "^5.0.3",
+    "prettier": "^2.0.5",
+    "typescript": "^3.9.7"
   }
 }
