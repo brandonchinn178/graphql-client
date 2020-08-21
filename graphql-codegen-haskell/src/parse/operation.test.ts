@@ -196,14 +196,22 @@ it('generates unique names for unnamed queries', () => {
 
 it('collects enums', () => {
   const ast = gql`
-    query getMyEnum {
-      myEnum
+    query getMyEnum2 {
+      myEnum2
+    }
+    query getMyEnum1 {
+      myEnum1
+    }
+    query getAnotherMyEnum1 {
+      myEnum1
     }
   `
 
-  expect(parseOperations(ast, TEST_SCHEMA, {})).toMatchObject({
-    enums: [{ name: 'MyEnum', values: ['FOO', 'BAR'] }],
-  })
+  const { enums } = parseOperations(ast, TEST_SCHEMA, {})
+  expect(enums).toStrictEqual([
+    { name: 'MyEnum1', values: ['FOO1', 'BAR1'] },
+    { name: 'MyEnum2', values: ['FOO2', 'BAR2'] },
+  ])
 })
 
 it('renders fragments in query document', () => {
@@ -237,7 +245,8 @@ const TEST_SCHEMA = buildASTSchema(
   gql`
     type Query {
       field1: QueryScalar!
-      myEnum: MyEnum!
+      myEnum1: MyEnum1!
+      myEnum2: MyEnum2!
     }
 
     type Mutation {
@@ -252,9 +261,13 @@ const TEST_SCHEMA = buildASTSchema(
     scalar MutationScalar
     scalar SubscriptionScalar
 
-    enum MyEnum {
-      FOO
-      BAR
+    enum MyEnum1 {
+      FOO1
+      BAR1
+    }
+    enum MyEnum2 {
+      FOO2
+      BAR2
     }
   `
 )

@@ -57,7 +57,6 @@ it('parses a simple selection set', () => {
   )
 
   expect(selectionSet).toMatchObject({
-    enums: ['MyEnum'],
     selections: {
       id: graphqlScalar('ID'),
       int: graphqlScalar('Int', NULLABLE),
@@ -68,6 +67,9 @@ it('parses a simple selection set', () => {
       enum: graphqlScalar('MyEnum', NULLABLE),
     },
   })
+
+  expect(selectionSet.enums).toHaveProperty('size', 1)
+  expect(selectionSet.enums).toContain('MyEnum')
 })
 
 it('parses fields with aliases', () => {
@@ -127,6 +129,54 @@ it('parses lists', () => {
       nullListNull: graphqlList(graphqlScalar('Int', NULLABLE), NULLABLE),
     },
   })
+})
+
+it('parses enums', () => {
+  const schema = buildASTSchema(
+    gql`
+      type Query {
+        foo1: Foo!
+        foo2: Foo!
+        bar: Bar!
+      }
+
+      enum Foo {
+        Foo1
+        Foo2
+      }
+
+      enum Bar {
+        Bar1
+        Bar2
+      }
+
+      enum Unused {
+        Unused1
+        Unused2
+      }
+    `
+  )
+
+  const { selections, enums } = parseSelectionSetAST(
+    schema,
+    gql`
+      query {
+        foo1
+        foo2
+        bar
+      }
+    `
+  )
+
+  expect(selections).toMatchObject({
+    foo1: graphqlScalar('Foo'),
+    foo2: graphqlScalar('Foo'),
+    bar: graphqlScalar('Bar'),
+  })
+
+  expect(enums).toHaveProperty('size', 2)
+  expect(enums).toContain('Foo')
+  expect(enums).toContain('Bar')
 })
 
 it('parses objects', () => {

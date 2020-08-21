@@ -33,7 +33,7 @@ import {
 } from './graphqlTypes'
 
 export type ParsedSelectionSet = {
-  enums: string[]
+  enums: Set<string>
   fragments: string[]
   selections: ParsedSelection
 }
@@ -75,18 +75,18 @@ export const parseSelectionSet = (
 }
 
 class SelectionSetParser {
-  _enums: string[]
+  _enums: Set<string>
   _fragments: string[]
 
   constructor(
     readonly schema: GraphQLSchema,
     readonly allFragments: ParsedFragments
   ) {
-    this._enums = []
+    this._enums = new Set()
     this._fragments = []
   }
 
-  getEnums(): string[] {
+  getEnums(): Set<string> {
     return this._enums
   }
 
@@ -225,7 +225,7 @@ class SelectionSetParser {
 
     if (isLeafType(type)) {
       if (isEnumType(type)) {
-        this._enums.push(type.name)
+        this._enums.add(type.name)
       }
       return graphqlScalar(type.name, nullable)
     }

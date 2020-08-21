@@ -14,9 +14,14 @@ const fullConfig = {
 
 const schema = buildASTSchema(
   gql`
-    enum MyEnum {
-      Hello
-      World
+    enum EnumFoo {
+      Foo1
+      Foo2
+    }
+
+    enum EnumBar {
+      Bar1
+      Bar2
     }
 
     interface Named {
@@ -49,7 +54,8 @@ const schema = buildASTSchema(
     }
 
     type Query {
-      foo: MyEnum
+      enumFoo: EnumFoo
+      enumBar: EnumBar
       bar(x: Int!): Bar
       getNamed(s: String!): Named
       getNamed2(s: String!): Named2
@@ -61,8 +67,13 @@ const documents = [
   {
     location: 'foo.graphql',
     document: gql`
-      query getFoo {
-        foo
+      query getEnums {
+        enumFoo
+        enumBar
+      }
+
+      query getMoreEnums {
+        enumFoo
       }
 
       query getBar($x: Int!) {
@@ -125,41 +136,84 @@ it('renders', () => {
     import Data.GraphQL.Bootstrap
 
     import Example.GraphQL.Scalars
-    import Example.GraphQL.Enums.MyEnum
+    import Example.GraphQL.Enums.EnumBar
+    import Example.GraphQL.Enums.EnumFoo
 
     {-----------------------------------------------------------------------------
-    * getFoo
+    * getEnums
 
-    -- result :: Object GetFooSchema; throws a GraphQL exception on errors
-    result <- runQuery GetFooQuery
+    -- result :: Object GetEnumsSchema; throws a GraphQL exception on errors
+    result <- runQuery GetEnumsQuery
       {
       }
 
-    -- result :: GraphQLResult (Object GetFooSchema)
-    result <- runQuerySafe GetFooQuery
+    -- result :: GraphQLResult (Object GetEnumsSchema)
+    result <- runQuerySafe GetEnumsQuery
       {
       }
     -----------------------------------------------------------------------------}
 
-    data GetFooQuery = GetFooQuery
+    data GetEnumsQuery = GetEnumsQuery
       {
       }
       deriving (Show)
 
-    type GetFooSchema = [schema|
+    type GetEnumsSchema = [schema|
       {
-        foo: Maybe MyEnum,
+        enumFoo: Maybe EnumFoo,
+        enumBar: Maybe EnumBar,
       }
     |]
 
-    instance GraphQLQuery GetFooQuery where
-      type ResultSchema GetFooQuery = GetFooSchema
+    instance GraphQLQuery GetEnumsQuery where
+      type ResultSchema GetEnumsQuery = GetEnumsSchema
 
-      getQueryName _ = \\"getFoo\\"
+      getQueryName _ = \\"getEnums\\"
 
       getQueryText _ = [query|
-        query getFoo {
-          foo
+        query getEnums {
+          enumFoo
+          enumBar
+        }
+      |]
+
+      getArgs query = object
+        [
+        ]
+
+    {-----------------------------------------------------------------------------
+    * getMoreEnums
+
+    -- result :: Object GetMoreEnumsSchema; throws a GraphQL exception on errors
+    result <- runQuery GetMoreEnumsQuery
+      {
+      }
+
+    -- result :: GraphQLResult (Object GetMoreEnumsSchema)
+    result <- runQuerySafe GetMoreEnumsQuery
+      {
+      }
+    -----------------------------------------------------------------------------}
+
+    data GetMoreEnumsQuery = GetMoreEnumsQuery
+      {
+      }
+      deriving (Show)
+
+    type GetMoreEnumsSchema = [schema|
+      {
+        enumFoo: Maybe EnumFoo,
+      }
+    |]
+
+    instance GraphQLQuery GetMoreEnumsQuery where
+      type ResultSchema GetMoreEnumsQuery = GetMoreEnumsSchema
+
+      getQueryName _ = \\"getMoreEnums\\"
+
+      getQueryText _ = [query|
+        query getMoreEnums {
+          enumFoo
         }
       |]
 
@@ -329,20 +383,38 @@ it('renders', () => {
     "
   `)
 
-  expect(mockWriteFileSync).toHaveBeenCalledTimes(1)
+  expect(mockWriteFileSync).toHaveBeenCalledTimes(2)
 
-  const [myEnumModuleName, myEnumModule] = mockWriteFileSync.mock.calls[0]
-  expect(myEnumModuleName).toBe('src/Example/GraphQL/Enums/MyEnum.hs')
-  expect(myEnumModule).toMatchInlineSnapshot(`
+  const [writeEnumBar, writeEnumFoo] = mockWriteFileSync.mock.calls
+
+  const [enumBarModuleName, enumBarModule] = writeEnumBar
+  expect(enumBarModuleName).toBe('src/Example/GraphQL/Enums/EnumBar.hs')
+  expect(enumBarModule).toMatchInlineSnapshot(`
     "{-# LANGUAGE TemplateHaskell #-}
 
-    module Example.GraphQL.Enums.MyEnum where
+    module Example.GraphQL.Enums.EnumBar where
 
     import Data.GraphQL.Bootstrap
 
-    mkEnum \\"MyEnum\\"
-      [ \\"Hello\\"
-      , \\"World\\"
+    mkEnum \\"EnumBar\\"
+      [ \\"Bar1\\"
+      , \\"Bar2\\"
+      ]
+    "
+  `)
+
+  const [enumFooModuleName, enumFooModule] = writeEnumFoo
+  expect(enumFooModuleName).toBe('src/Example/GraphQL/Enums/EnumFoo.hs')
+  expect(enumFooModule).toMatchInlineSnapshot(`
+    "{-# LANGUAGE TemplateHaskell #-}
+
+    module Example.GraphQL.Enums.EnumFoo where
+
+    import Data.GraphQL.Bootstrap
+
+    mkEnum \\"EnumFoo\\"
+      [ \\"Foo1\\"
+      , \\"Foo2\\"
       ]
     "
   `)
