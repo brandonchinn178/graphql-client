@@ -35,6 +35,7 @@
     "jest-raw-loader": "^1.0.1",
     "lodash": "^4.17.20",
     "rollup": "^2.23.1",
+    "rollup-plugin-node-externals": "^2.2.0",
     "rollup-plugin-string": "^3.0.0",
     "rollup-plugin-typescript2": "^0.27.2",
     "ts-jest": "^26.2.0",

@@ -130,7 +130,8 @@ main = do
 
 ## Configuration
 
-The `codegen.yml` file should have the following format:
+The `codegen.yml` file should have the following format. All paths are
+relative to the `codegen.yml` file.
 
 * `schema`: Where to get the schema of the entire GraphQL API. Can be one of
   the following:
