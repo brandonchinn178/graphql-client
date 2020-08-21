@@ -8,7 +8,6 @@
     "noUnusedParameters": true,
     "lib": ["esnext"],
     "baseUrl": ".",
-    "outDir": "dist",
     "paths": {
       "~/*": ["./src/*"]
     }

@@ -4,8 +4,6 @@
   "repository": "git@github.com:LeapYear/graphql-client",
   "author": "Brandon Chinn <brandon@leapyear.io>",
   "license": "BSD-3-Clause",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "scripts": {
     "build": "rollup --config",
     "typecheck": "tsc -p ./tsconfig.json --noEmit",
