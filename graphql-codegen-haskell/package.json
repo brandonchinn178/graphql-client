@@ -23,6 +23,8 @@
   "devDependencies": {
     "@graphql-codegen/cli": "^1.17.8",
     "@graphql-codegen/plugin-helpers": "^1.17.8",
+    "@rollup/plugin-commonjs": "^15.0.0",
+    "@rollup/plugin-node-resolve": "^9.0.0",
     "@types/jest": "^26.0.9",
     "@types/mustache": "^4.0.1",
     "@types/yup": "^0.29.4",

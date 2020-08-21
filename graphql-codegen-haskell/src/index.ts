@@ -43,3 +43,7 @@ export const plugin: PluginFunction<RawPluginConfig> = (
 export const validate: PluginValidateFn = (_schema, _documents, config) => {
   validateConfig(config)
 }
+
+if (require.main === module) {
+  console.log('hello world')
+}

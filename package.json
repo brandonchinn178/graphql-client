@@ -8,7 +8,8 @@
   },
   "scripts": {
     "example": "yarn workspace graphql-client-example",
-    "graphql": "yarn workspace graphql-codegen-haskell",
+    "graphql-codegen": "yarn workspace graphql-codegen-haskell",
+    "build": "yarn graphql-codegen build",
     "lint": "eslint --ext .ts,.js"
   },
   "devDependencies": {

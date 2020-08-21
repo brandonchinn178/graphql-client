@@ -1,7 +1,7 @@
+import commonjs from '@rollup/plugin-commonjs'
+import { nodeResolve } from '@rollup/plugin-node-resolve'
 import { string } from 'rollup-plugin-string'
 import typescript from 'rollup-plugin-typescript2'
-
-import pkg from './package.json'
 
 export default {
   input: './src/index.ts',
@@ -11,13 +11,11 @@ export default {
       format: 'cjs',
     },
   ],
-  external: [
-    ...Object.keys(pkg.dependencies || {}),
-    ...Object.keys(pkg.peerDependencies || {}),
-    'fs',
-    'path',
-  ],
+  external: ['fs', 'path'],
   plugins: [
+    nodeResolve(),
+    commonjs(),
+
     typescript({
       typescript: require('typescript'),
       tsconfigFile: 'tsconfig.build.json',
