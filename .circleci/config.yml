@@ -262,7 +262,7 @@ jobs:
       # lint
       - run:
           name: Lint
-          command: scripts/eslint.sh
+          command: scripts/eslint.sh .
 
       # test
       - run:

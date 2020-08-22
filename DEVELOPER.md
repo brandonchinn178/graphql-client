@@ -33,7 +33,7 @@ The following linters must pass CI in order for your PR to be accepted.
 * ESLint
 
     ```bash
-    scripts/eslint.sh
+    scripts/eslint.sh .
     ```
 
 You can install [pre-commit](https://pre-commit.com/) to run these linters as
