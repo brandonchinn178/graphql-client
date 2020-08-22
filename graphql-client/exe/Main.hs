@@ -10,7 +10,7 @@ import Language.Haskell.TH (listE, runIO, tupE)
 import Language.Haskell.TH.Syntax (addDependentFile)
 import Options.Applicative
 import Path
-import Path.IO (ensureDir, resolveFile', withSystemTempDir)
+import Path.IO (doesFileExist, ensureDir, resolveFile', withSystemTempDir)
 import System.Process.Typed (proc, runProcess_)
 
 data CliOptions = CliOptions
@@ -37,7 +37,13 @@ parseCliOptions = CliOptions
       ]
 
 graphqlCodegenScript :: ByteString
-graphqlCodegenScript = $(embedFile "js/graphql-codegen-haskell.js")
+graphqlCodegenScript = $(do
+  let script = [relfile|js/graphql-codegen-haskell.js|]
+      fallbackScript = [relfile|js/graphql-codegen-haskell-fallback.js|]
+
+  scriptExists <- runIO $ doesFileExist script
+  embedFile $ toFilePath $ if scriptExists then script else fallbackScript
+  )
 
 mockedLibraries :: [(Path Rel File, ByteString)]
 mockedLibraries = $(do

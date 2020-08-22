@@ -1,8 +1,11 @@
 /* global Proxy */
 
-const ISSUE_PATH = 'https://github.com/LeapYear/graphql-client/issues/'
+const GITHUB_URL = 'https://github.com/LeapYear/graphql-client'
+const ISSUE_PATH = `${GITHUB_URL}/issues`
 
 module.exports = {
+  GITHUB_URL,
+
   /**
    * Export an object for this module that will error if any export tries
    * to be accessed.

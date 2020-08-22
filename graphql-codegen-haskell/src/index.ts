@@ -14,6 +14,29 @@ import { renderAPIModule } from './render/api'
 import { renderEnumModule } from './render/enum'
 import { compact, moduleToPath, writeFile } from './utils'
 
+export const main = (): void => {
+  const error = (msg: string) => {
+    console.error(msg)
+    process.exit(1)
+  }
+
+  const argv = process.argv.slice(2)
+
+  if (argv.length !== 1) {
+    error(`Usage: ${process.argv[1]} CONFIG`)
+  }
+
+  const [configPath] = argv
+
+  generate(configPath)
+    .then((outputFiles) => {
+      Object.entries(outputFiles).forEach(([modulePath, content]) => {
+        writeFile(modulePath, content)
+      })
+    })
+    .catch(error)
+}
+
 type OutputFiles = {
   [modulePath: string]: string
 }
@@ -91,24 +114,5 @@ const loadDocuments = async (
 }
 
 if (require.main === module) {
-  const error = (msg: string) => {
-    console.error(msg)
-    process.exit(1)
-  }
-
-  const argv = process.argv.slice(2)
-
-  if (argv.length !== 1) {
-    error(`Usage: ${process.argv[1]} CONFIG`)
-  }
-
-  const [configPath] = argv
-
-  generate(configPath)
-    .then((outputFiles) => {
-      Object.entries(outputFiles).forEach(([modulePath, content]) => {
-        writeFile(modulePath, content)
-      })
-    })
-    .catch(error)
+  main()
 }

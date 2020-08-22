@@ -4,7 +4,7 @@ cabal-version: >= 1.10
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 237b299525260db4d6aaacb4099becbd5d2ae18d4955e2f831088baab4b9280d
+-- hash: 50ae710f7c7be0e6626b177699d8f9681f06e49ef3d17cee588d439e97de59a6
 
 name:           graphql-client
 version:        0.1.0
@@ -22,6 +22,7 @@ extra-source-files:
     README.md
     CHANGELOG.md
     ./js/graphql-codegen-haskell.js
+    ./js/graphql-codegen-haskell-fallback.js
     ./js/mocks/__utils.js
     ./js/mocks/websocket.js
 
