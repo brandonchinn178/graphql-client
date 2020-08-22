@@ -13,16 +13,22 @@ const utils = require('__utils')
 
 const ERROR_MESSAGE = `
 The graphql-codegen executable was built without the
-graphql-codegen-haskell.js bundle. This can happen if you're building
-the graphql-client package from a source other than Hackage.
+graphql-codegen-haskell.js bundle. This can happen if you're building the
+graphql-client package from a source other than Hackage.
 
-If this is the case, please clone the GitHub repo found at:
+If this is the case, get the graphql-codegen-haskell.js bundle manually and set
+the GRAPHQL_CODEGEN environment variable to the location of that bundle. You
+can get the bundle in one of the following ways:
 
-  ${utils.GITHUB_URL}
-
-and follow the instructions in DEVELOPER.md to build the
-graphql-codegen-haskell.js bundle manually. Then set the GRAPHQL_CODEGEN
-environment variable to the location of that bundle.
+  1. Download from CircleCI (recommended)
+      a. Go to ${utils.GITHUB_URL}
+      b. Navigate to the appropriate commit
+      c. Click on the commit status icon and click on the 'test_latest' CI job
+      d. Go to the Artifacts tab
+      e. Download 'graphql-codegen-haskell.js'
+  2. Build manually
+      a. Clone ${utils.GITHUB_URL}
+      b. Follow the instructions in DEVELOPER.md to build the bundle
 `
 
 const error = (msg) => {

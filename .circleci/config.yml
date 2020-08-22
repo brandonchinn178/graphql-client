@@ -120,12 +120,16 @@ jobs:
     steps:
       # init
       - checkout
+      - run: mkdir -p .ci
 
       # build graphql-codegen-haskell
       - helpers/install_yarn_and_deps
       - run:
           name: Build graphql-codegen-haskell
           command: yarn build
+      - run:
+          name: Copy graphql-codegen-haskell to CI artifacts
+          command: cp graphql-client/js/graphql-codegen-haskell.js .ci/
 
       # build graphql-client
       - helpers/install_stack_and_deps
@@ -194,11 +198,17 @@ jobs:
                   stack build --haddock graphql-client
             - run:
                 name: Bundle haddock docs
+                command: tar czf .ci/haddock-docs.tar.gz -C "$(find graphql-client/.stack-work/dist -regex '.*/doc/html/[^/]*')" .
+
+      # bundle Haskell files for deployment
+      - when:
+          condition: << parameters.latest >>
+          steps:
+            - run:
+                name: stack sdist
                 command: |
-                  mkdir -p .ci/
-                  tar czf .ci/haddock-docs.tar.gz -C "$(find graphql-client/.stack-work/dist -regex '.*/doc/html/[^/]*')" .
-            - store_artifacts:
-                path: .ci/
+                  stack sdist graphql-client
+                  cp "$(find graphql-client/.stack-work/ -name 'graphql-client-*.tar.gz')" .ci/
 
       # build and test graphql-client-example
       - when:
@@ -242,6 +252,9 @@ jobs:
             - run:
                 name: Run example
                 command: stack exec graphql-client-example
+
+      - store_artifacts:
+          path: .ci/
 
   test_node:
     executor: centos7
