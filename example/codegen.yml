@@ -1,16 +1,6 @@
 schema: https://graphbrainz.herokuapp.com
 documents: src/Example/GraphQL/api/*.graphql
-generates:
-  src/Example/GraphQL/API.hs:
-    config:
-      enumsModule: Example.GraphQL.Enums
-      scalarsModule: Example.GraphQL.Scalars
-    plugins:
-      - add:
-          content:
-            - '{- This file was automatically generated and should not be edited. -}'
-            - ' '
-      - graphql-codegen-haskell
-    hooks:
-      afterOneFileWrite:
-        - scripts/format-graphql-codegen.sh
+
+apiModule: Example.GraphQL.API
+enumsModule: Example.GraphQL.Enums
+scalarsModule: Example.GraphQL.Scalars
