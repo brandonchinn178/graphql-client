@@ -8,13 +8,10 @@ import template from './templates/enum.mustache'
 
 export const renderEnumModule = (
   config: PluginConfig,
-  parsedEnum: ParsedEnum
-): {
+  parsedEnum: ParsedEnum,
   enumModuleName: string
-  enumModule: string
-} => {
-  const enumModuleName = `${config.enumsModule}.${parsedEnum.name}`
-  const enumModule = Mustache.render(template, {
+): string =>
+  Mustache.render(template, {
     ...config,
     ...parsedEnum,
     enumModuleName,
@@ -22,5 +19,3 @@ export const renderEnumModule = (
       return (text: string) => templateOverList(text, this.values)
     },
   })
-  return { enumModuleName, enumModule }
-}

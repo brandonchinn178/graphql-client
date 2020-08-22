@@ -1,0 +1,46 @@
+enum EnumFoo {
+  Foo1
+  Foo2
+}
+
+enum EnumBar {
+  Bar1
+  Bar2
+}
+
+interface Named {
+  name: String!
+}
+
+type Bar implements Named {
+  id: ID!
+  foo: String
+  name: String!
+}
+
+type Baz implements Named {
+  id: ID!
+  name: String!
+}
+
+interface Named2 {
+  name: String!
+}
+
+type Bar2 implements Named2 {
+  id: ID!
+  name: String!
+}
+
+type Baz2 implements Named2 {
+  id: ID!
+  name: String!
+}
+
+type Query {
+  enumFoo: EnumFoo
+  enumBar: EnumBar
+  bar(x: Int!): Bar
+  getNamed(s: String!): Named
+  getNamed2(s: String!): Named2
+}

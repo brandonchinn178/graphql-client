@@ -1,0 +1,6 @@
+schema: ./schema.graphql
+documents: ./document.graphql
+
+apiModule: Example.GraphQL.API
+enumsModule: Example.GraphQL.Enums
+scalarsModule: Example.GraphQL.Scalars

@@ -1,129 +1,20 @@
-import * as fs from 'fs'
-import { buildASTSchema } from 'graphql'
-import gql from 'graphql-tag'
+import * as path from 'path'
 
-import { plugin, validate } from './index'
+import { generate } from './index'
 
-jest.mock('fs')
-const mockWriteFileSync = fs.writeFileSync as jest.Mock
+const TEST_DIR = path.resolve(__dirname, '..', 'test')
 
-const fullConfig = {
-  enumsModule: 'Example.GraphQL.Enums',
-  scalarsModule: 'Example.GraphQL.Scalars',
-}
+it(`generates files using files from ${TEST_DIR}`, async () => {
+  const outputFiles = await generate(path.resolve(TEST_DIR, 'codegen.yml'))
 
-const schema = buildASTSchema(
-  gql`
-    enum EnumFoo {
-      Foo1
-      Foo2
-    }
+  expect(Object.keys(outputFiles)).toHaveLength(3)
 
-    enum EnumBar {
-      Bar1
-      Bar2
-    }
+  const outputFile = (file: string) => outputFiles[path.resolve(TEST_DIR, file)]
 
-    interface Named {
-      name: String!
-    }
+  expect(outputFile('src/Example/GraphQL/API.hs')).toMatchInlineSnapshot(`
+    "{- This file was automatically generated and should not be edited. -}
 
-    type Bar implements Named {
-      id: ID!
-      foo: String
-      name: String!
-    }
-
-    type Baz implements Named {
-      id: ID!
-      name: String!
-    }
-
-    interface Named2 {
-      name: String!
-    }
-
-    type Bar2 implements Named2 {
-      id: ID!
-      name: String!
-    }
-
-    type Baz2 implements Named2 {
-      id: ID!
-      name: String!
-    }
-
-    type Query {
-      enumFoo: EnumFoo
-      enumBar: EnumBar
-      bar(x: Int!): Bar
-      getNamed(s: String!): Named
-      getNamed2(s: String!): Named2
-    }
-  `
-)
-
-const documents = [
-  {
-    location: 'foo.graphql',
-    document: gql`
-      query getEnums {
-        enumFoo
-        enumBar
-      }
-
-      query getMoreEnums {
-        enumFoo
-      }
-
-      query getBar($x: Int!) {
-        bar(x: $x) {
-          id
-          foo
-        }
-      }
-
-      query getNamed($s: String!) {
-        getNamed(s: $s) {
-          ...bar
-          ...baz
-        }
-      }
-
-      fragment bar on Bar {
-        id
-        foo
-      }
-
-      fragment baz on Baz {
-        id
-        name
-      }
-
-      query getNamed2($s: String!) {
-        getNamed2(s: $s) {
-          ...bar2
-        }
-      }
-
-      fragment bar2 on Bar2 {
-        id
-      }
-    `,
-  },
-]
-
-it('validates', () => {
-  expect(() => validate(schema, documents, fullConfig, '', [])).not.toThrow()
-})
-
-it('renders', () => {
-  const apiModule = plugin(schema, documents, fullConfig, {
-    outputFile: 'src/Example/GraphQL/API.hs',
-  })
-
-  expect(apiModule).toMatchInlineSnapshot(`
-    "{-# LANGUAGE DataKinds #-}
+    {-# LANGUAGE DataKinds #-}
     {-# LANGUAGE DuplicateRecordFields #-}
     {-# LANGUAGE OverloadedStrings #-}
     {-# LANGUAGE QuasiQuotes #-}
@@ -383,13 +274,8 @@ it('renders', () => {
     "
   `)
 
-  expect(mockWriteFileSync).toHaveBeenCalledTimes(2)
-
-  const [writeEnumBar, writeEnumFoo] = mockWriteFileSync.mock.calls
-
-  const [enumBarModuleName, enumBarModule] = writeEnumBar
-  expect(enumBarModuleName).toBe('src/Example/GraphQL/Enums/EnumBar.hs')
-  expect(enumBarModule).toMatchInlineSnapshot(`
+  expect(outputFile('src/Example/GraphQL/Enums/EnumBar.hs'))
+    .toMatchInlineSnapshot(`
     "{-# LANGUAGE TemplateHaskell #-}
 
     module Example.GraphQL.Enums.EnumBar where
@@ -403,9 +289,8 @@ it('renders', () => {
     "
   `)
 
-  const [enumFooModuleName, enumFooModule] = writeEnumFoo
-  expect(enumFooModuleName).toBe('src/Example/GraphQL/Enums/EnumFoo.hs')
-  expect(enumFooModule).toMatchInlineSnapshot(`
+  expect(outputFile('src/Example/GraphQL/Enums/EnumFoo.hs'))
+    .toMatchInlineSnapshot(`
     "{-# LANGUAGE TemplateHaskell #-}
 
     module Example.GraphQL.Enums.EnumFoo where

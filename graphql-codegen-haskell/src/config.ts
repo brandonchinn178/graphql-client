@@ -25,5 +25,5 @@ export type PluginConfig = {
   scalarsModule: string
 }
 
-export const validateConfig = (config: Record<string, unknown>): PluginConfig =>
+export const validateConfig = (config: unknown): PluginConfig =>
   CONFIG_SCHEMA.validateSync(config)
