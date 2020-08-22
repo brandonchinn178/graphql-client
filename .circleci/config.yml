@@ -120,11 +120,17 @@ jobs:
     steps:
       # init
       - checkout
-      - helpers/install_stack_and_deps
+
+      # build graphql-codegen-haskell
+      - helpers/install_yarn_and_deps
+      - run:
+          name: Build graphql-codegen-haskell
+          command: yarn build
 
       # build graphql-client
+      - helpers/install_stack_and_deps
       - run:
-          name: Build
+          name: Build graphql-client
           command: |
             STACK_ARGS=(
                 --test
@@ -202,6 +208,11 @@ jobs:
                 name: Remove old Main.mix file (LeapYear/hpc-lcov#12)
                 command: find graphql-client/ -name Main.mix | xargs rm -rf
             - run:
+                name: Test that example API is up to date
+                command: |
+                  example/scripts/codegen.sh
+                  git --no-pager diff --exit-code example/src/Example/GraphQL/
+            - run:
                 name: Build graphql-client-example
                 command: stack build --coverage graphql-client-example
             - run:
@@ -232,21 +243,6 @@ jobs:
                 name: Run example
                 command: stack exec graphql-client-example
 
-  test_example_api:
-    executor: centos7
-    steps:
-      # init
-      - checkout
-      - helpers/install_stack_and_deps
-      - helpers/install_yarn_and_deps
-
-      - run:
-          name: Ensure that example API is up to date
-          command: |
-            yarn graphql build
-            yarn example codegen
-            git --no-pager diff --exit-code example/src/Example/GraphQL/API.hs
-
   test_node:
     executor: centos7
     steps:
@@ -257,17 +253,17 @@ jobs:
       # build
       - run:
           name: Build
-          command: yarn graphql build
+          command: yarn build
 
       # lint
       - run:
           name: Lint
-          command: scripts/eslint.sh .
+          command: yarn lint .
 
       # test
       - run:
           name: Test Node package
-          command: yarn graphql test --coverage --runInBand
+          command: yarn graphql-codegen test --coverage --runInBand
       - codecov/upload:
           file: graphql-codegen-haskell/coverage/coverage-final.json
 
@@ -277,7 +273,6 @@ workflows:
   build_and_test:
     jobs:
       - test_node
-      - test_example_api
       - run_build_and_test:
           name: test_latest
           latest: true
