@@ -1,5 +1,5 @@
-schema: https://graphbrainz.herokuapp.com
-documents: src/Example/GraphQL/api/*.graphql
+schema: ./schema.graphql
+documents: ./document.graphql
 
 apiModule: Example.GraphQL.API
 enumsModule: Example.GraphQL.Enums

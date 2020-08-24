@@ -1,4 +1,7 @@
 .DS_Store
 .stack-work/
 /.ci/
+
 node_modules/
+!/graphql-client/js/node_modules/
+/graphql-client/js/graphql-codegen-haskell.js

@@ -6,9 +6,8 @@ set -eux -o pipefail
 # graphql-client-example.cabal
 ROOT="$(builtin cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-FILES=()
-for FILE in "$@"; do
-    FILES+=("${ROOT}/${FILE}")
-done
+stack exec -- graphql-codegen -c "${ROOT}/codegen.yml"
 
-exec "${ROOT}/../scripts/stylish-haskell.sh" --apply "${FILES[@]}"
+"${ROOT}/../scripts/stylish-haskell.sh" --apply \
+    "${ROOT}"/src/Example/GraphQL/API.hs \
+    "${ROOT}"/src/Example/GraphQL/Enums/*.hs

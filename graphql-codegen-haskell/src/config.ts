@@ -1,57 +1,29 @@
 import * as yup from 'yup'
 
-import { pathToModule } from './utils'
-
+// See the "Configuration" section in the README for more details.
 const CONFIG_SCHEMA = yup
   .object({
-    // The directory where Haskell source files live. By default tries to infer it
-    // from the output file path.
-    hsSrcDir: yup.string().notRequired(),
+    schema: yup.string().required(),
+    documents: yup.array().of(yup.string().defined()).ensure().required(),
 
-    // The Haskell module where GraphQL enum modules will be generated
+    hsSourceDir: yup.string().default('src/').defined(),
+
+    apiModule: yup.string().required(),
     enumsModule: yup.string().required(),
-
-    // The Haskell module containing all the scalar definitions
     scalarsModule: yup.string().required(),
   })
   .defined()
 
-export type RawPluginConfig = yup.InferType<typeof CONFIG_SCHEMA>
+export type PluginConfig = {
+  schema: string
+  documents: string[]
 
-export const validateConfig = (config: { [key: string]: unknown }): void => {
-  CONFIG_SCHEMA.validateSync(config)
-}
+  hsSourceDir: string
 
-export type PluginConfig = RawPluginConfig & {
-  hsSrcDir: NonNullable<RawPluginConfig['hsSrcDir']>
   apiModule: string
+  enumsModule: string
+  scalarsModule: string
 }
 
-export const resolveConfig = (
-  config: RawPluginConfig,
-  outputFile: string
-): PluginConfig => {
-  const hsSrcDir = config.hsSrcDir ?? inferSrcDir(outputFile)
-  const apiModule = pathToModule(outputFile, hsSrcDir)
-
-  return {
-    ...config,
-    hsSrcDir,
-    apiModule,
-  }
-}
-
-// Infer the hs-source-dir from the given Haskell module path. e.g.
-// "src/Example/GraphQL/API.hs" => "src/"
-const inferSrcDir = (path: string) => {
-  const parts = path.split('/')
-  const result = []
-  for (const part of parts) {
-    if (!/^[A-Z]/.test(part)) {
-      result.push(part)
-    } else {
-      break
-    }
-  }
-  return result.join('/')
-}
+export const validateConfig = (config: unknown): PluginConfig =>
+  CONFIG_SCHEMA.validateSync(config)

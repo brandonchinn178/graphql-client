@@ -120,11 +120,21 @@ jobs:
     steps:
       # init
       - checkout
-      - helpers/install_stack_and_deps
+      - run: mkdir -p .ci
+
+      # build graphql-codegen-haskell
+      - helpers/install_yarn_and_deps
+      - run:
+          name: Build graphql-codegen-haskell
+          command: yarn build
+      - run:
+          name: Copy graphql-codegen-haskell to CI artifacts
+          command: cp graphql-client/js/graphql-codegen-haskell.js .ci/
 
       # build graphql-client
+      - helpers/install_stack_and_deps
       - run:
-          name: Build
+          name: Build graphql-client
           command: |
             STACK_ARGS=(
                 --test
@@ -188,11 +198,17 @@ jobs:
                   stack build --haddock graphql-client
             - run:
                 name: Bundle haddock docs
+                command: tar czf .ci/haddock-docs.tar.gz -C "$(find graphql-client/.stack-work/dist -regex '.*/doc/html/[^/]*')" .
+
+      # bundle Haskell files for deployment
+      - when:
+          condition: << parameters.latest >>
+          steps:
+            - run:
+                name: stack sdist
                 command: |
-                  mkdir -p .ci/
-                  tar czf .ci/haddock-docs.tar.gz -C "$(find graphql-client/.stack-work/dist -regex '.*/doc/html/[^/]*')" .
-            - store_artifacts:
-                path: .ci/
+                  stack sdist graphql-client
+                  cp "$(find graphql-client/.stack-work/ -name 'graphql-client-*.tar.gz')" .ci/
 
       # build and test graphql-client-example
       - when:
@@ -201,6 +217,11 @@ jobs:
             - run:
                 name: Remove old Main.mix file (LeapYear/hpc-lcov#12)
                 command: find graphql-client/ -name Main.mix | xargs rm -rf
+            - run:
+                name: Test that example API is up to date
+                command: |
+                  example/scripts/codegen.sh
+                  git --no-pager diff --exit-code example/src/Example/GraphQL/
             - run:
                 name: Build graphql-client-example
                 command: stack build --coverage graphql-client-example
@@ -232,20 +253,8 @@ jobs:
                 name: Run example
                 command: stack exec graphql-client-example
 
-  test_example_api:
-    executor: centos7
-    steps:
-      # init
-      - checkout
-      - helpers/install_stack_and_deps
-      - helpers/install_yarn_and_deps
-
-      - run:
-          name: Ensure that example API is up to date
-          command: |
-            yarn graphql build
-            yarn example codegen
-            git --no-pager diff --exit-code example/src/Example/GraphQL/API.hs
+      - store_artifacts:
+          path: .ci/
 
   test_node:
     executor: centos7
@@ -257,17 +266,17 @@ jobs:
       # build
       - run:
           name: Build
-          command: yarn graphql build
+          command: yarn build
 
       # lint
       - run:
           name: Lint
-          command: scripts/eslint.sh .
+          command: yarn lint .
 
       # test
       - run:
           name: Test Node package
-          command: yarn graphql test --coverage --runInBand
+          command: yarn graphql-codegen test --coverage --runInBand
       - codecov/upload:
           file: graphql-codegen-haskell/coverage/coverage-final.json
 
@@ -277,7 +286,6 @@ workflows:
   build_and_test:
     jobs:
       - test_node
-      - test_example_api
       - run_build_and_test:
           name: test_latest
           latest: true

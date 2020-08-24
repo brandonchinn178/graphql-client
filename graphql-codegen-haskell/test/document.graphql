@@ -1,0 +1,42 @@
+query getEnums {
+  enumFoo
+  enumBar
+}
+
+query getMoreEnums {
+  enumFoo
+}
+
+query getBar($x: Int!) {
+  bar(x: $x) {
+    id
+    foo
+  }
+}
+
+query getNamed($s: String!) {
+  getNamed(s: $s) {
+    ...bar
+    ...baz
+  }
+}
+
+fragment bar on Bar {
+  id
+  foo
+}
+
+fragment baz on Baz {
+  id
+  name
+}
+
+query getNamed2($s: String!) {
+  getNamed2(s: $s) {
+    ...bar2
+  }
+}
+
+fragment bar2 on Bar2 {
+  id
+}

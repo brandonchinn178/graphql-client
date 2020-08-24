@@ -1,75 +1,92 @@
-import { resolveConfig, validateConfig } from './config'
+import * as _ from 'lodash'
+
+import { validateConfig } from './config'
 
 const fullConfig = {
-  hsSrcDir: 'src/',
-  enumsModule: 'Exammple.GraphQL.Enums',
-  scalarsModule: 'Example.GraphQL.Scalarjs',
+  schema: 'https://graphbrainz.herokuapp.com/',
+  documents: ['**/*.graphql'],
+
+  hsSourceDir: 'foo/bar/',
+
+  apiModule: 'Example.GraphQL.API',
+  enumsModule: 'Example.GraphQL.Enums',
+  scalarsModule: 'Example.GraphQL.Scalars',
 }
 
 describe('validateConfig', () => {
   it('validates a valid config', () => {
-    expect(() => validateConfig(fullConfig)).not.toThrow()
+    expect(validateConfig(fullConfig)).toEqual(fullConfig)
   })
 
-  it('requires enumsModule', () => {
-    const config = { ...fullConfig }
-    delete config.enumsModule
-    expect(() => validateConfig(config)).toThrow()
-  })
-
-  it('requires scalarModule', () => {
-    const config = { ...fullConfig }
-    delete config.scalarsModule
-    expect(() => validateConfig(config)).toThrow()
-  })
-
-  it('does not require hsSrcDir', () => {
-    const config = { ...fullConfig }
-    delete config.hsSrcDir
-    expect(() => validateConfig(config)).not.toThrow()
-  })
-})
-
-describe('resolveConfig', () => {
-  it('parses hsSrcDir and apiModule from the output file', () => {
-    const config = { ...fullConfig }
-    delete config.hsSrcDir
-    expect(
-      resolveConfig(config, 'foo/src/Example/GraphQL/API.hs')
-    ).toMatchObject({
-      hsSrcDir: 'foo/src',
-      apiModule: 'Example.GraphQL.API',
+  describe('schema', () => {
+    it('is required', () => {
+      const config = _.omit(fullConfig, 'schema')
+      expect(() => validateConfig(config)).toThrow()
     })
   })
 
-  it('parses apiModule from the output file without inferrable hsSrcDir', () => {
-    const config = { ...fullConfig }
-    delete config.hsSrcDir
-    expect(resolveConfig(config, 'Example/GraphQL/API.hs')).toMatchObject({
-      hsSrcDir: '',
-      apiModule: 'Example.GraphQL.API',
+  describe('documents', () => {
+    it('is required', () => {
+      const config = _.omit(fullConfig, 'documents')
+      expect(() => validateConfig(config)).toThrow()
+    })
+
+    it('works on an array of one path', () => {
+      const config = {
+        ...fullConfig,
+        documents: ['dir1/*.graphql'],
+      }
+      expect(validateConfig(config)).toEqual(config)
+    })
+
+    it('works on an array of multiple paths', () => {
+      const config = {
+        ...fullConfig,
+        documents: ['dir1/*.graphql', 'dir2/*.graphql'],
+      }
+      expect(validateConfig(config)).toEqual(config)
+    })
+
+    it('casts a single path into an array', () => {
+      const config = {
+        ...fullConfig,
+        documents: 'dir1/*.graphql',
+      }
+      expect(validateConfig(config)).toEqual({
+        ...config,
+        documents: ['dir1/*.graphql'],
+      })
     })
   })
 
-  it('parses hsSrcDir and apiModule from a provided hsSrcDir', () => {
-    const config = {
-      ...fullConfig,
-      hsSrcDir: 'src/Example/',
-    }
-    expect(resolveConfig(config, 'src/Example/GraphQL/API.hs')).toMatchObject({
-      hsSrcDir: 'src/Example/',
-      apiModule: 'GraphQL.API',
+  describe('hsSourceDir', () => {
+    it('defaults to src/', () => {
+      const config = _.omit(fullConfig, 'hsSourceDir')
+      expect(validateConfig(config)).toEqual({
+        ...fullConfig,
+        hsSourceDir: 'src/',
+      })
     })
   })
 
-  it('allows specifying hsSrcDir without trailing slash', () => {
-    const config = {
-      ...fullConfig,
-      hsSrcDir: 'src/Example',
-    }
-    expect(resolveConfig(config, 'src/Example/GraphQL/API.hs')).toMatchObject({
-      hsSrcDir: 'src/Example',
-      apiModule: 'GraphQL.API',
+  describe('apiModule', () => {
+    it('is required', () => {
+      const config = _.omit(fullConfig, 'apiModule')
+      expect(() => validateConfig(config)).toThrow()
+    })
+  })
+
+  describe('enumsModule', () => {
+    it('is required', () => {
+      const config = _.omit(fullConfig, 'enumsModule')
+      expect(() => validateConfig(config)).toThrow()
+    })
+  })
+
+  describe('scalarsModule', () => {
+    it('is required', () => {
+      const config = _.omit(fullConfig, 'scalarsModule')
+      expect(() => validateConfig(config)).toThrow()
     })
   })
 })
