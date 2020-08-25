@@ -25,7 +25,7 @@ import qualified Data.Aeson.Types as Aeson
 import qualified Data.Text as Text
 
 import Data.GraphQL.Error (GraphQLError)
-import Data.GraphQL.Monad (MonadQuery(..))
+import Data.GraphQL.Monad (MonadGraphQLQuery(..))
 import Data.GraphQL.Query (GraphQLQuery(..))
 
 data ResultMock query = ResultMock
@@ -51,7 +51,7 @@ getResult (AnyResultMock mock) = result mock
 newtype MockQueryT m a = MockQueryT { unMockQueryT :: StateT [AnyResultMock] m a }
   deriving (Functor, Applicative, Monad, MonadIO, MonadState [AnyResultMock])
 
-instance Monad m => MonadQuery (MockQueryT m) where
+instance Monad m => MonadGraphQLQuery (MockQueryT m) where
   runQuerySafe testQuery = toGraphQLResult <$> lookupMock
     where
       takeWhere :: (a -> Bool) -> [a] -> Maybe (a, [a])

@@ -94,18 +94,18 @@ A full example of the API in action:
 
 import Control.Monad.IO.Class (MonadIO(..))
 import Data.GraphQL
-    ( MonadQuery
-    , QuerySettings(..)
-    , defaultQuerySettings
+    ( MonadGraphQLQuery
+    , GraphQLSettings(..)
+    , defaultGraphQLSettings
     , get
+    , runGraphQLQueryT
     , runQuery
-    , runQueryT
     )
 import qualified Data.Text as Text
 
 import Example.GraphQL.API
 
-app :: (MonadQuery m, MonadIO m) => m ()
+app :: (MonadGraphQLQuery m, MonadIO m) => m ()
 app = do
   song <- Text.pack <$> liftIO getLine
 
@@ -120,12 +120,12 @@ app = do
 
 main :: IO ()
 main = do
-  let querySettings = defaultQuerySettings
+  let graphQLSettings = defaultGraphQLSettings
         { url = "https://graphbrainz.herokuapp.com/"
           -- ^ Most GraphQL APIs are at the path `/graphql`, but not this one
         }
 
-  runQueryT querySettings app
+  runGraphQLQueryT graphQLSettings app
 ```
 
 ## Configuration

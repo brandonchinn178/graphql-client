@@ -4,8 +4,8 @@ Maintainer  :  Brandon Chinn <brandon@leapyear.io>
 Stability   :  experimental
 Portability :  portable
 
-Defines the 'QueryT' monad transformer, which implements
-'MonadQuery' to allow querying GraphQL APIs.
+Defines the 'GraphQLQueryT' monad transformer, which implements
+'MonadGraphQLQuery' to allow querying GraphQL APIs.
 -}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -15,10 +15,10 @@ Defines the 'QueryT' monad transformer, which implements
 
 module Data.GraphQL.Monad
   ( module Data.GraphQL.Monad.Class
-  , QueryT
-  , runQueryT
-  , QuerySettings(..)
-  , defaultQuerySettings
+  , GraphQLQueryT
+  , runGraphQLQueryT
+  , GraphQLSettings(..)
+  , defaultGraphQLSettings
   ) where
 
 import Control.Monad.IO.Class (MonadIO(..))
@@ -43,7 +43,7 @@ import Network.HTTP.Types (hContentType)
 import Data.GraphQL.Monad.Class
 import Data.GraphQL.Query (GraphQLQuery(..))
 
--- | The state for running QueryT.
+-- | The state for running GraphQLQueryT.
 data QueryState = QueryState
   { manager :: Manager
   , baseReq :: Request
@@ -52,12 +52,12 @@ data QueryState = QueryState
 -- | The monad transformer type that should be used to run GraphQL queries.
 --
 -- @
--- newtype MyMonad a = MyMonad { unMyMonad :: QueryT IO a }
+-- newtype MyMonad a = MyMonad { unMyMonad :: GraphQLQueryT IO a }
 --
 -- runMyMonad :: MyMonad a -> IO a
--- runMyMonad = runQueryT querySettings . unMyMonad
+-- runMyMonad = runGraphQLQueryT graphQLSettings . unMyMonad
 --   where
---     querySettings = defaultQuerySettings
+--     graphQLSettings = defaultGraphQLSettings
 --       { url = "https://api.github.com/graphql"
 --       , modifyReq = \\req -> req
 --           { requestHeaders =
@@ -65,7 +65,7 @@ data QueryState = QueryState
 --           }
 --       }
 -- @
-newtype QueryT m a = QueryT { unQueryT :: ReaderT QueryState m a }
+newtype GraphQLQueryT m a = GraphQLQueryT { unGraphQLQueryT :: ReaderT QueryState m a }
   deriving
     ( Functor
     , Applicative
@@ -75,10 +75,10 @@ newtype QueryT m a = QueryT { unQueryT :: ReaderT QueryState m a }
     , MonadTrans
     )
 
-instance MonadUnliftIO m => MonadUnliftIO (QueryT m) where
-  withRunInIO inner = QueryT $ withRunInIO $ \run -> inner (run . unQueryT)
+instance MonadUnliftIO m => MonadUnliftIO (GraphQLQueryT m) where
+  withRunInIO inner = GraphQLQueryT $ withRunInIO $ \run -> inner (run . unGraphQLQueryT)
 
-instance MonadIO m => MonadQuery (QueryT m) where
+instance MonadIO m => MonadGraphQLQuery (GraphQLQueryT m) where
   runQuerySafe query = do
     QueryState{..} <- ask
 
@@ -91,25 +91,25 @@ instance MonadIO m => MonadQuery (QueryT m) where
 
     liftIO $ either fail return . Aeson.eitherDecode . responseBody =<< httpLbs request manager
 
--- | Run a QueryT stack.
-runQueryT :: MonadIO m => QuerySettings -> QueryT m a -> m a
-runQueryT QuerySettings{..} queryT = do
+-- | Run a GraphQLQueryT stack.
+runGraphQLQueryT :: MonadIO m => GraphQLSettings -> GraphQLQueryT m a -> m a
+runGraphQLQueryT GraphQLSettings{..} m = do
   state <- liftIO $ do
     manager <- newManager managerSettings
     baseReq <- modifyReq . modifyReq' <$> parseUrlThrow url
     return QueryState{..}
 
   (`runReaderT` state)
-    . unQueryT
-    $ queryT
+    . unGraphQLQueryT
+    $ m
   where
     modifyReq' req = req
       { method = "POST"
       , requestHeaders = (hContentType, "application/json") : requestHeaders req
       }
 
--- | The settings for running QueryT.
-data QuerySettings = QuerySettings
+-- | The settings for running GraphQLQueryT.
+data GraphQLSettings = GraphQLSettings
   { managerSettings :: ManagerSettings
     -- ^ Uses TLS by default
   , url             :: String
@@ -117,8 +117,8 @@ data QuerySettings = QuerySettings
   }
 
 -- | Default query settings.
-defaultQuerySettings :: QuerySettings
-defaultQuerySettings = QuerySettings
+defaultGraphQLSettings :: GraphQLSettings
+defaultGraphQLSettings = GraphQLSettings
   { managerSettings = tlsManagerSettings
   , url = error "No URL is provided"
   , modifyReq = id
