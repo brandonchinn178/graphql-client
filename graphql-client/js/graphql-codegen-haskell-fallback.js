@@ -46,8 +46,8 @@ let codegen
 
 try {
   codegen = require(codegenFile)
-} catch (_) {
-  error(`File not found: ${codegenFile}`)
+} catch (e) {
+  error(`Could not load file ${codegenFile}:\n${e}`)
 }
 
 codegen.main()
