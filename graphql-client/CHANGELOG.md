@@ -4,5 +4,4 @@
 
 Initial release:
 
-* Implement `graphql-client` Haskell library
-* Implement `graphql-codegen-haskell` plugin for `graphql-code-generator`
+* Implement `graphql-client` Haskell library with a `graphql-codegen` executable that can generate Haskell definitions for `.graphql` files.
