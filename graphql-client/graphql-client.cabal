@@ -4,7 +4,7 @@ cabal-version: >= 1.10
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 50ae710f7c7be0e6626b177699d8f9681f06e49ef3d17cee588d439e97de59a6
+-- hash: 6b38e4a38cac41436688a2c39d77a3be6ca094b061fb461cd3f7baa469cb959f
 
 name:           graphql-client
 version:        0.1.0
@@ -64,7 +64,7 @@ library
   default-language: Haskell2010
 
 executable graphql-codegen
-  main-is: exe/Main.hs
+  main-is: exe/Codegen.hs
   other-modules:
       Paths_graphql_client
   ghc-options: -Wall
