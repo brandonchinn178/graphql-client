@@ -26,7 +26,9 @@ OVERLAY_CONTENTS = [
         TickFunction('modifyReq', 116, r'modifyReq\s+:: Request -> Request'),
     ]),
     Module('graphql-client', 'Data.GraphQL.Monad.Class', [
-        TickFunction('runQuerySafe', 54, r'lift \. runQuerySafe')
+        # MonadQuery instances for standard monad transformers
+        TickFunction('runQuerySafe', line_num, r'lift \. runQuerySafe')
+        for line_num in [59, 62, 65, 68, 71, 74, 77, 80, 83, 86]
     ]),
 ]
 
