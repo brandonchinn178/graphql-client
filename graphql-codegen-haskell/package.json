@@ -1,6 +1,7 @@
 {
   "name": "graphql-codegen-haskell",
   "version": "0.0.1",
+  "private": true,
   "repository": "git@github.com:LeapYear/graphql-client",
   "author": "Brandon Chinn <brandon@leapyear.io>",
   "license": "BSD-3-Clause",
