@@ -36,7 +36,7 @@ Pre-requisites: Have [Node.js](https://nodejs.org/) installed.
     scalarsModule: Example.GraphQL.Scalars
     ```
 
-    See `example/codegen.yml` as an example. The full specification for this file can be found in [the docs for `graphql-code-generator`](https://graphql-code-generator.com/docs/getting-started/codegen-config)
+    See the "Configuration" section for the full format of this file.
 
 1. Write the module specified in `scalarsModule` (e.g.
    `src/Example/GraphQL/Scalars.hs`). See the "Configuration" section for more
