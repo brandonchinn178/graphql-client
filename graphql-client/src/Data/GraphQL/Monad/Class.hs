@@ -30,6 +30,9 @@ import Data.GraphQL.Query (GraphQLQuery(..))
 import Data.GraphQL.Result (GraphQLResult, getErrors, getResult)
 
 -- | A type class for monads that can run GraphQL queries.
+--
+-- If you're building a monad transformer stack with 'Data.GraphQL.Monad.GraphQLQueryT', this
+-- instance is automatically implemented for you.
 class Monad m => MonadGraphQLQuery m where
   runQuerySafe
     :: (GraphQLQuery query, schema ~ ResultSchema query)
