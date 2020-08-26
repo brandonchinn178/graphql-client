@@ -25,7 +25,7 @@ import Language.Haskell.TH.Syntax (lift)
 
 -- | A type class for defining GraphQL queries.
 --
--- Should be generated via graphql-codegen-haskell. Any manual instances needs
+-- Should be generated via the `graphql-codegen` command. Any manual instances needs
 -- to be certain that `getArgs query` satisfies the arguments defined in
 -- `getQueryText query`, and that the result adheres to `ResultSchema query`.
 class IsSchemaObject (ResultSchema query) => GraphQLQuery query where
