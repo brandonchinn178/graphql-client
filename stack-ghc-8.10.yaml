@@ -5,7 +5,7 @@ packages:
   - example/
 
 extra-deps:
-  - aeson-schemas-1.2.0
+  - aeson-schemas-1.3.0
 
 flags:
   cryptonite:

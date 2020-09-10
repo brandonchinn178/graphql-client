@@ -2,12 +2,12 @@
 
 module Example.GraphQL.Scalars.Duration where
 
-import Data.Aeson (FromJSON)
+import Data.Aeson (FromJSON, ToJSON)
 import Text.Printf (printf)
 
 -- | Duration in milliseconds.
 newtype Duration = Duration Int
-  deriving (Show,FromJSON)
+  deriving (Show,FromJSON,ToJSON)
 
 -- | Duration in (minutes, seconds).
 getDuration :: Duration -> (Int, Int)
