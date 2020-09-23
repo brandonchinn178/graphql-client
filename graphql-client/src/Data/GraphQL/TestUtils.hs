@@ -20,6 +20,7 @@ module Data.GraphQL.TestUtils
 
 import Control.Monad.IO.Class (MonadIO)
 import Control.Monad.State.Strict (MonadState, StateT, evalStateT, state)
+import Control.Monad.Trans.Class (MonadTrans)
 import Data.Aeson (FromJSON, Value, object, (.=))
 import qualified Data.Aeson.Types as Aeson
 import qualified Data.Text as Text
@@ -49,7 +50,7 @@ getResult (AnyResultMock mock) = result mock
 {- MockQueryT -}
 
 newtype MockQueryT m a = MockQueryT { unMockQueryT :: StateT [AnyResultMock] m a }
-  deriving (Functor, Applicative, Monad, MonadIO, MonadState [AnyResultMock])
+  deriving (Functor, Applicative, Monad, MonadIO, MonadState [AnyResultMock], MonadTrans)
 
 instance Monad m => MonadGraphQLQuery (MockQueryT m) where
   runQuerySafe testQuery = toGraphQLResult <$> lookupMock
