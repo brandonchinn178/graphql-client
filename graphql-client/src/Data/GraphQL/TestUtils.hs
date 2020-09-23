@@ -10,16 +10,19 @@ Defines test utilities for testing GraphQL queries.
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving #-}
 
 module Data.GraphQL.TestUtils
   ( ResultMock(..)
   , mocked
   , MockQueryT
   , runMockQueryT
+  , AnyResultMock
   ) where
 
 import Control.Monad.IO.Class (MonadIO)
 import Control.Monad.State.Strict (MonadState, StateT, evalStateT, state)
+import Control.Monad.Trans.Class (MonadTrans)
 import Data.Aeson (FromJSON, Value, object, (.=))
 import qualified Data.Aeson.Types as Aeson
 import qualified Data.Text as Text
@@ -33,12 +36,14 @@ data ResultMock query = ResultMock
   , result :: Value
   } deriving (Show)
 
-mocked :: GraphQLQuery query => ResultMock query -> AnyResultMock
+mocked :: (Show query, GraphQLQuery query) => ResultMock query -> AnyResultMock
 mocked = AnyResultMock
 
 {- AnyResultMock -}
 
-data AnyResultMock = forall query. GraphQLQuery query => AnyResultMock (ResultMock query)
+data AnyResultMock = forall query. (Show query, GraphQLQuery query) => AnyResultMock (ResultMock query)
+
+deriving instance Show AnyResultMock
 
 isMatch :: GraphQLQuery query => query -> AnyResultMock -> Bool
 isMatch testQuery (AnyResultMock mock) = getArgs (query mock) == getArgs testQuery
@@ -49,7 +54,7 @@ getResult (AnyResultMock mock) = result mock
 {- MockQueryT -}
 
 newtype MockQueryT m a = MockQueryT { unMockQueryT :: StateT [AnyResultMock] m a }
-  deriving (Functor, Applicative, Monad, MonadIO, MonadState [AnyResultMock])
+  deriving (Functor, Applicative, Monad, MonadIO, MonadState [AnyResultMock], MonadTrans)
 
 instance Monad m => MonadGraphQLQuery (MockQueryT m) where
   runQuerySafe testQuery = toGraphQLResult <$> lookupMock
