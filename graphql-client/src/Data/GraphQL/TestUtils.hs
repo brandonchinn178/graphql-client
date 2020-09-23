@@ -16,6 +16,7 @@ module Data.GraphQL.TestUtils
   , mocked
   , MockQueryT
   , runMockQueryT
+  , AnyResultMock
   ) where
 
 import Control.Monad.IO.Class (MonadIO)
