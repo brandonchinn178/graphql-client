@@ -9,6 +9,7 @@ import Data.Aeson (object)
 import Data.GraphQL
 
 data TestQuery = TestQuery
+  deriving (Show)
 
 type TestSchema = [schema|
   {

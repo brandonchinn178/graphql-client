@@ -10,6 +10,7 @@ Defines test utilities for testing GraphQL queries.
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving #-}
 
 module Data.GraphQL.TestUtils
   ( ResultMock(..)
@@ -35,12 +36,14 @@ data ResultMock query = ResultMock
   , result :: Value
   } deriving (Show)
 
-mocked :: GraphQLQuery query => ResultMock query -> AnyResultMock
+mocked :: (Show query, GraphQLQuery query) => ResultMock query -> AnyResultMock
 mocked = AnyResultMock
 
 {- AnyResultMock -}
 
-data AnyResultMock = forall query. GraphQLQuery query => AnyResultMock (ResultMock query)
+data AnyResultMock = forall query. (Show query, GraphQLQuery query) => AnyResultMock (ResultMock query)
+
+deriving instance Show AnyResultMock
 
 isMatch :: GraphQLQuery query => query -> AnyResultMock -> Bool
 isMatch testQuery (AnyResultMock mock) = getArgs (query mock) == getArgs testQuery
