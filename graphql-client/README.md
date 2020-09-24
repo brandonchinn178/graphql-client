@@ -87,7 +87,6 @@ A full example of the API in action:
 ```haskell
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE QuasiQuotes #-}
-{-# LANGUAGE TypeApplications #-}
 
 import Control.Monad.IO.Class (MonadIO(..))
 import Data.GraphQL

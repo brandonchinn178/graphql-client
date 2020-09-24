@@ -3,9 +3,6 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
--- TypeApplications is needed in the [get| ... |] quasiquoter
-{- HLint ignore "Unused LANGUAGE pragma" -}
-{-# LANGUAGE TypeApplications #-}
 
 module Data.GraphQL.Test.Monad.Class where
 
