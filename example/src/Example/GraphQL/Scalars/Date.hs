@@ -3,7 +3,7 @@
 
 module Example.GraphQL.Scalars.Date where
 
-import Data.Aeson (FromJSON(..), withText)
+import Data.Aeson (FromJSON(..), ToJSON(..), withText)
 import Data.List (intercalate)
 import Data.Maybe (maybeToList)
 import qualified Data.Text as Text
@@ -22,6 +22,9 @@ instance FromJSON Date where
       [y,m] -> return $ Date y (Just m) Nothing
       [y,m,d] -> return $ Date y (Just m) (Just d)
       v -> fail $ "Invalid Date: " ++ show v
+
+instance ToJSON Date where
+  toJSON = toJSON . showDate
 
 showDate :: Date -> String
 showDate Date{..} = intercalate "-" $ map show $ [year] ++ maybeToList month ++ maybeToList day

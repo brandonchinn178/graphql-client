@@ -87,7 +87,6 @@ A full example of the API in action:
 ```haskell
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE QuasiQuotes #-}
-{-# LANGUAGE TypeApplications #-}
 
 import Control.Monad.IO.Class (MonadIO(..))
 import Data.GraphQL
@@ -160,8 +159,8 @@ relative to the `codegen.yml` file.
 * `scalarsModule`: The module where custom GraphQL scalars should be exported.
   You may define the scalars in other modules, but you must re-export them in
   this module. If you're not using any custom scalars in your queries, this
-  module can be empty (but must still exist). All GraphQL scalars must have a
-  `FromJSON` instance.
+  module can be empty (but must still exist). All GraphQL scalars must have
+  `FromJSON` and `ToJSON` instances.
 
 ## Testing
 
