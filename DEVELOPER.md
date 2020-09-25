@@ -82,6 +82,7 @@ Follow these steps to release this project:
        (keeping `Upcoming` as a section)
     1. Add comments to new features indicating when it was added (e.g.
        `-- @since v2.0.0`)
+    1. Run `stack haddock graphql-client` and skim through documentation
 
 1. Create PR as usual and merge into `master`
     1. In the `test_latest` CI job, check the output of the `stack sdist`

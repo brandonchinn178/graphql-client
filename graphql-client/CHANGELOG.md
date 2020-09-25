@@ -1,5 +1,7 @@
 ## Upcoming
 
+## 1.1.0
+
 Breaking changes:
 
 * Require `aeson-schemas-1.3.0`
