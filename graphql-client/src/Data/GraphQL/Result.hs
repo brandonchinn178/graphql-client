@@ -6,7 +6,6 @@ Portability :  portable
 
 Definitions parsing responses from a GraphQL API.
 -}
-{-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
