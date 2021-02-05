@@ -6,7 +6,7 @@
 {-# LANGUAGE TypeApplications #-}
 
 import Control.Exception (SomeException, try)
-import Control.Monad (forM_)
+import Control.Monad (forM_, unless)
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as ByteString
 import Data.FileEmbed (bsToExp, embedFile, getDir)
@@ -77,6 +77,10 @@ main = do
 
     nodeExe <- maybe (pure "node") (fmap toFilePath . resolveFile') cliNode
     configFile <- resolveFile' cliConfig
+
+    configFileExists <- doesFileExist configFile
+    unless configFileExists $
+      errorWithoutStackTrace $ "Config file doesn't exist: " ++ toFilePath configFile
 
     try @SomeException (readProcess $ proc nodeExe ["-e", "console.log('TEST')"]) >>= \case
       Right (ExitSuccess, "TEST\n", _) -> return ()
