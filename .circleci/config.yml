@@ -215,9 +215,6 @@ jobs:
           condition: << parameters.latest >>
           steps:
             - run:
-                name: Remove old Main.mix file (LeapYear/hpc-lcov#12)
-                command: find graphql-client/ -name Main.mix | xargs rm -rf
-            - run:
                 name: Test that example API is up to date
                 command: |
                   example/scripts/codegen.sh
@@ -225,6 +222,9 @@ jobs:
             - run:
                 name: Build graphql-client-example
                 command: stack build --coverage graphql-client-example
+            - run:
+                name: Remove old Main.mix file (LeapYear/hpc-lcov#12)
+                command: find graphql-client/ -name Main.mix | xargs rm -rf
             - run:
                 name: Run example
                 command: stack exec graphql-client-example
