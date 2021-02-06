@@ -1,8 +1,12 @@
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeApplications #-}
 
-import Control.Monad (forM_)
+import Control.Exception (SomeException, try)
+import Control.Monad (forM_, unless)
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as ByteString
 import Data.FileEmbed (bsToExp, embedFile, getDir)
@@ -11,7 +15,8 @@ import Language.Haskell.TH.Syntax (addDependentFile)
 import Options.Applicative
 import Path
 import Path.IO (doesFileExist, ensureDir, resolveFile', withSystemTempDir)
-import System.Process.Typed (proc, runProcess_)
+import System.Exit (ExitCode(..))
+import System.Process.Typed (proc, readProcess, runProcess_)
 
 data CliOptions = CliOptions
   { cliNode   :: Maybe FilePath
@@ -72,6 +77,14 @@ main = do
 
     nodeExe <- maybe (pure "node") (fmap toFilePath . resolveFile') cliNode
     configFile <- resolveFile' cliConfig
+
+    configFileExists <- doesFileExist configFile
+    unless configFileExists $
+      errorWithoutStackTrace $ "Config file doesn't exist: " ++ toFilePath configFile
+
+    try @SomeException (readProcess $ proc nodeExe ["-e", "console.log('TEST')"]) >>= \case
+      Right (ExitSuccess, "TEST\n", _) -> return ()
+      _ -> errorWithoutStackTrace $ "Could not find working Node executable: " ++ nodeExe
 
     runProcess_ $ proc nodeExe [toFilePath graphqlCodegen, toFilePath configFile]
   where
