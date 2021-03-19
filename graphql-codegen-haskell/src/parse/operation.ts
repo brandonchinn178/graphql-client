@@ -3,6 +3,7 @@ import {
   DocumentNode,
   GraphQLObjectType,
   GraphQLSchema,
+  isEnumType,
   Kind,
   OperationDefinitionNode,
   print as renderGraphQLNode,
@@ -112,6 +113,16 @@ class OperationDefinitionParser {
         `Unable to find root schema type for operation type "${node.operation}"`
       )
     }
+
+    node.variableDefinitions?.forEach((v) => {
+      let type = v.type.kind == "NonNullType" ? v.type.type : v.type;
+      if (type.kind == 'NamedType') {
+        let schemaType = this.schema.getType(type.name.value);
+        if (isEnumType(schemaType)) {
+          this._enums.add(schemaType.name);
+        }
+      }
+    });
 
     const { enums, fragments, selections } = parseSelectionSet(
       this.schema,
