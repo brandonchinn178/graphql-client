@@ -91,6 +91,7 @@ class OperationDefinitionParser {
     const opType = capitalize(node.operation)
 
     const variableDefinitions = parseVariableDefinitions(
+      this.schema,
       node.variableDefinitions ?? []
     )
 

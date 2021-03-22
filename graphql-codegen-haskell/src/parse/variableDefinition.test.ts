@@ -1,4 +1,4 @@
-import { DocumentNode, OperationDefinitionNode } from 'graphql'
+import { buildASTSchema, DocumentNode, OperationDefinitionNode } from 'graphql'
 import gql from 'graphql-tag'
 
 import { parseVariableDefinitions } from './variableDefinition'
@@ -233,11 +233,21 @@ it('parses a non null list of a non null scalar', () => {
 })
 
 const parseVariableDefinitionsAST = (query: DocumentNode) => {
+  const schema = buildASTSchema(
+    gql`
+      type Query {
+        id: ID!
+      }
+
+      scalar MyScalar
+    `
+  )
+
   const [definition] = query.definitions as OperationDefinitionNode[]
   const { variableDefinitions } = definition
   if (!variableDefinitions) {
     throw new Error('Found no variable definitions in query')
   }
 
-  return parseVariableDefinitions(variableDefinitions)
+  return parseVariableDefinitions(schema, variableDefinitions)
 }

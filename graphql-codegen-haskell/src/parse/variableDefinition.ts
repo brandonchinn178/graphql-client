@@ -1,4 +1,4 @@
-import { Kind, TypeNode, VariableDefinitionNode } from 'graphql'
+import { GraphQLSchema, Kind, TypeNode, VariableDefinitionNode } from 'graphql'
 
 import {
   graphqlList,
@@ -9,6 +9,7 @@ import {
 
 export type ParsedVariableDefinitions = {
   args: ParsedArgument[]
+  enums: Set<string>
 }
 
 export type ParsedArgument = {
@@ -19,6 +20,7 @@ export type ParsedArgument = {
 }
 
 export const parseVariableDefinitions = (
+  _schema: GraphQLSchema,
   variableDefinitions: ReadonlyArray<VariableDefinitionNode>
 ): ParsedVariableDefinitions => {
   const args = variableDefinitions.map(({ type, variable }) => ({
@@ -26,7 +28,10 @@ export const parseVariableDefinitions = (
     type: parseType(type),
   }))
 
-  return { args }
+  // TODO
+  const enums = new Set<string>()
+
+  return { args, enums }
 }
 
 export type ParsedType = ParsedScalarType | ParsedListType<ParsedType>
