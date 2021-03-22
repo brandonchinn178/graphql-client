@@ -11,7 +11,7 @@ import {
 import { ParsedFragments } from './fragments'
 import { ParsedSelection, parseSelectionSet } from './selectionSet'
 import {
-  ParsedVariableDefinitions,
+  ParsedArgument,
   parseVariableDefinitions,
 } from './variableDefinition'
 
@@ -38,7 +38,7 @@ export type ParsedOperation = {
   queryName: string
 
   // The GraphQL arguments
-  args: Array<ParsedVariableDefinitions>
+  args: ParsedArgument[]
 
   // The name of the Haskell schema type, e.g. "GetUserSchema"
   schemaType: string
@@ -93,7 +93,7 @@ class OperationDefinitionParser {
     const capitalName = capitalize(name)
     const opType = capitalize(node.operation)
 
-    const args = parseVariableDefinitions(node.variableDefinitions ?? [])
+    const { args } = parseVariableDefinitions(node.variableDefinitions ?? [])
 
     let schemaRoot: GraphQLObjectType | undefined | null
     switch (node.operation) {

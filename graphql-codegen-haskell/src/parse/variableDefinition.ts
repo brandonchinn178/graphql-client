@@ -8,6 +8,10 @@ import {
 } from './graphqlTypes'
 
 export type ParsedVariableDefinitions = {
+  args: ParsedArgument[]
+}
+
+export type ParsedArgument = {
   // The name of the argument
   name: string
   // The Haskell type of the argument
@@ -16,11 +20,14 @@ export type ParsedVariableDefinitions = {
 
 export const parseVariableDefinitions = (
   variableDefinitions: ReadonlyArray<VariableDefinitionNode>
-): ParsedVariableDefinitions[] =>
-  variableDefinitions.map(({ type, variable }) => ({
+): ParsedVariableDefinitions => {
+  const args = variableDefinitions.map(({ type, variable }) => ({
     name: variable.name.value,
     type: parseType(type),
   }))
+
+  return { args }
+}
 
 export type ParsedType = ParsedScalarType | ParsedListType<ParsedType>
 

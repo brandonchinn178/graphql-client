@@ -26,7 +26,8 @@ it('parses variable definitions', () => {
 
   expect(
     parseVariableDefinitions(definition.variableDefinitions ?? [])
-  ).toStrictEqual([
+  ).toStrictEqual({
+    args: [
     {
       name: 'int',
       type: {
@@ -135,5 +136,6 @@ it('parses variable definitions', () => {
         nullable: false,
       },
     },
-  ])
+    ],
+  })
 })
