@@ -232,6 +232,28 @@ it('parses a non null list of a non null scalar', () => {
   ])
 })
 
+it('collects enums', () => {
+  const { args, enums } = parseVariableDefinitionsAST(gql`
+    query($x: MyEnum) {
+      id
+    }
+  `)
+
+  expect(args).toMatchObject([
+    {
+      name: 'x',
+      type: {
+        list: false,
+        name: 'MyEnum',
+        nullable: true,
+      },
+    },
+  ])
+
+  expect(enums).toHaveProperty('size', 1)
+  expect(enums).toContain('MyEnum')
+})
+
 const parseVariableDefinitionsAST = (query: DocumentNode) => {
   const schema = buildASTSchema(
     gql`
@@ -240,6 +262,11 @@ const parseVariableDefinitionsAST = (query: DocumentNode) => {
       }
 
       scalar MyScalar
+
+      enum MyEnum {
+        Foo1
+        Foo2
+      }
     `
   )
 
