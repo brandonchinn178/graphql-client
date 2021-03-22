@@ -1,5 +1,11 @@
 ## Upcoming
 
+## 1.1.1
+
+Bug fixes:
+
+* Generate enums that only appear in query arguments ([#59](https://github.com/LeapYear/graphql-client/pull/59))
+
 ## 1.1.0
 
 Breaking changes:
