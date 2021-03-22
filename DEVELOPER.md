@@ -50,6 +50,10 @@ All tests must pass CI in order for your PR to be accepted.
 stack test
 ```
 
+```bash
+yarn graphql-codegen test
+```
+
 # Git etiquette
 
 See [`CONTRIBUTING`](https://github.com/LeapYear/.github/blob/master/CONTRIBUTING)
