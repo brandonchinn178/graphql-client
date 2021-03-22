@@ -10,10 +10,7 @@ import {
 
 import { ParsedFragments } from './fragments'
 import { ParsedSelection, parseSelectionSet } from './selectionSet'
-import {
-  ParsedVariableDefinitions,
-  parseVariableDefinitions,
-} from './variableDefinition'
+import { ParsedArgument, parseVariableDefinitions } from './variableDefinition'
 
 export type ParsedOperations = {
   // Sorted alphabetically and contains no duplicates
@@ -38,7 +35,7 @@ export type ParsedOperation = {
   queryName: string
 
   // The GraphQL arguments
-  args: Array<ParsedVariableDefinitions>
+  args: ParsedArgument[]
 
   // The name of the Haskell schema type, e.g. "GetUserSchema"
   schemaType: string
@@ -93,7 +90,11 @@ class OperationDefinitionParser {
     const capitalName = capitalize(name)
     const opType = capitalize(node.operation)
 
-    const args = parseVariableDefinitions(node.variableDefinitions ?? [])
+    const variableDefinitions = parseVariableDefinitions(
+      this.schema,
+      node.variableDefinitions ?? []
+    )
+    this.addEnums(variableDefinitions.enums)
 
     let schemaRoot: GraphQLObjectType | undefined | null
     switch (node.operation) {
@@ -113,30 +114,33 @@ class OperationDefinitionParser {
       )
     }
 
-    const { enums, fragments, selections } = parseSelectionSet(
+    const selectionSet = parseSelectionSet(
       this.schema,
       node.selectionSet,
       schemaRoot,
       this.fragments
     )
-
-    enums.forEach((e) => {
-      this._enums.add(e)
-    })
+    this.addEnums(selectionSet.enums)
 
     return {
       name,
       queryText: [
         renderGraphQLNode(node),
-        ...fragments.map((fragment) =>
+        ...selectionSet.fragments.map((fragment) =>
           renderGraphQLNode(this.fragments[fragment])
         ),
       ].join('\n'),
       queryName: `${capitalName}${opType}`,
-      args,
+      args: variableDefinitions.args,
       schemaType: `${capitalName}Schema`,
-      schema: selections,
+      schema: selectionSet.selections,
     }
+  }
+
+  private addEnums(enums: Set<string>) {
+    enums.forEach((e) => {
+      this._enums.add(e)
+    })
   }
 }
 

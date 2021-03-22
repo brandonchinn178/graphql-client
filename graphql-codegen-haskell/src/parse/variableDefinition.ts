@@ -1,4 +1,10 @@
-import { Kind, TypeNode, VariableDefinitionNode } from 'graphql'
+import {
+  GraphQLSchema,
+  isEnumType,
+  Kind,
+  TypeNode,
+  VariableDefinitionNode,
+} from 'graphql'
 
 import {
   graphqlList,
@@ -8,6 +14,11 @@ import {
 } from './graphqlTypes'
 
 export type ParsedVariableDefinitions = {
+  args: ParsedArgument[]
+  enums: Set<string>
+}
+
+export type ParsedArgument = {
   // The name of the argument
   name: string
   // The Haskell type of the argument
@@ -15,12 +26,24 @@ export type ParsedVariableDefinitions = {
 }
 
 export const parseVariableDefinitions = (
+  schema: GraphQLSchema,
   variableDefinitions: ReadonlyArray<VariableDefinitionNode>
-): ParsedVariableDefinitions[] =>
-  variableDefinitions.map(({ type, variable }) => ({
+): ParsedVariableDefinitions => {
+  const args = variableDefinitions.map(({ type, variable }) => ({
     name: variable.name.value,
     type: parseType(type),
   }))
+
+  const enums = new Set<string>()
+  args.forEach(({ type }) => {
+    const enumName = getEnumName(schema, type)
+    if (enumName) {
+      enums.add(enumName)
+    }
+  })
+
+  return { args, enums }
+}
 
 export type ParsedType = ParsedScalarType | ParsedListType<ParsedType>
 
@@ -33,4 +56,16 @@ const parseType = (type: TypeNode, nullable = true): ParsedType => {
     case Kind.NON_NULL_TYPE:
       return parseType(type.type, false)
   }
+}
+
+const getEnumName = (
+  schema: GraphQLSchema,
+  type: ParsedType
+): string | null => {
+  if (type.list) {
+    return getEnumName(schema, type.inner)
+  }
+
+  const schemaType = schema.getType(type.name)
+  return isEnumType(schemaType) ? type.name : null
 }

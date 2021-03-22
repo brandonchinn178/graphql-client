@@ -1,90 +1,151 @@
-import { OperationDefinitionNode } from 'graphql'
+import { buildASTSchema, DocumentNode, OperationDefinitionNode } from 'graphql'
 import gql from 'graphql-tag'
 
 import { parseVariableDefinitions } from './variableDefinition'
 
-it('parses variable definitions', () => {
-  const query = gql`
-    query(
-      $int: Int
-      $float: Float
-      $string: String
-      $bool: Boolean
-      $id: ID
-      $scalar: MyScalar
-      $nonNull: String!
-      $list: [Int]
-      $listList: [[Int]]
-      $nonNullList: [Int]!
-      $nonNullListNonNull: [Int!]!
-    ) {
+it('parses an Int scalar', () => {
+  const { args } = parseVariableDefinitionsAST(gql`
+    query($x: Int) {
       id
     }
-  `
+  `)
 
-  const [definition] = query.definitions as OperationDefinitionNode[]
-
-  expect(
-    parseVariableDefinitions(definition.variableDefinitions ?? [])
-  ).toStrictEqual([
+  expect(args).toStrictEqual([
     {
-      name: 'int',
+      name: 'x',
       type: {
         list: false,
         name: 'Int',
         nullable: true,
       },
     },
+  ])
+})
+
+it('parses a Float scalar', () => {
+  const { args } = parseVariableDefinitionsAST(gql`
+    query($x: Float) {
+      id
+    }
+  `)
+
+  expect(args).toStrictEqual([
     {
-      name: 'float',
+      name: 'x',
       type: {
         list: false,
         name: 'Float',
         nullable: true,
       },
     },
+  ])
+})
+
+it('parses a String scalar', () => {
+  const { args } = parseVariableDefinitionsAST(gql`
+    query($x: String) {
+      id
+    }
+  `)
+
+  expect(args).toStrictEqual([
     {
-      name: 'string',
+      name: 'x',
       type: {
         list: false,
         name: 'String',
         nullable: true,
       },
     },
+  ])
+})
+
+it('parses a Boolean scalar', () => {
+  const { args } = parseVariableDefinitionsAST(gql`
+    query($x: Boolean) {
+      id
+    }
+  `)
+
+  expect(args).toStrictEqual([
     {
-      name: 'bool',
+      name: 'x',
       type: {
         list: false,
         name: 'Boolean',
         nullable: true,
       },
     },
+  ])
+})
+
+it('parses an ID scalar', () => {
+  const { args } = parseVariableDefinitionsAST(gql`
+    query($x: ID) {
+      id
+    }
+  `)
+
+  expect(args).toStrictEqual([
     {
-      name: 'id',
+      name: 'x',
       type: {
         list: false,
         name: 'ID',
         nullable: true,
       },
     },
+  ])
+})
+
+it('parses a custom scalar', () => {
+  const { args } = parseVariableDefinitionsAST(gql`
+    query($x: MyScalar) {
+      id
+    }
+  `)
+
+  expect(args).toStrictEqual([
     {
-      name: 'scalar',
+      name: 'x',
       type: {
         list: false,
         name: 'MyScalar',
         nullable: true,
       },
     },
+  ])
+})
+
+it('parses a non null scalar', () => {
+  const { args } = parseVariableDefinitionsAST(gql`
+    query($x: String!) {
+      id
+    }
+  `)
+
+  expect(args).toStrictEqual([
     {
-      name: 'nonNull',
+      name: 'x',
       type: {
         list: false,
         name: 'String',
         nullable: false,
       },
     },
+  ])
+})
+
+it('parses a list', () => {
+  const { args } = parseVariableDefinitionsAST(gql`
+    query($x: [Int]) {
+      id
+    }
+  `)
+
+  expect(args).toStrictEqual([
     {
-      name: 'list',
+      name: 'x',
       type: {
         list: true,
         inner: {
@@ -95,8 +156,19 @@ it('parses variable definitions', () => {
         nullable: true,
       },
     },
+  ])
+})
+
+it('parses a list of a list', () => {
+  const { args } = parseVariableDefinitionsAST(gql`
+    query($x: [[Int]]) {
+      id
+    }
+  `)
+
+  expect(args).toStrictEqual([
     {
-      name: 'listList',
+      name: 'x',
       type: {
         list: true,
         inner: {
@@ -111,8 +183,19 @@ it('parses variable definitions', () => {
         nullable: true,
       },
     },
+  ])
+})
+
+it('parses a non null list', () => {
+  const { args } = parseVariableDefinitionsAST(gql`
+    query($x: [Int]!) {
+      id
+    }
+  `)
+
+  expect(args).toStrictEqual([
     {
-      name: 'nonNullList',
+      name: 'x',
       type: {
         list: true,
         inner: {
@@ -123,8 +206,19 @@ it('parses variable definitions', () => {
         nullable: false,
       },
     },
+  ])
+})
+
+it('parses a non null list of a non null scalar', () => {
+  const { args } = parseVariableDefinitionsAST(gql`
+    query($x: [Int!]!) {
+      id
+    }
+  `)
+
+  expect(args).toStrictEqual([
     {
-      name: 'nonNullListNonNull',
+      name: 'x',
       type: {
         list: true,
         inner: {
@@ -137,3 +231,50 @@ it('parses variable definitions', () => {
     },
   ])
 })
+
+it('collects enums', () => {
+  const { args, enums } = parseVariableDefinitionsAST(gql`
+    query($x: MyEnum) {
+      id
+    }
+  `)
+
+  expect(args).toMatchObject([
+    {
+      name: 'x',
+      type: {
+        list: false,
+        name: 'MyEnum',
+        nullable: true,
+      },
+    },
+  ])
+
+  expect(enums).toHaveProperty('size', 1)
+  expect(enums).toContain('MyEnum')
+})
+
+const parseVariableDefinitionsAST = (query: DocumentNode) => {
+  const schema = buildASTSchema(
+    gql`
+      type Query {
+        id: ID!
+      }
+
+      scalar MyScalar
+
+      enum MyEnum {
+        Foo1
+        Foo2
+      }
+    `
+  )
+
+  const [definition] = query.definitions as OperationDefinitionNode[]
+  const { variableDefinitions } = definition
+  if (!variableDefinitions) {
+    throw new Error('Found no variable definitions in query')
+  }
+
+  return parseVariableDefinitions(schema, variableDefinitions)
+}

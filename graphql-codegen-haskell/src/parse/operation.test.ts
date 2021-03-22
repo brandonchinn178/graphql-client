@@ -205,12 +205,16 @@ it('collects enums', () => {
     query getAnotherMyEnum1 {
       myEnum1
     }
+    query getMyEnumOnlyArg($arg: MyEnumOnlyArg) {
+      field1
+    }
   `
 
   const { enums } = parseOperations(ast, TEST_SCHEMA, {})
   expect(enums).toStrictEqual([
     { name: 'MyEnum1', values: ['FOO1', 'BAR1'] },
     { name: 'MyEnum2', values: ['FOO2', 'BAR2'] },
+    { name: 'MyEnumOnlyArg', values: ['ENUM_FOR_ARG1', 'ENUM_FOR_ARG2'] },
   ])
 })
 
@@ -268,6 +272,10 @@ const TEST_SCHEMA = buildASTSchema(
     enum MyEnum2 {
       FOO2
       BAR2
+    }
+    enum MyEnumOnlyArg {
+      ENUM_FOR_ARG1
+      ENUM_FOR_ARG2
     }
   `
 )
