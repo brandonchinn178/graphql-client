@@ -90,7 +90,9 @@ class OperationDefinitionParser {
     const capitalName = capitalize(name)
     const opType = capitalize(node.operation)
 
-    const { args } = parseVariableDefinitions(node.variableDefinitions ?? [])
+    const variableDefinitions = parseVariableDefinitions(
+      node.variableDefinitions ?? []
+    )
 
     let schemaRoot: GraphQLObjectType | undefined | null
     switch (node.operation) {
@@ -110,14 +112,14 @@ class OperationDefinitionParser {
       )
     }
 
-    const { enums, fragments, selections } = parseSelectionSet(
+    const selectionSet = parseSelectionSet(
       this.schema,
       node.selectionSet,
       schemaRoot,
       this.fragments
     )
 
-    enums.forEach((e) => {
+    selectionSet.enums.forEach((e) => {
       this._enums.add(e)
     })
 
@@ -125,14 +127,14 @@ class OperationDefinitionParser {
       name,
       queryText: [
         renderGraphQLNode(node),
-        ...fragments.map((fragment) =>
+        ...selectionSet.fragments.map((fragment) =>
           renderGraphQLNode(this.fragments[fragment])
         ),
       ].join('\n'),
       queryName: `${capitalName}${opType}`,
-      args,
+      args: variableDefinitions.args,
       schemaType: `${capitalName}Schema`,
-      schema: selections,
+      schema: selectionSet.selections,
     }
   }
 }
