@@ -94,6 +94,7 @@ class OperationDefinitionParser {
       this.schema,
       node.variableDefinitions ?? []
     )
+    this.addEnums(variableDefinitions.enums)
 
     let schemaRoot: GraphQLObjectType | undefined | null
     switch (node.operation) {
@@ -119,10 +120,7 @@ class OperationDefinitionParser {
       schemaRoot,
       this.fragments
     )
-
-    selectionSet.enums.forEach((e) => {
-      this._enums.add(e)
-    })
+    this.addEnums(selectionSet.enums)
 
     return {
       name,
@@ -137,6 +135,12 @@ class OperationDefinitionParser {
       schemaType: `${capitalName}Schema`,
       schema: selectionSet.selections,
     }
+  }
+
+  private addEnums(enums: Set<string>) {
+    enums.forEach((e) => {
+      this._enums.add(e)
+    })
   }
 }
 
