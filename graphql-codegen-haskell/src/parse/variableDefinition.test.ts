@@ -28,79 +28,65 @@ it('parses variable definitions', () => {
     parseVariableDefinitions(definition.variableDefinitions ?? [])
   ).toStrictEqual({
     args: [
-    {
-      name: 'int',
-      type: {
-        list: false,
-        name: 'Int',
-        nullable: true,
-      },
-    },
-    {
-      name: 'float',
-      type: {
-        list: false,
-        name: 'Float',
-        nullable: true,
-      },
-    },
-    {
-      name: 'string',
-      type: {
-        list: false,
-        name: 'String',
-        nullable: true,
-      },
-    },
-    {
-      name: 'bool',
-      type: {
-        list: false,
-        name: 'Boolean',
-        nullable: true,
-      },
-    },
-    {
-      name: 'id',
-      type: {
-        list: false,
-        name: 'ID',
-        nullable: true,
-      },
-    },
-    {
-      name: 'scalar',
-      type: {
-        list: false,
-        name: 'MyScalar',
-        nullable: true,
-      },
-    },
-    {
-      name: 'nonNull',
-      type: {
-        list: false,
-        name: 'String',
-        nullable: false,
-      },
-    },
-    {
-      name: 'list',
-      type: {
-        list: true,
-        inner: {
+      {
+        name: 'int',
+        type: {
           list: false,
           name: 'Int',
           nullable: true,
         },
-        nullable: true,
       },
-    },
-    {
-      name: 'listList',
-      type: {
-        list: true,
-        inner: {
+      {
+        name: 'float',
+        type: {
+          list: false,
+          name: 'Float',
+          nullable: true,
+        },
+      },
+      {
+        name: 'string',
+        type: {
+          list: false,
+          name: 'String',
+          nullable: true,
+        },
+      },
+      {
+        name: 'bool',
+        type: {
+          list: false,
+          name: 'Boolean',
+          nullable: true,
+        },
+      },
+      {
+        name: 'id',
+        type: {
+          list: false,
+          name: 'ID',
+          nullable: true,
+        },
+      },
+      {
+        name: 'scalar',
+        type: {
+          list: false,
+          name: 'MyScalar',
+          nullable: true,
+        },
+      },
+      {
+        name: 'nonNull',
+        type: {
+          list: false,
+          name: 'String',
+          nullable: false,
+        },
+      },
+      {
+        name: 'list',
+        type: {
           list: true,
           inner: {
             list: false,
@@ -109,33 +95,47 @@ it('parses variable definitions', () => {
           },
           nullable: true,
         },
-        nullable: true,
       },
-    },
-    {
-      name: 'nonNullList',
-      type: {
-        list: true,
-        inner: {
-          list: false,
-          name: 'Int',
+      {
+        name: 'listList',
+        type: {
+          list: true,
+          inner: {
+            list: true,
+            inner: {
+              list: false,
+              name: 'Int',
+              nullable: true,
+            },
+            nullable: true,
+          },
           nullable: true,
         },
-        nullable: false,
       },
-    },
-    {
-      name: 'nonNullListNonNull',
-      type: {
-        list: true,
-        inner: {
-          list: false,
-          name: 'Int',
+      {
+        name: 'nonNullList',
+        type: {
+          list: true,
+          inner: {
+            list: false,
+            name: 'Int',
+            nullable: true,
+          },
           nullable: false,
         },
-        nullable: false,
       },
-    },
+      {
+        name: 'nonNullListNonNull',
+        type: {
+          list: true,
+          inner: {
+            list: false,
+            name: 'Int',
+            nullable: false,
+          },
+          nullable: false,
+        },
+      },
     ],
   })
 })

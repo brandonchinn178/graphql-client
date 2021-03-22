@@ -10,10 +10,7 @@ import {
 
 import { ParsedFragments } from './fragments'
 import { ParsedSelection, parseSelectionSet } from './selectionSet'
-import {
-  ParsedArgument,
-  parseVariableDefinitions,
-} from './variableDefinition'
+import { ParsedArgument, parseVariableDefinitions } from './variableDefinition'
 
 export type ParsedOperations = {
   // Sorted alphabetically and contains no duplicates
