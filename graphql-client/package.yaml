@@ -15,7 +15,7 @@ extra-source-files:
   - README.md
   - CHANGELOG.md
   # Make sure graphql-codegen-haskell.js is listed in the Cabal file,
-  # in the off case it's not built yet
+  # in the off-chance it's not built yet
   - ./js/graphql-codegen-haskell.js
   - ./js/**/*
 
