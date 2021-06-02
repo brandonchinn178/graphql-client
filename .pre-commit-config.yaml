@@ -14,9 +14,9 @@ repos:
         language: script
         files: '\.hs$'
 
-      - id: stylish-haskell
-        name: Run stylish-haskell
-        entry: scripts/stylish-haskell.sh
+      - id: fourmolu
+        name: Run fourmolu
+        entry: scripts/fourmolu.sh
         language: script
         files: '\.hs$'
 
