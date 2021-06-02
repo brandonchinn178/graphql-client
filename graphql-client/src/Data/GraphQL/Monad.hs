@@ -44,7 +44,7 @@ import Data.GraphQL.Monad.Class
 import Data.GraphQL.Query (GraphQLQuery(..))
 
 -- | The state for running GraphQLQueryT.
-data QueryState = QueryState
+data GraphQLManager = GraphQLManager
   { manager :: Manager
   , baseReq :: Request
   }
@@ -65,7 +65,7 @@ data QueryState = QueryState
 --           }
 --       }
 -- @
-newtype GraphQLQueryT m a = GraphQLQueryT { unGraphQLQueryT :: ReaderT QueryState m a }
+newtype GraphQLQueryT m a = GraphQLQueryT { unGraphQLQueryT :: ReaderT GraphQLManager m a }
   deriving
     ( Functor
     , Applicative
@@ -79,7 +79,7 @@ instance MonadUnliftIO m => MonadUnliftIO (GraphQLQueryT m) where
 
 instance MonadIO m => MonadGraphQLQuery (GraphQLQueryT m) where
   runQuerySafe query = do
-    QueryState{..} <- GraphQLQueryT ask
+    GraphQLManager{..} <- GraphQLQueryT ask
 
     let request = baseReq
           { requestBody = RequestBodyLBS $ Aeson.encode $ Aeson.object
@@ -96,7 +96,7 @@ runGraphQLQueryT GraphQLSettings{..} m = do
   state <- liftIO $ do
     manager <- newManager managerSettings
     baseReq <- modifyReq . modifyReq' <$> parseUrlThrow url
-    return QueryState{..}
+    return GraphQLManager{..}
 
   (`runReaderT` state)
     . unGraphQLQueryT
