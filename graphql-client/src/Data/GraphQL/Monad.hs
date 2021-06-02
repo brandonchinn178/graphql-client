@@ -43,6 +43,24 @@ import Network.HTTP.Types (hContentType)
 import Data.GraphQL.Monad.Class
 import Data.GraphQL.Query (GraphQLQuery(..))
 
+{- GraphQLSettings -}
+
+-- | The settings for running GraphQLQueryT.
+data GraphQLSettings = GraphQLSettings
+  { managerSettings :: ManagerSettings
+    -- ^ Uses TLS by default
+  , url             :: String
+  , modifyReq       :: Request -> Request
+  }
+
+-- | Default query settings.
+defaultGraphQLSettings :: GraphQLSettings
+defaultGraphQLSettings = GraphQLSettings
+  { managerSettings = tlsManagerSettings
+  , url = error "No URL is provided"
+  , modifyReq = id
+  }
+
 -- | The state for running GraphQLQueryT.
 data GraphQLManager = GraphQLManager
   { manager :: Manager
@@ -106,19 +124,3 @@ runGraphQLQueryT GraphQLSettings{..} m = do
       { method = "POST"
       , requestHeaders = (hContentType, "application/json") : requestHeaders req
       }
-
--- | The settings for running GraphQLQueryT.
-data GraphQLSettings = GraphQLSettings
-  { managerSettings :: ManagerSettings
-    -- ^ Uses TLS by default
-  , url             :: String
-  , modifyReq       :: Request -> Request
-  }
-
--- | Default query settings.
-defaultGraphQLSettings :: GraphQLSettings
-defaultGraphQLSettings = GraphQLSettings
-  { managerSettings = tlsManagerSettings
-  , url = error "No URL is provided"
-  , modifyReq = id
-  }
