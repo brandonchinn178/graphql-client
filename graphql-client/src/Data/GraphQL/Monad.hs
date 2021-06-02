@@ -23,7 +23,7 @@ module Data.GraphQL.Monad
 
 import Control.Monad.IO.Class (MonadIO(..))
 import Control.Monad.IO.Unlift (MonadUnliftIO(..))
-import Control.Monad.Reader (MonadReader, ReaderT, ask, runReaderT)
+import Control.Monad.Reader (ReaderT, ask, runReaderT)
 import Control.Monad.Trans.Class (MonadTrans)
 import Data.Aeson ((.=))
 import qualified Data.Aeson as Aeson
@@ -71,7 +71,6 @@ newtype GraphQLQueryT m a = GraphQLQueryT { unGraphQLQueryT :: ReaderT QueryStat
     , Applicative
     , Monad
     , MonadIO
-    , MonadReader QueryState
     , MonadTrans
     )
 
@@ -80,7 +79,7 @@ instance MonadUnliftIO m => MonadUnliftIO (GraphQLQueryT m) where
 
 instance MonadIO m => MonadGraphQLQuery (GraphQLQueryT m) where
   runQuerySafe query = do
-    QueryState{..} <- ask
+    QueryState{..} <- GraphQLQueryT ask
 
     let request = baseReq
           { requestBody = RequestBodyLBS $ Aeson.encode $ Aeson.object
