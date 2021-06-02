@@ -102,7 +102,7 @@ orbs:
               key: *yarn_cache_key
           - run:
               name: Install yarn dependencies
-              command: yarn --frozen-lockfile
+              command: yarn --immutable
           - save_cache:
               key: *yarn_cache_key
               paths:

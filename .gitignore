@@ -2,6 +2,12 @@
 .stack-work/
 /.ci/
 
-node_modules/
-!/graphql-client/js/node_modules/
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+
 /graphql-client/js/graphql-codegen-haskell.js
