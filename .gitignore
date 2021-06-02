@@ -9,5 +9,6 @@
 !.yarn/sdks
 !.yarn/versions
 .pnp.*
+node_modules/
 
 /graphql-client/js/graphql-codegen-haskell.js

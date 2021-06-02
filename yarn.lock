@@ -1757,6 +1757,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"builtin-modules@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "builtin-modules@npm:3.2.0"
+  checksum: f0e7240f70ae472a0a0167bf76d2e828c73028fe60be8cd229939c38a27527ea68c92f700553dac1316fa124af3037bc7a765ca0e029a03d2e9201dfb372ea24
+  languageName: node
+  linkType: hard
+
 "cacache@npm:^15.0.5":
   version: 15.2.0
   resolution: "cacache@npm:15.2.0"
@@ -3234,6 +3241,7 @@ __metadata:
     "@types/mustache": ^4.0.1
     "@types/yargs": ^15.0.7
     "@types/yup": ^0.29.7
+    builtin-modules: ^3.2.0
     graphql: ^15.3.0
     graphql-tag: ^2.11.0
     jest: ^26.4.2
@@ -3246,6 +3254,7 @@ __metadata:
     rollup-plugin-string: ^3.0.0
     rollup-plugin-typescript2: ^0.27.2
     ts-jest: ^26.4.0
+    tslib: ^2.2.0
     typescript: ^4.0.3
     yup: ^0.29.3
   languageName: unknown
@@ -6705,6 +6714,13 @@ __metadata:
   version: 1.13.0
   resolution: "tslib@npm:1.13.0"
   checksum: 5dc3bdaea3b67c76ef4a14c28fcb2171da7bcf292fd9c59a260098729626b1ce766c52b588f08e324ed9a0c52ea8a93a815920f980d75981abc9d850fbf310fb
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "tslib@npm:2.2.0"
+  checksum: 2d35468c470410871c5246e43f12dcb6d0fc363b617c176f26443b9530e5c5ee8448966892a42956168d8f495da7865bda33dfe82c26c91991e28999974a618f
   languageName: node
   linkType: hard
 
