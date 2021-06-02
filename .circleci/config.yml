@@ -70,7 +70,8 @@ orbs:
                 stack build "${STACK_ARGS[@]}"
 
                 if [[ -n "${CI_LATEST}" ]]; then
-                    stack build hlint fourmolu
+                    stack install -j1 hlint fourmolu
+                    echo 'export PATH=~/.local/bin:$PATH' >> "${BASH_ENV}"
                     stack install hpc-lcov --local-bin-path /usr/local/bin
                 fi
           - save_cache:
