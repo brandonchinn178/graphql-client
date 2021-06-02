@@ -11,7 +11,8 @@ import Data.GraphQL
 data TestQuery = TestQuery
   deriving (Show)
 
-type TestSchema = [schema|
+type TestSchema =
+  [schema|
   {
     getUser: {
       id: Int
@@ -22,7 +23,8 @@ type TestSchema = [schema|
 instance GraphQLQuery TestQuery where
   type ResultSchema TestQuery = TestSchema
   getQueryName _ = "test"
-  getQueryText _ = [query|
+  getQueryText _ =
+    [query|
     query test($name: String!) {
       getUser(name: $name) {
         id

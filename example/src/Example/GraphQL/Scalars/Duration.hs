@@ -7,7 +7,7 @@ import Text.Printf (printf)
 
 -- | Duration in milliseconds.
 newtype Duration = Duration Int
-  deriving (Show,FromJSON,ToJSON)
+  deriving (Show, FromJSON, ToJSON)
 
 -- | Duration in (minutes, seconds).
 getDuration :: Duration -> (Int, Int)

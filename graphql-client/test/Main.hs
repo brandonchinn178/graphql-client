@@ -4,7 +4,10 @@ import Data.GraphQL.Test.Monad.Class
 import Data.GraphQL.Test.TestUtils
 
 main :: IO ()
-main = defaultMain $ testGroup "graphql-client"
-  [ testRunQuery
-  , testTestUtils
-  ]
+main =
+  defaultMain $
+    testGroup
+      "graphql-client"
+      [ testRunQuery
+      , testTestUtils
+      ]

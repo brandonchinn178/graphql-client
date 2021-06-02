@@ -1,5 +1,4 @@
 {- This file was automatically generated and should not be edited. -}
-
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -37,7 +36,8 @@ data GetRecordingsQuery = GetRecordingsQuery
   }
   deriving (Show)
 
-type GetRecordingsSchema = [schema|
+type GetRecordingsSchema =
+  [schema|
   {
     search: Maybe {
       recordings: Maybe {
@@ -72,7 +72,8 @@ instance GraphQLQuery GetRecordingsQuery where
 
   getQueryName _ = "getRecordings"
 
-  getQueryText _ = [query|
+  getQueryText _ =
+    [query|
     query getRecordings($query: String!, $first: Int) {
       search {
         recordings(query: $query, first: $first) {
@@ -102,8 +103,8 @@ instance GraphQLQuery GetRecordingsQuery where
     }
   |]
 
-  getArgs query = object
-    [ "query" .= _query (query :: GetRecordingsQuery)
-    , "first" .= _first (query :: GetRecordingsQuery)
-    ]
-
+  getArgs query =
+    object
+      [ "query" .= _query (query :: GetRecordingsQuery)
+      , "first" .= _first (query :: GetRecordingsQuery)
+      ]

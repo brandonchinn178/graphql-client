@@ -1,4 +1,10 @@
-{-|
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeFamilies #-}
+
+{- |
 Module      :  Data.GraphQL.Monad.Class
 Maintainer  :  Brandon Chinn <brandon@leapyear.io>
 Stability   :  experimental
@@ -6,26 +12,20 @@ Portability :  portable
 
 Defines the 'MonadGraphQLQuery' type class, which defines how GraphQL queries should be run.
 -}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE TypeFamilies #-}
-
-module Data.GraphQL.Monad.Class
-  ( MonadGraphQLQuery(..)
-  , runQuery
-  ) where
+module Data.GraphQL.Monad.Class (
+  MonadGraphQLQuery (..),
+  runQuery,
+) where
 
 import Control.Exception (throwIO)
-import Control.Monad.IO.Class (MonadIO(..))
+import Control.Monad.IO.Class (MonadIO (..))
 import Control.Monad.Trans.Class (lift)
 import Control.Monad.Trans.Except (ExceptT)
 import Control.Monad.Trans.Identity (IdentityT)
 import Control.Monad.Trans.Maybe (MaybeT)
-import Control.Monad.Trans.Reader (ReaderT)
 import qualified Control.Monad.Trans.RWS.Lazy as Lazy
 import qualified Control.Monad.Trans.RWS.Strict as Strict
+import Control.Monad.Trans.Reader (ReaderT)
 import qualified Control.Monad.Trans.State.Lazy as Lazy
 import qualified Control.Monad.Trans.State.Strict as Strict
 import qualified Control.Monad.Trans.Writer.Lazy as Lazy
@@ -33,21 +33,23 @@ import qualified Control.Monad.Trans.Writer.Strict as Strict
 import Data.Aeson.Schema (Object)
 import Data.Maybe (fromJust)
 
-import Data.GraphQL.Error (GraphQLException(..))
-import Data.GraphQL.Query (GraphQLQuery(..))
+import Data.GraphQL.Error (GraphQLException (..))
+import Data.GraphQL.Query (GraphQLQuery (..))
 import Data.GraphQL.Result (GraphQLResult, getErrors, getResult)
 
 -- | A type class for monads that can run GraphQL queries.
 class Monad m => MonadGraphQLQuery m where
   -- | Run the given query and return the 'GraphQLResult'.
-  runQuerySafe
-    :: (GraphQLQuery query, schema ~ ResultSchema query)
-    => query -> m (GraphQLResult (Object schema))
+  runQuerySafe ::
+    (GraphQLQuery query, schema ~ ResultSchema query) =>
+    query ->
+    m (GraphQLResult (Object schema))
 
 -- | Run the given query and returns the result, erroring if the query returned errors.
-runQuery
-  :: (MonadIO m, MonadGraphQLQuery m, GraphQLQuery query, schema ~ ResultSchema query)
-  => query -> m (Object schema)
+runQuery ::
+  (MonadIO m, MonadGraphQLQuery m, GraphQLQuery query, schema ~ ResultSchema query) =>
+  query ->
+  m (Object schema)
 runQuery query = do
   result <- runQuerySafe query
   case getErrors result of
