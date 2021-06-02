@@ -15,20 +15,20 @@ TickFunction = namedtuple('TickFunction', ['name', 'line_num', 'pattern'])
 
 OVERLAY_CONTENTS = [
     Module('graphql-client', 'Data.GraphQL.Monad', [
-        # QueryState fields used by RecordWildCards: https://gitlab.haskell.org/ghc/ghc/issues/17834
-        TickFunction('manager', 48, r'manager :: Manager'),
-        TickFunction('baseReq', 49, r'baseReq :: Request'),
+        # GraphQLManager fields used by RecordWildCards: https://gitlab.haskell.org/ghc/ghc/issues/17834
+        TickFunction('manager', 94, r'manager :: Manager'),
+        TickFunction('baseReq', 95, r'baseReq :: Request'),
         # Instance for MonadUnliftIO for transformer stacks built on top of QueryT
-        TickFunction('withRunInIO', 79, r'withRunInIO inner = GraphQLQueryT \$'),
-        # QuerySettings fields used by RecordWildCards: https://gitlab.haskell.org/ghc/ghc/issues/17834
-        TickFunction('managerSettings', 113, r'managerSettings :: ManagerSettings'),
-        TickFunction('url', 115, r'url\s+:: String'),
-        TickFunction('modifyReq', 116, r'modifyReq\s+:: Request -> Request'),
+        TickFunction('withRunInIO', 147, r'withRunInIO inner = GraphQLQueryT \$'),
+        # GraphQLSettings fields used by RecordWildCards: https://gitlab.haskell.org/ghc/ghc/issues/17834
+        TickFunction('managerSettings', 66, r'managerSettings :: ManagerSettings'),
+        TickFunction('url', 68, r'url\s+:: String'),
+        TickFunction('modifyReq', 69, r'modifyReq\s+:: Request -> Request'),
     ]),
     Module('graphql-client', 'Data.GraphQL.Monad.Class', [
         # MonadQuery instances for standard monad transformers
         TickFunction('runQuerySafe', line_num, r'lift \. runQuerySafe')
-        for line_num in [59, 62, 65, 68, 71, 74, 77, 80, 83, 86]
+        for line_num in [60, 63, 66, 69, 72, 75, 78, 81, 84, 87]
     ]),
 ]
 
