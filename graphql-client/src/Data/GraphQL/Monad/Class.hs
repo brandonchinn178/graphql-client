@@ -39,11 +39,12 @@ import Data.GraphQL.Result (GraphQLResult, getErrors, getResult)
 
 -- | A type class for monads that can run GraphQL queries.
 class Monad m => MonadGraphQLQuery m where
+  -- | Run the given query and return the 'GraphQLResult'.
   runQuerySafe
     :: (GraphQLQuery query, schema ~ ResultSchema query)
     => query -> m (GraphQLResult (Object schema))
 
--- | Runs the given query and returns the result, erroring if the query returned errors.
+-- | Run the given query and returns the result, erroring if the query returned errors.
 runQuery
   :: (MonadIO m, MonadGraphQLQuery m, GraphQLQuery query, schema ~ ResultSchema query)
   => query -> m (Object schema)

@@ -1,5 +1,9 @@
 ## Upcoming
 
+New features:
+
+* Added `runQuerySafeIO` and expose `GraphQLManager` for applications that want to manually implement `MonadGraphQLQuery`
+
 ## 1.1.1
 
 Bug fixes:
