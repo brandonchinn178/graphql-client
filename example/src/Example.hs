@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DisambiguateRecordFields #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -12,9 +13,11 @@ module Example where
 import Control.Monad.IO.Class (MonadIO)
 import Data.Bool (bool)
 import Data.GraphQL
-import Data.Maybe (fromMaybe)
-import Data.Monoid ((<>))
 import qualified Data.Text as Text
+
+#if !MIN_VERSION_base(4,11,0)
+import Data.Monoid ((<>))
+#endif
 
 import Example.GraphQL.API (GetRecordingsQuery (..), GetRecordingsSchema)
 import Example.GraphQL.Enums.ReleaseStatus (ReleaseStatus (..))
