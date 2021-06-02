@@ -1,4 +1,10 @@
-{-|
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving #-}
+
+{- |
 Module      :  Data.GraphQL.TestUtils
 Maintainer  :  Brandon Chinn <brandon@leapyear.io>
 Stability   :  experimental
@@ -6,19 +12,13 @@ Portability :  portable
 
 Defines test utilities for testing GraphQL queries.
 -}
-{-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE StandaloneDeriving #-}
-
-module Data.GraphQL.TestUtils
-  ( ResultMock(..)
-  , mocked
-  , MockQueryT
-  , runMockQueryT
-  , AnyResultMock
-  ) where
+module Data.GraphQL.TestUtils (
+  ResultMock (..),
+  mocked,
+  MockQueryT,
+  runMockQueryT,
+  AnyResultMock,
+) where
 
 import Control.Monad.IO.Class (MonadIO)
 import Control.Monad.State.Strict (MonadState, StateT, evalStateT, state)
@@ -28,13 +28,14 @@ import qualified Data.Aeson.Types as Aeson
 import qualified Data.Text as Text
 
 import Data.GraphQL.Error (GraphQLError)
-import Data.GraphQL.Monad (MonadGraphQLQuery(..))
-import Data.GraphQL.Query (GraphQLQuery(..))
+import Data.GraphQL.Monad (MonadGraphQLQuery (..))
+import Data.GraphQL.Query (GraphQLQuery (..))
 
 data ResultMock query = ResultMock
-  { query  :: query
+  { query :: query
   , result :: Value
-  } deriving (Show)
+  }
+  deriving (Show)
 
 mocked :: (Show query, GraphQLQuery query) => ResultMock query -> AnyResultMock
 mocked = AnyResultMock
@@ -53,7 +54,7 @@ getResult (AnyResultMock mock) = result mock
 
 {- MockQueryT -}
 
-newtype MockQueryT m a = MockQueryT { unMockQueryT :: StateT [AnyResultMock] m a }
+newtype MockQueryT m a = MockQueryT {unMockQueryT :: StateT [AnyResultMock] m a}
   deriving (Functor, Applicative, Monad, MonadIO, MonadState [AnyResultMock], MonadTrans)
 
 instance Monad m => MonadGraphQLQuery (MockQueryT m) where
@@ -61,7 +62,7 @@ instance Monad m => MonadGraphQLQuery (MockQueryT m) where
     where
       takeWhere :: (a -> Bool) -> [a] -> Maybe (a, [a])
       takeWhere f xs = case break f xs of
-        (before, match:after) -> Just (match, before ++ after)
+        (before, match : after) -> Just (match, before ++ after)
         (_, []) -> Nothing
 
       -- Find the first matching mock and remove it from the state
@@ -72,10 +73,12 @@ instance Monad m => MonadGraphQLQuery (MockQueryT m) where
           Nothing -> error $ "No more mocked responses for query: " ++ Text.unpack (getQueryName testQuery)
 
       toGraphQLResult :: FromJSON a => Value -> a
-      toGraphQLResult mockData = either error id . Aeson.parseEither Aeson.parseJSON $ object
-        [ "errors" .= ([] :: [GraphQLError])
-        , "data"   .= Just mockData
-        ]
+      toGraphQLResult mockData =
+        either error id . Aeson.parseEither Aeson.parseJSON $
+          object
+            [ "errors" .= ([] :: [GraphQLError])
+            , "data" .= Just mockData
+            ]
 
 runMockQueryT :: Monad m => MockQueryT m a -> [AnyResultMock] -> m a
 runMockQueryT mockQueryT mocks = (`evalStateT` mocks) . unMockQueryT $ mockQueryT

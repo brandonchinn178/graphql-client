@@ -2,46 +2,60 @@
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
 
-import Data.Aeson (ToJSON(..))
+import Data.Aeson (ToJSON (..))
 import Data.Aeson.QQ (aesonQQ)
 import qualified Data.ByteString.Lazy.Char8 as ByteString
-import Data.GraphQL.TestUtils (ResultMock(..), mocked, runMockQueryT)
+import Data.GraphQL.TestUtils (ResultMock (..), mocked, runMockQueryT)
 import Test.Tasty (defaultMain, testGroup)
 import Test.Tasty.Golden (goldenVsString)
 
 import Example (searchForSong)
-import Example.GraphQL.API (GetRecordingsQuery(..))
-import Example.GraphQL.Enums.ReleaseStatus (ReleaseStatus(..))
+import Example.GraphQL.API (GetRecordingsQuery (..))
+import Example.GraphQL.Enums.ReleaseStatus (ReleaseStatus (..))
 
 main :: IO ()
-main = defaultMain $ testGroup "searchForSong"
-  [ goldens "AllStar" $ runMockQueryT (searchForSong "All Star")
-      [ mockedGetRecordings "All Star"
-          [ recordingAllStar
-          ]
+main =
+  defaultMain $
+    testGroup
+      "searchForSong"
+      [ goldens "AllStar" $
+          runMockQueryT
+            (searchForSong "All Star")
+            [ mockedGetRecordings
+                "All Star"
+                [ recordingAllStar
+                ]
+            ]
+      , goldens "OldTownRoad" $
+          runMockQueryT
+            (searchForSong "Old Town Road")
+            [ mockedGetRecordings
+                "Old Town Road"
+                [ recordingOldTownRoad
+                , recordingOldTownRoadRemix
+                ]
+            ]
+      , goldens "NonExistentSong" $
+          runMockQueryT
+            (searchForSong "Non-Existent Song")
+            [ mockedGetRecordings "Non-Existent Song" []
+            ]
       ]
-  , goldens "OldTownRoad" $ runMockQueryT (searchForSong "Old Town Road")
-      [ mockedGetRecordings "Old Town Road"
-          [ recordingOldTownRoad
-          , recordingOldTownRoadRemix
-          ]
-      ]
-  , goldens "NonExistentSong" $ runMockQueryT (searchForSong "Non-Existent Song")
-      [ mockedGetRecordings "Non-Existent Song" []
-      ]
-  ]
   where
     goldens name = goldenVsString name fp . fmap (ByteString.pack . show)
       where
         fp = "test/goldens/" ++ name ++ ".golden"
 
-    mockedGetRecordings searchQuery recordings = mocked ResultMock
-      { query = GetRecordingsQuery
-          { _query = searchQuery
-          , _first = Just 5
-          }
-      , result =
-          [aesonQQ|
+    mockedGetRecordings searchQuery recordings =
+      mocked
+        ResultMock
+          { query =
+              GetRecordingsQuery
+                { _query = searchQuery
+                , _first = Just 5
+                }
+          , result =
+              [aesonQQ|
             {
               "search": {
                 "recordings": {
@@ -50,21 +64,22 @@ main = defaultMain $ testGroup "searchForSong"
               }
             }
           |]
-      }
+          }
 
 {- Mock data -}
 
 data Recording = Recording
-  { title       :: String
-  , artist      :: String
-  , video       :: Bool
-  , duration    :: Int
+  { title :: String
+  , artist :: String
+  , video :: Bool
+  , duration :: Int
   , ratingCount :: Int
   , ratingValue :: Double
-  , albumTitle  :: String
-  , albumYear   :: Int
+  , albumTitle :: String
+  , albumYear :: Int
   , albumStatus :: ReleaseStatus
-  } deriving (Show)
+  }
+  deriving (Show)
 
 instance ToJSON Recording where
   toJSON Recording{..} =
@@ -97,37 +112,40 @@ instance ToJSON Recording where
     |]
 
 recordingAllStar :: Recording
-recordingAllStar = Recording
-  { title = "All Star"
-  , artist = "Smash Mouth"
-  , video = True
-  , duration = 201000
-  , ratingCount = 500
-  , ratingValue = 4.8
-  , albumTitle = "Astro Lounge"
-  , albumYear = 1999
-  , albumStatus = OFFICIAL
-  }
+recordingAllStar =
+  Recording
+    { title = "All Star"
+    , artist = "Smash Mouth"
+    , video = True
+    , duration = 201000
+    , ratingCount = 500
+    , ratingValue = 4.8
+    , albumTitle = "Astro Lounge"
+    , albumYear = 1999
+    , albumStatus = OFFICIAL
+    }
 
 recordingOldTownRoad :: Recording
-recordingOldTownRoad = Recording
-  { title = "Old Town Road"
-  , artist = "Lil Nas X"
-  , video = False
-  , duration = 113000
-  , ratingCount = 200
-  , ratingValue = 3.4
-  , albumTitle = "7"
-  , albumYear = 2019
-  , albumStatus = OFFICIAL
-  }
+recordingOldTownRoad =
+  Recording
+    { title = "Old Town Road"
+    , artist = "Lil Nas X"
+    , video = False
+    , duration = 113000
+    , ratingCount = 200
+    , ratingValue = 3.4
+    , albumTitle = "7"
+    , albumYear = 2019
+    , albumStatus = OFFICIAL
+    }
 
 recordingOldTownRoadRemix :: Recording
-recordingOldTownRoadRemix = recordingOldTownRoad
-  { title = "Old Town Road (Remix)"
-  , artist = "Lil Nas X (feat. Billy Ray Cyrus)"
-  , video = True
-  , duration = 157000
-  , ratingCount = 250
-  , ratingValue = 4.3
-  }
+recordingOldTownRoadRemix =
+  recordingOldTownRoad
+    { title = "Old Town Road (Remix)"
+    , artist = "Lil Nas X (feat. Billy Ray Cyrus)"
+    , video = True
+    , duration = 157000
+    , ratingCount = 250
+    , ratingValue = 4.3
+    }

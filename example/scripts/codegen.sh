@@ -8,6 +8,6 @@ ROOT="$(builtin cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 stack exec -- graphql-codegen -c "${ROOT}/codegen.yml"
 
-"${ROOT}/../scripts/stylish-haskell.sh" --apply \
+"${ROOT}/../scripts/fourmolu.sh" \
     "${ROOT}"/src/Example/GraphQL/API.hs \
     "${ROOT}"/src/Example/GraphQL/Enums/*.hs

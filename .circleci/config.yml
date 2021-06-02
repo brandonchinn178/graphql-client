@@ -70,7 +70,8 @@ orbs:
                 stack build "${STACK_ARGS[@]}"
 
                 if [[ -n "${CI_LATEST}" ]]; then
-                    stack build hlint stylish-haskell
+                    stack install -j1 hlint fourmolu
+                    echo 'export PATH=~/.local/bin:$PATH' >> "${BASH_ENV}"
                     stack install hpc-lcov --local-bin-path /usr/local/bin
                 fi
           - save_cache:
@@ -159,7 +160,8 @@ jobs:
                   set +e
                   STATUS=0
                   scripts/hlint.sh || STATUS=1
-                  scripts/stylish-haskell.sh || STATUS=1
+                  scripts/fourmolu.sh
+                  git diff --exit-code -- '*.hs' || STATUS=1
                   exit "${STATUS}"
 
       # test
