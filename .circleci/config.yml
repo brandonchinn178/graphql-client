@@ -145,7 +145,7 @@ jobs:
                 STACK_ARGS+=(--coverage)
             fi
 
-            stack build "${STACK_ARGS[@]}" --ghc-options -Werror graphql-client
+            stack build "${STACK_ARGS[@]}" graphql-client
       - run:
           name: Check Cabal files up to date
           command: git diff --exit-code -- *.cabal

@@ -8,7 +8,7 @@ Builds must pass with Haddock enabled and no warnings in order for your PR to be
 # First, build the graphql-codegen Typescript code
 yarn build
 
-stack build --ghc-options -Werror
+stack build
 
 # with haddock
 stack build --haddock
