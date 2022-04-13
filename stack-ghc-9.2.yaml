@@ -1,0 +1,12 @@
+resolver: nightly-2022-04-13
+
+packages:
+  - graphql-client/
+  - example/
+
+flags:
+  cryptonite:
+    use_target_attributes: false
+
+ghc-options:
+  "$locals": -Werror

@@ -1,6 +1,7 @@
 .DS_Store
 .stack-work/
 /.ci/
+stack-ghc-*.yaml.lock
 
 .yarn/*
 !.yarn/patches
