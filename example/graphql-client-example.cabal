@@ -3,8 +3,6 @@ cabal-version: 1.12
 -- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
---
--- hash: 6c296d7469c272f87a1f82fcf9f102fc6addf16ae44dc2cd90a3baf6679cd196
 
 name:           graphql-client-example
 version:        0.1.0
