@@ -1,4 +1,4 @@
-resolver: nightly-2022-04-13
+resolver: nightly-2022-06-15
 
 packages:
   - graphql-client/
