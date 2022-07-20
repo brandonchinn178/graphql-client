@@ -21,19 +21,21 @@ The following linters must pass CI in order for your PR to be accepted.
 * HLint
 
     ```bash
-    scripts/hlint.sh
+    stack install hlint-3.4.1
+    hlint .
     ```
 
 * fourmolu
 
     ```bash
-    scripts/fourmolu.sh
+    stack install fourmolu-0.7.0.1
+    fourmolu -i $(git ls-files '*.hs')
     ```
 
 * ESLint
 
     ```bash
-    scripts/eslint.sh .
+    yarn lint .
     ```
 
 You can install [pre-commit](https://pre-commit.com/) to run these linters as

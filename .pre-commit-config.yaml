@@ -3,21 +3,21 @@ repos:
     hooks:
       - id: eslint
         name: Run ESLint
-        entry: scripts/eslint.sh
-        language: script
+        entry: yarn lint
+        language: system
         files: '\.ts$'
         require_serial: true
 
       - id: hlint
         name: Run HLint
-        entry: scripts/hlint.sh
-        language: script
+        entry: hlint
+        language: system
         files: '\.hs$'
 
       - id: fourmolu
         name: Run fourmolu
-        entry: scripts/fourmolu.sh
-        language: script
+        entry: fourmolu -i
+        language: system
         files: '\.hs$'
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
