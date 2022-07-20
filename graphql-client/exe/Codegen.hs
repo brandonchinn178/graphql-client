@@ -92,7 +92,8 @@ main = do
 
     configFileExists <- doesFileExist configFile
     unless configFileExists $
-      errorWithoutStackTrace $ "Config file doesn't exist: " ++ toFilePath configFile
+      errorWithoutStackTrace $
+        "Config file doesn't exist: " ++ toFilePath configFile
 
     try @SomeException (readProcess $ proc nodeExe ["-e", "console.log('TEST')"]) >>= \case
       Right (ExitSuccess, "TEST\n", _) -> return ()

@@ -63,8 +63,8 @@ import Data.GraphQL.Result (GraphQLResult)
 
 -- | The settings for initializing a 'GraphQLManager'.
 data GraphQLSettings = GraphQLSettings
-  { -- | Uses TLS by default
-    managerSettings :: ManagerSettings
+  { managerSettings :: ManagerSettings
+  -- ^ Uses TLS by default
   , url :: String
   , modifyReq :: Request -> Request
   }
