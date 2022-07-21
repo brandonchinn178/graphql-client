@@ -21,7 +21,7 @@ OVERLAY_CONTENTS = [
         # Instance for MonadUnliftIO for transformer stacks built on top of QueryT
         TickFunction('withRunInIO', 156, r'withRunInIO inner = GraphQLQueryT \$'),
         # GraphQLSettings fields used by RecordWildCards: https://gitlab.haskell.org/ghc/ghc/issues/17834
-        TickFunction('managerSettings', 67, r'managerSettings :: ManagerSettings'),
+        TickFunction('managerSettings', 66, r'managerSettings :: ManagerSettings'),
         TickFunction('url', 68, r'url\s+:: String'),
         TickFunction('modifyReq', 69, r'modifyReq\s+:: Request -> Request'),
     ]),
