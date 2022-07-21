@@ -31,7 +31,7 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
     import Example.GraphQL.Enums.EnumFoo
 
     {-----------------------------------------------------------------------------
-    * getEnums
+    -- getEnums
 
     -- result :: Object GetEnumsSchema; throws a GraphQL exception on errors
     result <- runQuery GetEnumsQuery
@@ -73,7 +73,7 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
         ]
 
     {-----------------------------------------------------------------------------
-    * getMoreEnums
+    -- getMoreEnums
 
     -- result :: Object GetMoreEnumsSchema; throws a GraphQL exception on errors
     result <- runQuery GetMoreEnumsQuery
@@ -113,7 +113,7 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
         ]
 
     {-----------------------------------------------------------------------------
-    * getBar
+    -- getBar
 
     -- result :: Object GetBarSchema; throws a GraphQL exception on errors
     result <- runQuery GetBarQuery
@@ -159,7 +159,7 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
         ]
 
     {-----------------------------------------------------------------------------
-    * getNamed
+    -- getNamed
 
     -- result :: Object GetNamedSchema; throws a GraphQL exception on errors
     result <- runQuery GetNamedQuery
@@ -221,7 +221,7 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
         ]
 
     {-----------------------------------------------------------------------------
-    * getNamed2
+    -- getNamed2
 
     -- result :: Object GetNamed2Schema; throws a GraphQL exception on errors
     result <- runQuery GetNamed2Query
