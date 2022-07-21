@@ -220,47 +220,17 @@ jobs:
                   cp "$(find graphql-client/.stack-work/ -name 'graphql-client-*.tar.gz')" .ci/
 
       # build and test graphql-client-example
-      - when:
-          condition: << parameters.latest >>
-          steps:
-            - run:
-                name: Test that example API is up to date
-                command: |
-                  example/scripts/codegen.sh
-                  git --no-pager diff --exit-code example/src/Example/GraphQL/
-            - run:
-                name: Build graphql-client-example
-                command: stack build --coverage graphql-client-example
-            - run:
-                name: Remove old Main.mix file (LeapYear/hpc-lcov#12)
-                command: find graphql-client/ -name Main.mix | xargs rm -rf
-            - run:
-                name: Run example
-                command: stack exec graphql-client-example
-            - run:
-                name: Convert coverage output
-                command: hpc-lcov --file graphql-client-example.tix --main-package graphql-client-example -o lcov-example-exe.info
-            - codecov/upload:
-                file: lcov-example-exe.info
-            - run:
-                name: Test graphql-client-example
-                command: |
-                  stack clean graphql-client-example
-                  stack test --coverage graphql-client-example
-            - run:
-                name: Convert coverage output
-                command: hpc-lcov -o lcov-example-test.info
-            - codecov/upload:
-                file: lcov-example-test.info
-      - unless:
-          condition: << parameters.latest >>
-          steps:
-            - run:
-                name: Test graphql-client-example
-                command: stack test graphql-client-example
-            - run:
-                name: Run example
-                command: stack exec graphql-client-example
+      - run:
+          name: Test that example API is up to date
+          command: |
+            example/scripts/codegen.sh
+            git --no-pager diff --exit-code example/src/Example/GraphQL/
+      - run:
+          name: Build + Test graphql-client-example
+          command: stack test graphql-client-example
+      - run:
+          name: Run example
+          command: stack exec graphql-client-example
 
       - store_artifacts:
           path: .ci/
