@@ -21,12 +21,12 @@ If this is the case, get the graphql-codegen-haskell.js bundle manually and set
 the GRAPHQL_CODEGEN environment variable to the location of that bundle. You
 can get the bundle in one of the following ways:
 
-  1. Download from CircleCI (recommended)
+  1. Download from CI (recommended)
       a. Go to ${utils.GITHUB_URL}
       b. Navigate to the appropriate commit
-      c. Click on the commit status icon and click on the 'test_latest' CI job
-      d. Go to the Artifacts tab
-      e. Download 'graphql-codegen-haskell.js'
+      c. Click on the commit status icon and click on the any of the CI links
+      d. Click on the "Summary" tab
+      e. Under "Artifacts", download 'graphql-codegen-haskell.js'
   2. Build manually
       a. Clone ${utils.GITHUB_URL}
       b. Follow the instructions in DEVELOPER.md to build the bundle

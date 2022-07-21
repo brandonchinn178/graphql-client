@@ -1,13 +1,7 @@
 repos:
+  # Haskell
   - repo: local
     hooks:
-      - id: eslint
-        name: Run ESLint
-        entry: yarn lint
-        language: system
-        files: '\.ts$'
-        require_serial: true
-
       - id: hlint
         name: Run HLint
         entry: hlint
@@ -19,6 +13,31 @@ repos:
         entry: fourmolu -i
         language: system
         files: '\.hs$'
+
+  # Typescript
+  - repo: local
+    hooks:
+      - id: eslint
+        name: Run ESLint
+        entry: yarn lint
+        language: system
+        files: '\.ts$'
+        require_serial: true
+
+  # Python
+  - repo: https://github.com/psf/black
+    rev: '22.6.0'
+    hooks:
+      - id: black
+  - repo: local
+    hooks:
+      - id: pyright
+        name: pyright
+        entry: pyright
+        language: node
+        pass_filenames: false
+        types: [python]
+        additional_dependencies: ['pyright@1.1.258']
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.3.0
