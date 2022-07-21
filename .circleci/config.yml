@@ -96,11 +96,13 @@ orbs:
                 )
                 cat "${YARN_FILES[@]}" > yarn-cache-key.txt
           - run:
-              name: Install yarn
+              name: Install NodeJS + yarn
               command: |
-                curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
                 curl --silent --location https://rpm.nodesource.com/setup_<< parameters.version >>.x | bash -
-                yum install -y yarn
+                yum install -y nodejs
+                corepack enable
+                node --version
+                yarn --version
           - run:
               name: Install system dependencies
               command: yum install -y git
