@@ -15,7 +15,7 @@ import Example.GraphQL.Enums.ReleaseStatus
 import Example.GraphQL.Scalars
 
 {-----------------------------------------------------------------------------
-* getRecordings
+-- getRecordings
 
 -- result :: Object GetRecordingsSchema; throws a GraphQL exception on errors
 result <- runQuery GetRecordingsQuery

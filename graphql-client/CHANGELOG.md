@@ -1,5 +1,9 @@
 ## Upcoming
 
+Breaking changes:
+
+* Remove support for GHC < 8.10
+
 New features:
 
 * Added `runQuerySafeIO` and expose `GraphQLManager` for applications that want to manually implement `MonadGraphQLQuery`
