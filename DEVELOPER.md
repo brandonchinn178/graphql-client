@@ -91,12 +91,9 @@ Follow these steps to release this project:
     1. In the `check_sdist` CI job, check the output of the `stack sdist`
        step for any warnings.
 
-1. Create a release on GitHub on the merge commit
-    1. The tag version should be of the format `vX.Y.Z`
-    1. The release title should be the same as the tag version
-    1. The release body should contain everything in `CHANGELOG.md` in the
-       section for this version
+1. Ensure your Hackage token is set in Settings > Secrets > Actions as `HACKAGE_TOKEN_<github_username>` (replace any non alphanumeric characters in username with `_`).
+   * Generate a token from `https://hackage.haskell.org/user/<hackage_username>/manage`
 
-1. Upload the package to Hackage
-    1. Download the `graphql-client-*.tar.gz` file from CI artifacts
-    1. Upload tarbell to Hackage
+1. Go to the GitHub Actions page, click on the "Release" workflow, and click "Run workflow" on the main branch
+
+1. Publish the candidate: https://hackage.haskell.org/package/graphql-client/candidates
