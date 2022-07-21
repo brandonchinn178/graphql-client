@@ -1,4 +1,4 @@
-## Upcoming
+# Upcoming
 
 Breaking changes:
 
@@ -8,13 +8,13 @@ New features:
 
 * Added `runQuerySafeIO` and expose `GraphQLManager` for applications that want to manually implement `MonadGraphQLQuery`
 
-## 1.1.1
+# v1.1.1
 
 Bug fixes:
 
 * Generate enums that only appear in query arguments ([#59](https://github.com/LeapYear/graphql-client/pull/59))
 
-## 1.1.0
+# v1.1.0
 
 Breaking changes:
 
@@ -30,7 +30,7 @@ Miscellaneous changes:
     * Add `Show` instance for `AnyResultMock`
     * Add `MonadTrans` instance for `MockQueryT`
 
-## 1.0.0
+# v1.0.0
 
 Initial release:
 
