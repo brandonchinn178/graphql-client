@@ -82,6 +82,11 @@ orbs:
                 - .stack-work
 
       install_yarn_and_deps:
+        parameters:
+          version:
+            type: string
+            default: lts
+
         steps:
           - run:
               name: Build cache keys
@@ -94,7 +99,7 @@ orbs:
               name: Install yarn
               command: |
                 curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
-                curl --silent --location https://rpm.nodesource.com/setup_12.x | bash -
+                curl --silent --location https://rpm.nodesource.com/setup_<< parameters.version >>.x | bash -
                 yum install -y yarn
           - run:
               name: Install system dependencies
@@ -260,11 +265,16 @@ jobs:
           path: .ci/
 
   test_node:
+    parameters:
+      version:
+        type: string
+
     executor: centos7
     steps:
       # init
       - checkout
-      - helpers/install_yarn_and_deps
+      - helpers/install_yarn_and_deps:
+          version: << parameters.version >>
 
       # build
       - run:
@@ -288,7 +298,15 @@ workflows:
 
   build_and_test:
     jobs:
-      - test_node
+      - test_node:
+          name: test_node_14
+          version: '14'
+      - test_node:
+          name: test_node_16
+          version: '16'
+      - test_node:
+          name: test_node_18
+          version: '18'
       - run_build_and_test:
           name: test_latest
           latest: true
