@@ -1,5 +1,7 @@
 # Unreleased
 
+# v1.2.0
+
 Breaking changes:
 
 * Remove support for GHC < 8.10
