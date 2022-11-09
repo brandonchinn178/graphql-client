@@ -24,7 +24,7 @@ jobs:
       STACK_YAML: ${{ matrix.stack_yaml }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: latest
@@ -91,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.version }}
@@ -109,7 +109,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install fourmolu
         run: |
@@ -144,7 +144,7 @@ jobs:
   check_sdist:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: corepack enable
       - uses: actions/cache@v3
         with:
@@ -153,6 +153,9 @@ jobs:
 
       - name: Build graphql-codegen-haskell
         run: yarn install --immutable && yarn build
+
+      - name: Strip unreleased section from CHANGELOG
+        run: sed -i -n '/^# Unreleased/d; /^#/,$p' graphql-client/CHANGELOG.md
 
       - name: Create sdist bundle
         run: stack sdist graphql-client --test-tarball --tar-dir .

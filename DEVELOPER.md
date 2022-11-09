@@ -97,3 +97,5 @@ Follow these steps to release this project:
 1. Go to the GitHub Actions page, click on the "Release" workflow, and click "Run workflow" on the main branch
 
 1. Publish the candidate: https://hackage.haskell.org/package/graphql-client/candidates
+
+1. Publish the GitHub release: https://github.com/LeapYear/graphql-client/releases
