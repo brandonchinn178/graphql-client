@@ -27,12 +27,6 @@ jobs:
       - name: Set version label
         run: echo 'VERSION=v${{ steps.cabal_file.outputs.version }}' >> "${GITHUB_ENV}"
 
-      - name: Load Hackage token secret name
-        id: hackage_token_secret
-        run: |
-          USERNAME="$(echo "${GITHUB_ACTOR}" | tr '[:lower:]' '[:upper:]' | tr '-' '_')"
-          echo "name=HACKAGE_TOKEN_${USERNAME}" >> "${GITHUB_OUTPUT}"
-
       - name: Get CHANGELOG section
         run: |
           sed '/^# Unreleased/,/^$/d' CHANGELOG.md > /tmp/changelog-without-unreleased
@@ -45,7 +39,7 @@ jobs:
       - uses: brandonchinn178/haskell-actions/hackage-upload@hackage-upload
         with:
           archive: sdist/graphql-client-*.tar.gz
-          token: ${{ secrets[steps.hackage_token_secret.outputs.name] }}
+          token: ${{ secrets.HACKAGE_TOKEN_LEAPYEAR }}
 
       - uses: softprops/action-gh-release@v1
         with:
