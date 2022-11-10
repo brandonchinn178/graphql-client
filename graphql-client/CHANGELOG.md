@@ -1,4 +1,6 @@
-# Upcoming
+# Unreleased
+
+# v1.2.0
 
 Breaking changes:
 

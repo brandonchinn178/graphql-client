@@ -1,11 +1,11 @@
 cabal-version: >= 1.10
 
--- This file has been generated from package.yaml by hpack version 0.34.4.
+-- This file has been generated from package.yaml by hpack version 0.35.0.
 --
 -- see: https://github.com/sol/hpack
 
 name:           graphql-client
-version:        1.1.1
+version:        1.2.0
 synopsis:       A client for Haskell programs to query a GraphQL API
 description:    A client for Haskell programs to query a GraphQL API.
 category:       Graphql
@@ -45,7 +45,7 @@ library
   ghc-options: -Wall
   build-depends:
       aeson >=1.2.4.0 && <3
-    , aeson-schemas ==1.3.*
+    , aeson-schemas >=1.3 && <1.5
     , base >=4.14 && <5
     , http-client >=0.5.13.1 && <0.8
     , http-client-tls >=0.3.5.3 && <0.4
@@ -55,11 +55,11 @@ library
     , text >=1.2.3.0 && <1.3
     , transformers >=0.5.2.0 && <0.6
     , unliftio-core >=0.1.1.0 && <0.3
+  default-language: Haskell2010
   if impl(ghc >= 8.0)
     ghc-options: -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
   if impl(ghc < 8.8)
     ghc-options: -Wnoncanonical-monadfail-instances
-  default-language: Haskell2010
 
 executable graphql-codegen
   main-is: exe/Codegen.hs
@@ -68,7 +68,7 @@ executable graphql-codegen
   ghc-options: -Wall
   build-depends:
       aeson >=1.2.4.0 && <3
-    , aeson-schemas ==1.3.*
+    , aeson-schemas >=1.3 && <1.5
     , base >=4.14 && <5
     , bytestring >=0.10.8.2 && <0.12
     , file-embed >=0.0.10.1 && <0.1
@@ -85,11 +85,11 @@ executable graphql-codegen
     , transformers >=0.5.2.0 && <0.6
     , typed-process >=0.2.3.0 && <0.3
     , unliftio-core >=0.1.1.0 && <0.3
+  default-language: Haskell2010
   if impl(ghc >= 8.0)
     ghc-options: -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
   if impl(ghc < 8.8)
     ghc-options: -Wnoncanonical-monadfail-instances
-  default-language: Haskell2010
 
 test-suite graphql-client-test
   type: exitcode-stdio-1.0
@@ -104,7 +104,7 @@ test-suite graphql-client-test
   ghc-options: -Wall
   build-depends:
       aeson >=1.2.4.0 && <3
-    , aeson-schemas ==1.3.*
+    , aeson-schemas >=1.3 && <1.5
     , base >=4.14 && <5
     , graphql-client
     , http-client >=0.5.13.1 && <0.8
@@ -117,8 +117,8 @@ test-suite graphql-client-test
     , text >=1.2.3.0 && <1.3
     , transformers >=0.5.2.0 && <0.6
     , unliftio-core >=0.1.1.0 && <0.3
+  default-language: Haskell2010
   if impl(ghc >= 8.0)
     ghc-options: -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
   if impl(ghc < 8.8)
     ghc-options: -Wnoncanonical-monadfail-instances
-  default-language: Haskell2010
