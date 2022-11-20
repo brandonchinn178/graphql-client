@@ -5,7 +5,7 @@ cabal-version: >= 1.10
 -- see: https://github.com/sol/hpack
 
 name:           graphql-client
-version:        1.2.0
+version:        1.2.1
 synopsis:       A client for Haskell programs to query a GraphQL API
 description:    A client for Haskell programs to query a GraphQL API.
 category:       Graphql
