@@ -1,5 +1,9 @@
 # Unreleased
 
+# v1.2.1
+
+* Add support for GHC 9.4
+
 # v1.2.0
 
 Breaking changes:
