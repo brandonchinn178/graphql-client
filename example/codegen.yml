@@ -1,4 +1,4 @@
-schema: https://graphbrainz.herokuapp.com
+schema: https://graphbrainz.fly.dev
 documents: src/Example/GraphQL/api/*.graphql
 
 apiModule: Example.GraphQL.API

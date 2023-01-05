@@ -3,7 +3,7 @@ import * as _ from 'lodash'
 import { validateConfig } from './config'
 
 const fullConfig = {
-  schema: 'https://graphbrainz.herokuapp.com/',
+  schema: 'https://graphbrainz.fly.dev',
   documents: ['**/*.graphql'],
 
   hsSourceDir: 'foo/bar/',

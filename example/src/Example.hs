@@ -27,7 +27,7 @@ runApp = runGraphQLQueryT graphQLSettings . unApp
   where
     graphQLSettings =
       defaultGraphQLSettings
-        { url = "https://graphbrainz.herokuapp.com/"
+        { url = "https://graphbrainz.fly.dev"
         }
 
 mkGetter "Song" "getSongs" ''GetRecordingsSchema ".search!.recordings!.nodes![]!"
