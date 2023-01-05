@@ -20,7 +20,7 @@ jobs:
             latest: true
 
     name: build_and_test (${{ matrix.stack_yaml }})
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       STACK_YAML: ${{ matrix.stack_yaml }}
 
@@ -132,7 +132,7 @@ jobs:
           chmod +x /usr/local/bin/hlint
           rm -rf "${tmpdir}"
         env:
-          HLINT_VERSION: '3.4.1'
+          HLINT_VERSION: '3.5'
 
       - name: Install ESLint
         run: corepack enable && yarn install --immutable

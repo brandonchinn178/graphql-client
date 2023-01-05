@@ -117,7 +117,7 @@ app = do
 main :: IO ()
 main = do
   let graphQLSettings = defaultGraphQLSettings
-        { url = "https://graphbrainz.herokuapp.com/"
+        { url = "https://graphbrainz.fly.dev"
           -- ^ Most GraphQL APIs are at the path `/graphql`, but not this one
         }
 
