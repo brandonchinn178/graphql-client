@@ -4,8 +4,11 @@
 
 Builds must pass with Haddock enabled and no warnings in order for your PR to be accepted.
 
+Make sure you have `yarn` installed via [corepack](https://yarnpkg.com/getting-started/install).
+
 ```bash
 # First, build the graphql-codegen Typescript code
+yarn install
 yarn build
 
 stack build
