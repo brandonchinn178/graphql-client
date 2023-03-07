@@ -53,7 +53,7 @@ instance GraphQLQuery {{queryName}} where
   getQueryName _ = "{{name}}"
 
   getQueryText _ = [query|
-    {{{queryText}}}
+    {{queryText}}
   |]
 
   getArgs query = object

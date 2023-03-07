@@ -5,6 +5,7 @@ import { UrlLoader } from '@graphql-tools/url-loader'
 import * as fs from 'fs'
 import { concatAST, DocumentNode, GraphQLSchema } from 'graphql'
 import * as yaml from 'js-yaml'
+import Mustache from 'mustache'
 import * as path from 'path'
 
 import { validateConfig } from './config'
@@ -70,6 +71,9 @@ export const generate = async (configPath: string): Promise<OutputFiles> => {
     const modulePath = moduleToPath(module, sourceDir)
     filesToGenerate[modulePath] = content
   }
+
+  // globally disable html-escaping
+  Mustache.escape = x => x
 
   addModule(
     config.apiModule,
