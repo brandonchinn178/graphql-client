@@ -44,3 +44,4 @@ type Query {
   getNamed(s: String!): Named
   getNamed2(s: String!): Named2
 }
+

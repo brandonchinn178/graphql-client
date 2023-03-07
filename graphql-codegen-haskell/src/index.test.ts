@@ -271,6 +271,50 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
         [ \\"s\\" .= _s (query :: GetNamed2Query)
         ]
 
+    {-----------------------------------------------------------------------------
+    -- getNamedWithLiteralParam
+
+    -- result :: Object GetNamedWithLiteralParamSchema; throws a GraphQL exception on errors
+    result <- runQuery GetNamedWithLiteralParamQuery
+      {
+      }
+
+    -- result :: GraphQLResult (Object GetNamedWithLiteralParamSchema)
+    result <- runQuerySafe GetNamedWithLiteralParamQuery
+      {
+      }
+    -----------------------------------------------------------------------------}
+
+    data GetNamedWithLiteralParamQuery = GetNamedWithLiteralParamQuery
+      {
+      }
+      deriving (Show)
+
+    type GetNamedWithLiteralParamSchema = [schema|
+      {
+        getNamed: Maybe {
+          name: Text,
+        },
+      }
+    |]
+
+    instance GraphQLQuery GetNamedWithLiteralParamQuery where
+      type ResultSchema GetNamedWithLiteralParamQuery = GetNamedWithLiteralParamSchema
+
+      getQueryName _ = \\"getNamedWithLiteralParam\\"
+
+      getQueryText _ = [query|
+        query getNamedWithLiteralParam {
+          getNamed(s: \\"LITERAL\\") {
+            name
+          }
+        }
+      |]
+
+      getArgs query = object
+        [
+        ]
+
     "
   `)
 
