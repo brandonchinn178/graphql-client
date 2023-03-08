@@ -25,14 +25,15 @@ The following linters must pass CI in order for your PR to be accepted.
 * HLint
 
     ```bash
-    stack install hlint-3.4.1
+    cabal install hlint-3.4.1
+    # try adding "-f ghc-lib" if the above does not work.
     hlint .
     ```
 
 * fourmolu
 
     ```bash
-    stack install fourmolu-0.7.0.1
+    cabal install fourmolu-0.7.0.1
     fourmolu -i $(git ls-files '*.hs')
     ```
 
