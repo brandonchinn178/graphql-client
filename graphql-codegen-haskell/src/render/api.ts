@@ -1,4 +1,4 @@
-import * as Mustache from 'mustache'
+import Mustache from 'mustache'
 
 import { PluginConfig } from '~/config'
 import { ParsedOperation } from '~/parse/operation'
@@ -7,6 +7,9 @@ import { ParsedType } from '~/parse/variableDefinition'
 import { templateOverList } from '~/utils'
 
 import template from './templates/api.mustache'
+
+// globally disable html-escaping
+Mustache.escape = (x: any) => x
 
 export const renderAPIModule = (
   config: PluginConfig,
@@ -30,6 +33,7 @@ export const renderAPIModule = (
       },
     })),
   })
+
 
 export const renderHaskellType = (type: ParsedType): string => {
   const baseType = type.list
