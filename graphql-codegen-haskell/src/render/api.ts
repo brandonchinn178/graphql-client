@@ -9,7 +9,7 @@ import { templateOverList } from '~/utils'
 import template from './templates/api.mustache'
 
 // globally disable html-escaping
-Mustache.escape = (x: any) => x
+Mustache.escape = (x) => x
 
 export const renderAPIModule = (
   config: PluginConfig,
@@ -33,7 +33,6 @@ export const renderAPIModule = (
       },
     })),
   })
-
 
 export const renderHaskellType = (type: ParsedType): string => {
   const baseType = type.list
