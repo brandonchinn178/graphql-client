@@ -40,3 +40,9 @@ query getNamed2($s: String!) {
 fragment bar2 on Bar2 {
   id
 }
+
+query getNamedWithLiteralParam {
+  getNamed(s: "LITERAL") {
+    name
+  }
+}
