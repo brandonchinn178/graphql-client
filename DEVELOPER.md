@@ -4,8 +4,12 @@
 
 Builds must pass with Haddock enabled and no warnings in order for your PR to be accepted.
 
+Make sure you have `yarn` installed via [corepack](https://yarnpkg.com/getting-started/install). 
+This way the version of yarn used in building the package is managed by the attribute `packageManager` in `package.json`.
+
 ```bash
 # First, build the graphql-codegen Typescript code
+yarn install
 yarn build
 
 stack build
@@ -21,14 +25,15 @@ The following linters must pass CI in order for your PR to be accepted.
 * HLint
 
     ```bash
-    stack install hlint-3.4.1
+    cabal install hlint-3.4.1
+    # try adding "-f ghc-lib" if the above does not work.
     hlint .
     ```
 
 * fourmolu
 
     ```bash
-    stack install fourmolu-0.7.0.1
+    cabal install fourmolu-0.7.0.1
     fourmolu -i $(git ls-files '*.hs')
     ```
 

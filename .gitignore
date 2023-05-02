@@ -3,6 +3,9 @@
 /.ci/
 stack-ghc-*.yaml.lock
 
+dist-newstyle/
+
+.yarnrc.yml
 .yarn/*
 !.yarn/patches
 !.yarn/releases
