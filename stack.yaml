@@ -1,1 +1,12 @@
-stack-ghc-9.0.yaml
+resolver: lts-20.24
+
+packages:
+  - graphql-client/
+  - example/
+
+flags:
+  cryptonite:
+    use_target_attributes: false
+
+ghc-options:
+  "$locals": -Werror
