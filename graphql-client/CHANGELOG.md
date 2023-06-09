@@ -1,6 +1,9 @@
 # Unreleased
 
+# v1.2.2
+
 * Add support for GHC 9.6
+* Fix escaping issues in generated code (e.g. literal strings in graphql queries) ([#80](https://github.com/brandonchinn178/graphql-client/issues/80))
 
 # v1.2.1
 
