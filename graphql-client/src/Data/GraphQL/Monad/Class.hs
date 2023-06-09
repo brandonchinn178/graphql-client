@@ -5,7 +5,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 
-{- |
+{-|
 Module      :  Data.GraphQL.Monad.Class
 Maintainer  :  Brandon Chinn <brandonchinn178@gmail.com>
 Stability   :  experimental
@@ -43,14 +43,14 @@ class (Monad m) => MonadGraphQLQuery m where
   -- | Run the given query and return the 'GraphQLResult'.
   runQuerySafe ::
     (GraphQLQuery query, schema ~ ResultSchema query) =>
-    query ->
-    m (GraphQLResult (Object schema))
+    query
+    -> m (GraphQLResult (Object schema))
 
 -- | Run the given query and returns the result, erroring if the query returned errors.
 runQuery ::
   (MonadIO m, MonadGraphQLQuery m, GraphQLQuery query, schema ~ ResultSchema query) =>
-  query ->
-  m (Object schema)
+  query
+  -> m (Object schema)
 runQuery query = do
   result <- runQuerySafe query
   case getErrors result of

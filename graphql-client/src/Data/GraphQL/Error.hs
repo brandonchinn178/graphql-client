@@ -2,7 +2,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-{- |
+{-|
 Module      :  Data.GraphQL.Error
 Maintainer  :  Brandon Chinn <brandonchinn178@gmail.com>
 Stability   :  experimental

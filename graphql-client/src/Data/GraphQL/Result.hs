@@ -2,7 +2,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-{- |
+{-|
 Module      :  Data.GraphQL.Result
 Maintainer  :  Brandon Chinn <brandonchinn178@gmail.com>
 Stability   :  experimental
