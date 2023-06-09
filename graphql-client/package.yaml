@@ -5,9 +5,9 @@ verbatim:
 license: BSD3
 license-file: LICENSE.md
 author:
-  - Brandon Chinn <brandon@leapyear.io>
+  - Brandon Chinn <brandonchinn178@gmail.com>
 maintainer:
-  - Brandon Chinn <brandon@leapyear.io>
+  - Brandon Chinn <brandonchinn178@gmail.com>
 category: Graphql
 synopsis: A client for Haskell programs to query a GraphQL API
 description: A client for Haskell programs to query a GraphQL API.
@@ -19,7 +19,7 @@ extra-source-files:
   - ./js/graphql-codegen-haskell.js
   - ./js/**/*
 
-github: LeapYear/graphql-client
+github: brandonchinn178/graphql-client
 
 ghc-options: -Wall
 when:
