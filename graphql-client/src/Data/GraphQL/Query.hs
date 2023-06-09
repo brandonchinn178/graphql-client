@@ -29,7 +29,7 @@ import Language.Haskell.TH.Syntax (lift)
  to be certain that `getArgs query` satisfies the arguments defined in
  `getQueryText query`, and that the result adheres to `ResultSchema query`.
 -}
-class IsSchema (ResultSchema query) => GraphQLQuery query where
+class (IsSchema (ResultSchema query)) => GraphQLQuery query where
   type ResultSchema query :: Schema
   getQueryName :: query -> Text
   getQueryText :: query -> Text

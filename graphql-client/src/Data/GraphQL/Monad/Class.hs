@@ -39,7 +39,7 @@ import Data.GraphQL.Query (GraphQLQuery (..))
 import Data.GraphQL.Result (GraphQLResult, getErrors, getResult)
 
 -- | A type class for monads that can run GraphQL queries.
-class Monad m => MonadGraphQLQuery m where
+class (Monad m) => MonadGraphQLQuery m where
   -- | Run the given query and return the 'GraphQLResult'.
   runQuerySafe ::
     (GraphQLQuery query, schema ~ ResultSchema query) =>
@@ -59,16 +59,16 @@ runQuery query = do
 
 {- Instances for common monad transformers -}
 
-instance MonadGraphQLQuery m => MonadGraphQLQuery (ReaderT r m) where
+instance (MonadGraphQLQuery m) => MonadGraphQLQuery (ReaderT r m) where
   runQuerySafe = lift . runQuerySafe
 
-instance MonadGraphQLQuery m => MonadGraphQLQuery (ExceptT e m) where
+instance (MonadGraphQLQuery m) => MonadGraphQLQuery (ExceptT e m) where
   runQuerySafe = lift . runQuerySafe
 
-instance MonadGraphQLQuery m => MonadGraphQLQuery (IdentityT m) where
+instance (MonadGraphQLQuery m) => MonadGraphQLQuery (IdentityT m) where
   runQuerySafe = lift . runQuerySafe
 
-instance MonadGraphQLQuery m => MonadGraphQLQuery (MaybeT m) where
+instance (MonadGraphQLQuery m) => MonadGraphQLQuery (MaybeT m) where
   runQuerySafe = lift . runQuerySafe
 
 instance (Monoid w, MonadGraphQLQuery m) => MonadGraphQLQuery (Lazy.RWST r w s m) where
@@ -77,10 +77,10 @@ instance (Monoid w, MonadGraphQLQuery m) => MonadGraphQLQuery (Lazy.RWST r w s m
 instance (Monoid w, MonadGraphQLQuery m) => MonadGraphQLQuery (Strict.RWST r w s m) where
   runQuerySafe = lift . runQuerySafe
 
-instance MonadGraphQLQuery m => MonadGraphQLQuery (Lazy.StateT s m) where
+instance (MonadGraphQLQuery m) => MonadGraphQLQuery (Lazy.StateT s m) where
   runQuerySafe = lift . runQuerySafe
 
-instance MonadGraphQLQuery m => MonadGraphQLQuery (Strict.StateT s m) where
+instance (MonadGraphQLQuery m) => MonadGraphQLQuery (Strict.StateT s m) where
   runQuerySafe = lift . runQuerySafe
 
 instance (Monoid w, MonadGraphQLQuery m) => MonadGraphQLQuery (Lazy.WriterT w m) where

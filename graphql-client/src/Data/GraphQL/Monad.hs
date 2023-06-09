@@ -153,16 +153,16 @@ newtype GraphQLQueryT m a = GraphQLQueryT {unGraphQLQueryT :: ReaderT GraphQLMan
     , MonadTrans
     )
 
-instance MonadUnliftIO m => MonadUnliftIO (GraphQLQueryT m) where
+instance (MonadUnliftIO m) => MonadUnliftIO (GraphQLQueryT m) where
   withRunInIO inner = GraphQLQueryT $ withRunInIO $ \run -> inner (run . unGraphQLQueryT)
 
-instance MonadIO m => MonadGraphQLQuery (GraphQLQueryT m) where
+instance (MonadIO m) => MonadGraphQLQuery (GraphQLQueryT m) where
   runQuerySafe query = do
     manager <- GraphQLQueryT ask
     liftIO $ runQuerySafeIO manager query
 
 -- | Run the GraphQLQueryT monad transformer.
-runGraphQLQueryT :: MonadIO m => GraphQLSettings -> GraphQLQueryT m a -> m a
+runGraphQLQueryT :: (MonadIO m) => GraphQLSettings -> GraphQLQueryT m a -> m a
 runGraphQLQueryT settings m = do
   manager <- liftIO $ initGraphQLManager settings
   (`runReaderT` manager) . unGraphQLQueryT $ m

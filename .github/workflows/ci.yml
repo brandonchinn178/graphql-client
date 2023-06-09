@@ -70,7 +70,7 @@ jobs:
             -o /usr/local/bin/fourmolu
           chmod +x /usr/local/bin/fourmolu
         env:
-          FOURMOLU_VERSION: '0.7.0.1'
+          FOURMOLU_VERSION: '0.13.0.0'
       - name: Test that example API is up to date
         run: |
           example/scripts/codegen.sh
@@ -119,7 +119,7 @@ jobs:
             -o /usr/local/bin/fourmolu
           chmod +x /usr/local/bin/fourmolu
         env:
-          FOURMOLU_VERSION: '0.7.0.1'
+          FOURMOLU_VERSION: '0.13.0.0'
 
       - name: Install hlint
         run: |

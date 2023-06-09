@@ -74,5 +74,5 @@ showRecording song =
 
     parens s = "(" <> s <> ")"
     yesno = bool "No" "Yes"
-    showT :: Show a => a -> Text.Text
+    showT :: (Show a) => a -> Text.Text
     showT = Text.pack . show

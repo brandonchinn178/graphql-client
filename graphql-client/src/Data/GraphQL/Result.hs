@@ -27,7 +27,7 @@ data GraphQLResult r = GraphQLResult
   }
   deriving (Show, Functor, Foldable, Traversable)
 
-instance FromJSON r => FromJSON (GraphQLResult r) where
+instance (FromJSON r) => FromJSON (GraphQLResult r) where
   parseJSON = withObject "GraphQLResult" $ \o ->
     GraphQLResult
       <$> o .:? "errors" .!= []
