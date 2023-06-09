@@ -10,14 +10,12 @@ jobs:
   build_and_test:
     strategy:
       matrix:
-        stack_yaml:
-          - stack-ghc-8.10.yaml
-          - stack-ghc-9.0.yaml
-          - stack-ghc-9.2.yaml
-          - stack-ghc-9.4.yaml
         include:
-          - stack_yaml: stack.yaml
+          -
+            stack_yaml: stack.yaml
             latest: true
+          -
+            stack_yaml: stack-ghc-8.10.yaml
 
     name: build_and_test (${{ matrix.stack_yaml }})
     runs-on: ubuntu-latest
@@ -25,60 +23,125 @@ jobs:
       STACK_YAML: ${{ matrix.stack_yaml }}
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      -
+        uses: actions/checkout@v3
+
+      # Build JS
+      -
+        uses: actions/setup-node@v3
         with:
           node-version: latest
           cache: yarn
-      - run: corepack enable
-      - uses: actions/cache@v3
+      -
+        run: corepack enable
+      -
+        uses: actions/cache@v3
         with:
           path: ~/.stack
           key: ${{ runner.os }}-stack-cache-${{ hashFiles(matrix.stack_yaml, 'package.yaml') }}
-
-      - name: Build graphql-codegen-haskell
+      -
+        name: Build graphql-codegen-haskell
         run: yarn install --immutable && yarn build
-      - if: ${{ matrix.latest }}
+      -
+        if: ${{ matrix.latest }}
         uses: actions/upload-artifact@v3
         with:
           name: graphql-codegen-haskell.js
           path: graphql-client/js/graphql-codegen-haskell.js
 
-      - name: Build + Test
+      # Build + test Haskell
+      -
+        name: Build + Test
         run: stack test graphql-client --haddock --no-haddock-deps --coverage
-
-      - name: Check that files are unmodified
+      -
+        name: Check that files are unmodified
         run: git diff --exit-code
 
-      - if: ${{ matrix.latest }}
+      # Coverage
+      -
+        if: ${{ matrix.latest }}
         name: Convert coverage output
-        run: stack install hpc-lcov && hpc-lcov
-      - if: ${{ matrix.latest }}
+        run: |
+          HPC_LCOV_VERSION=1.1.1
+          curl -fsSL \
+            "https://github.com/brandonchinn178/hpc-lcov/releases/download/v${HPC_LCOV_VERSION}/hpc-lcov-${HPC_LCOV_VERSION}-linux-x86_64" \
+            -o /usr/local/bin/hpc-lcov
+          chmod +x /usr/local/bin/hpc-lcov
+          hpc-lcov
+      -
+        if: ${{ matrix.latest }}
         name: Generate hpc overlay file
         run: |
           scripts/make_hpc_overlay.py
           hpc-lcov --file overlay.tix -o lcov-overlay.info
-      - if: ${{ matrix.latest }}
+      -
+        if: ${{ matrix.latest }}
         uses: codecov/codecov-action@v3
         with:
           files: lcov.info,lcov-overlay.info
 
-      - name: Install fourmolu
+      # Build + test example
+      -
+        name: Install fourmolu
         run: |
           curl -fsSL \
             "https://github.com/fourmolu/fourmolu/releases/download/v${FOURMOLU_VERSION}/fourmolu-${FOURMOLU_VERSION}-linux-x86_64" \
             -o /usr/local/bin/fourmolu
           chmod +x /usr/local/bin/fourmolu
         env:
-          FOURMOLU_VERSION: '0.7.0.1'
-      - name: Test that example API is up to date
+          FOURMOLU_VERSION: '0.13.0.0'
+      -
+        name: Test that example API is up to date
         run: |
           example/scripts/codegen.sh
           git diff --exit-code example/src/Example/GraphQL/
-      - name: Build + Test example
+      -
+        name: Build + Test example
         run: stack test graphql-client-example
-      - name: Run example
+      -
+        name: Run example
         run: stack exec graphql-client-example
+
+  ghc_compat_test:
+    strategy:
+      matrix:
+        ghc_version:
+          - '8.10'
+          - '9.0'
+          - '9.2'
+          - '9.4'
+          - '9.6'
+
+    name: ghc_compat_test (${{ matrix.ghc_version }})
+    runs-on: ubuntu-latest
+
+    steps:
+      -
+        uses: actions/checkout@v3
+      -
+        id: setup
+        name: Set up GHC ${{ matrix.ghc_version }}
+        uses: haskell-actions/setup@v2
+        with:
+          ghc-version: ${{ matrix.ghc_version }}
+      -
+        name: Configure the build
+        run: |
+          cabal configure --enable-test --test-show-details=streaming
+          cabal build all --dry-run
+      -
+        name: Get current month to clear cache
+        run: echo "CURR_MONTH=$(date +%B)" | tee -a "$GITHUB_ENV"
+      -
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.setup.outputs.cabal-store }}
+          key: ${{ runner.os }}-cabal-cache-${{ env.CURR_MONTH }}-${{ matrix.ghc_version }}-${{ hashFiles('**/plan.json') }}
+          restore-keys: |
+               ${{ runner.os }}-cabal-cache-${{ env.CURR_MONTH }}-${{ matrix.ghc_version }}-
+      -
+        name: Build + Test
+        run: cabal test all
 
   test_node:
     strategy:
@@ -92,17 +155,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      -
+        uses: actions/checkout@v3
+      -
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.version }}
           cache: yarn
-      - run: corepack enable
-
-      - run: yarn install --immutable
-      - run: yarn build
-      - run: yarn graphql-codegen test --coverage --runInBand
-      - if: ${{ matrix.latest }}
+      -
+        run: corepack enable
+      -
+        run: yarn install --immutable
+      -
+        run: yarn build
+      -
+        run: yarn graphql-codegen test --coverage --runInBand
+      -
+        if: ${{ matrix.latest }}
         uses: codecov/codecov-action@v3
         with:
           files: graphql-codegen-haskell/coverage/coverage-final.json
@@ -110,18 +179,19 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Install fourmolu
+      -
+        uses: actions/checkout@v3
+      -
+        name: Install fourmolu
         run: |
           curl -fsSL \
             "https://github.com/fourmolu/fourmolu/releases/download/v${FOURMOLU_VERSION}/fourmolu-${FOURMOLU_VERSION}-linux-x86_64" \
             -o /usr/local/bin/fourmolu
           chmod +x /usr/local/bin/fourmolu
         env:
-          FOURMOLU_VERSION: '0.7.0.1'
-
-      - name: Install hlint
+          FOURMOLU_VERSION: '0.13.0.0'
+      -
+        name: Install hlint
         run: |
           tmpdir=$(mktemp -d)
           curl -fsSL \
@@ -133,35 +203,39 @@ jobs:
           rm -rf "${tmpdir}"
         env:
           HLINT_VERSION: '3.5'
-
-      - name: Install ESLint
+      -
+        name: Install ESLint
         run: corepack enable && yarn install --immutable
-
-      - name: Install pre-commit
+      -
+        name: Install pre-commit
         run: pip install pre-commit
-      - name: Run pre-commit
+      -
+        name: Run pre-commit
         run: pre-commit run -a --show-diff-on-failure
 
   check_sdist:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - run: corepack enable
-      - uses: actions/cache@v3
+      -
+        uses: actions/checkout@v3
+      -
+        run: corepack enable
+      -
+        uses: actions/cache@v3
         with:
           path: ~/.stack
           key: ${{ runner.os }}-check_sdist-${{ hashFiles('stack.yaml', 'package.yaml') }}
-
-      - name: Build graphql-codegen-haskell
+      -
+        name: Build graphql-codegen-haskell
         run: yarn install --immutable && yarn build
-
-      - name: Strip unreleased section from CHANGELOG
+      -
+        name: Strip unreleased section from CHANGELOG
         run: sed -i -n '/^# Unreleased/d; /^#/,$p' graphql-client/CHANGELOG.md
-
-      - name: Create sdist bundle
+      -
+        name: Create sdist bundle
         run: stack sdist graphql-client --test-tarball --tar-dir .
-
-      - uses: actions/upload-artifact@v3
+      -
+        uses: actions/upload-artifact@v3
         with:
           name: graphql-client-sdist
           path: graphql-client-*.tar.gz

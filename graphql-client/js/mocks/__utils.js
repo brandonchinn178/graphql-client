@@ -1,6 +1,6 @@
 /* global Proxy */
 
-const GITHUB_URL = 'https://github.com/LeapYear/graphql-client'
+const GITHUB_URL = 'https://github.com/brandonchinn178/graphql-client'
 const ISSUE_PATH = `${GITHUB_URL}/issues`
 
 module.exports = {

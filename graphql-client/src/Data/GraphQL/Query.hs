@@ -1,11 +1,11 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeInType #-}
 
-{- |
+{-|
 Module      :  Data.GraphQL.Query
-Maintainer  :  Brandon Chinn <brandon@leapyear.io>
+Maintainer  :  Brandon Chinn <brandonchinn178@gmail.com>
 Stability   :  experimental
 Portability :  portable
 
@@ -23,22 +23,20 @@ import qualified Data.Text as Text
 import Language.Haskell.TH.Quote (QuasiQuoter (..))
 import Language.Haskell.TH.Syntax (lift)
 
-{- | A type class for defining GraphQL queries.
-
- Should be generated via the `graphql-codegen` command. Any manual instances needs
- to be certain that `getArgs query` satisfies the arguments defined in
- `getQueryText query`, and that the result adheres to `ResultSchema query`.
--}
-class IsSchema (ResultSchema query) => GraphQLQuery query where
+-- | A type class for defining GraphQL queries.
+--
+--  Should be generated via the `graphql-codegen` command. Any manual instances needs
+--  to be certain that `getArgs query` satisfies the arguments defined in
+--  `getQueryText query`, and that the result adheres to `ResultSchema query`.
+class (IsSchema (ResultSchema query)) => GraphQLQuery query where
   type ResultSchema query :: Schema
   getQueryName :: query -> Text
   getQueryText :: query -> Text
   getArgs :: query -> Value
 
-{- | A quasiquoter that interpolates the given string as raw text.
-
- Trying to avoid a dependency on raw-strings-qq
--}
+-- | A quasiquoter that interpolates the given string as raw text.
+--
+--  Trying to avoid a dependency on raw-strings-qq
 query :: QuasiQuoter
 query =
   QuasiQuoter

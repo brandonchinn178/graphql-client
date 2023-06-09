@@ -1,0 +1,4 @@
+packages: graphql-client/ example/
+
+program-options
+  ghc-options: -Werror

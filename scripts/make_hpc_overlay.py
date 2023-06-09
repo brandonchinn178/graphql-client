@@ -32,10 +32,10 @@ OVERLAY_CONTENTS = [
         name="Data.GraphQL.Monad",
         overlays=[
             # GraphQLManager fields used by RecordWildCards: https://gitlab.haskell.org/ghc/ghc/issues/17834
-            TickFunction("manager", 97, r"manager :: Manager"),
-            TickFunction("baseReq", 98, r"baseReq :: Request"),
+            TickFunction("manager", 96, r"manager :: Manager"),
+            TickFunction("baseReq", 97, r"baseReq :: Request"),
             # Instance for MonadUnliftIO for transformer stacks built on top of QueryT
-            TickFunction("withRunInIO", 157, r"withRunInIO inner = GraphQLQueryT \$"),
+            TickFunction("withRunInIO", 155, r"withRunInIO inner = GraphQLQueryT \$"),
             # GraphQLSettings fields used by RecordWildCards: https://gitlab.haskell.org/ghc/ghc/issues/17834
             TickFunction("managerSettings", 67, r"managerSettings :: ManagerSettings"),
             TickFunction("url", 69, r"url\s+:: String"),

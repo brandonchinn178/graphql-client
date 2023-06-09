@@ -4,9 +4,9 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StandaloneDeriving #-}
 
-{- |
+{-|
 Module      :  Data.GraphQL.TestUtils
-Maintainer  :  Brandon Chinn <brandon@leapyear.io>
+Maintainer  :  Brandon Chinn <brandonchinn178@gmail.com>
 Stability   :  experimental
 Portability :  portable
 
@@ -46,7 +46,7 @@ data AnyResultMock = forall query. (Show query, GraphQLQuery query) => AnyResult
 
 deriving instance Show AnyResultMock
 
-isMatch :: GraphQLQuery query => query -> AnyResultMock -> Bool
+isMatch :: (GraphQLQuery query) => query -> AnyResultMock -> Bool
 isMatch testQuery (AnyResultMock mock) = getArgs (query mock) == getArgs testQuery
 
 getResult :: AnyResultMock -> Value
@@ -57,7 +57,7 @@ getResult (AnyResultMock mock) = result mock
 newtype MockQueryT m a = MockQueryT {unMockQueryT :: StateT [AnyResultMock] m a}
   deriving (Functor, Applicative, Monad, MonadIO, MonadState [AnyResultMock], MonadTrans)
 
-instance Monad m => MonadGraphQLQuery (MockQueryT m) where
+instance (Monad m) => MonadGraphQLQuery (MockQueryT m) where
   runQuerySafe testQuery = toGraphQLResult <$> lookupMock
     where
       takeWhere :: (a -> Bool) -> [a] -> Maybe (a, [a])
@@ -72,7 +72,7 @@ instance Monad m => MonadGraphQLQuery (MockQueryT m) where
           Just (mock, mocks') -> (getResult mock, mocks')
           Nothing -> error $ "No more mocked responses for query: " ++ Text.unpack (getQueryName testQuery)
 
-      toGraphQLResult :: FromJSON a => Value -> a
+      toGraphQLResult :: (FromJSON a) => Value -> a
       toGraphQLResult mockData =
         either error id . Aeson.parseEither Aeson.parseJSON $
           object
@@ -80,5 +80,5 @@ instance Monad m => MonadGraphQLQuery (MockQueryT m) where
             , "data" .= Just mockData
             ]
 
-runMockQueryT :: Monad m => MockQueryT m a -> [AnyResultMock] -> m a
+runMockQueryT :: (Monad m) => MockQueryT m a -> [AnyResultMock] -> m a
 runMockQueryT mockQueryT mocks = (`evalStateT` mocks) . unMockQueryT $ mockQueryT

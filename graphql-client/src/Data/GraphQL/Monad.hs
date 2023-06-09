@@ -6,9 +6,9 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 
-{- |
+{-|
 Module      :  Data.GraphQL.Monad
-Maintainer  :  Brandon Chinn <brandon@leapyear.io>
+Maintainer  :  Brandon Chinn <brandonchinn178@gmail.com>
 Stability   :  experimental
 Portability :  portable
 
@@ -70,18 +70,17 @@ data GraphQLSettings = GraphQLSettings
   , modifyReq :: Request -> Request
   }
 
-{- | Default settings for 'GraphQLSettings'. Requires 'url' field to be overridden.
-
- Example usage:
-
- >>> defaultGraphQLSettings
- ...   { url = "https://api.github.com/graphql"
- ...   , modifyReq = \\req -> req
- ...       { requestHeaders =
- ...           (hAuthorization, "bearer my_github_token") : requestHeaders req
- ...       }
- ...   }
--}
+-- | Default settings for 'GraphQLSettings'. Requires 'url' field to be overridden.
+--
+--  Example usage:
+--
+--  >>> defaultGraphQLSettings
+--  ...   { url = "https://api.github.com/graphql"
+--  ...   , modifyReq = \\req -> req
+--  ...       { requestHeaders =
+--  ...           (hAuthorization, "bearer my_github_token") : requestHeaders req
+--  ...       }
+--  ...   }
 defaultGraphQLSettings :: GraphQLSettings
 defaultGraphQLSettings =
   GraphQLSettings
@@ -113,9 +112,9 @@ initGraphQLManager GraphQLSettings{..} = do
 -- | Execute a GraphQL query with the given 'GraphQLManager'.
 runQuerySafeIO ::
   (GraphQLQuery query, schema ~ ResultSchema query) =>
-  GraphQLManager ->
-  query ->
-  IO (GraphQLResult (Object schema))
+  GraphQLManager
+  -> query
+  -> IO (GraphQLResult (Object schema))
 runQuerySafeIO GraphQLManager{..} query = httpLbs request manager >>= decodeBody
   where
     request =
@@ -133,17 +132,16 @@ runQuerySafeIO GraphQLManager{..} query = httpLbs request manager >>= decodeBody
 
 {- GraphQLQueryT monad transformer -}
 
-{- | The monad transformer type that can be used to run GraphQL queries.
-
- @
- newtype MyMonad a = MyMonad { unMyMonad :: GraphQLQueryT IO a }
-
- runMyMonad :: MyMonad a -> IO a
- runMyMonad = runGraphQLQueryT graphQLSettings . unMyMonad
-   where
-     graphQLSettings = defaultGraphQLSettings{url = "https://api.github.com/graphql"}
- @
--}
+-- | The monad transformer type that can be used to run GraphQL queries.
+--
+--  @
+--  newtype MyMonad a = MyMonad { unMyMonad :: GraphQLQueryT IO a }
+--
+--  runMyMonad :: MyMonad a -> IO a
+--  runMyMonad = runGraphQLQueryT graphQLSettings . unMyMonad
+--    where
+--      graphQLSettings = defaultGraphQLSettings{url = "https://api.github.com/graphql"}
+--  @
 newtype GraphQLQueryT m a = GraphQLQueryT {unGraphQLQueryT :: ReaderT GraphQLManager m a}
   deriving
     ( Functor
@@ -153,16 +151,16 @@ newtype GraphQLQueryT m a = GraphQLQueryT {unGraphQLQueryT :: ReaderT GraphQLMan
     , MonadTrans
     )
 
-instance MonadUnliftIO m => MonadUnliftIO (GraphQLQueryT m) where
+instance (MonadUnliftIO m) => MonadUnliftIO (GraphQLQueryT m) where
   withRunInIO inner = GraphQLQueryT $ withRunInIO $ \run -> inner (run . unGraphQLQueryT)
 
-instance MonadIO m => MonadGraphQLQuery (GraphQLQueryT m) where
+instance (MonadIO m) => MonadGraphQLQuery (GraphQLQueryT m) where
   runQuerySafe query = do
     manager <- GraphQLQueryT ask
     liftIO $ runQuerySafeIO manager query
 
 -- | Run the GraphQLQueryT monad transformer.
-runGraphQLQueryT :: MonadIO m => GraphQLSettings -> GraphQLQueryT m a -> m a
+runGraphQLQueryT :: (MonadIO m) => GraphQLSettings -> GraphQLQueryT m a -> m a
 runGraphQLQueryT settings m = do
   manager <- liftIO $ initGraphQLManager settings
   (`runReaderT` manager) . unGraphQLQueryT $ m

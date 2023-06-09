@@ -2,8 +2,8 @@
   "name": "graphql-codegen-haskell",
   "version": "0.0.1",
   "private": true,
-  "repository": "git@github.com:LeapYear/graphql-client",
-  "author": "Brandon Chinn <brandon@leapyear.io>",
+  "repository": "git@github.com:brandonchinn178/graphql-client",
+  "author": "Brandon Chinn <brandonchinn178@gmail.com>",
   "license": "BSD-3-Clause",
   "scripts": {
     "build": "rollup --config",

@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DisambiguateRecordFields #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -5,7 +6,6 @@
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeInType #-}
 
 module Example where
 
@@ -74,5 +74,5 @@ showRecording song =
 
     parens s = "(" <> s <> ")"
     yesno = bool "No" "Yes"
-    showT :: Show a => a -> Text.Text
+    showT :: (Show a) => a -> Text.Text
     showT = Text.pack . show

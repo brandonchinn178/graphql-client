@@ -2,9 +2,9 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-{- |
+{-|
 Module      :  Data.GraphQL.Result
-Maintainer  :  Brandon Chinn <brandon@leapyear.io>
+Maintainer  :  Brandon Chinn <brandonchinn178@gmail.com>
 Stability   :  experimental
 Portability :  portable
 
@@ -27,7 +27,7 @@ data GraphQLResult r = GraphQLResult
   }
   deriving (Show, Functor, Foldable, Traversable)
 
-instance FromJSON r => FromJSON (GraphQLResult r) where
+instance (FromJSON r) => FromJSON (GraphQLResult r) where
   parseJSON = withObject "GraphQLResult" $ \o ->
     GraphQLResult
       <$> o .:? "errors" .!= []

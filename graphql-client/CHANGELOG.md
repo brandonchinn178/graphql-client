@@ -1,5 +1,10 @@
 # Unreleased
 
+# v1.2.2
+
+* Add support for GHC 9.6
+* Fix escaping issues in generated code (e.g. literal strings in graphql queries) ([#80](https://github.com/brandonchinn178/graphql-client/issues/80))
+
 # v1.2.1
 
 * Add support for GHC 9.4
@@ -18,7 +23,7 @@ New features:
 
 Bug fixes:
 
-* Generate enums that only appear in query arguments ([#59](https://github.com/LeapYear/graphql-client/pull/59))
+* Generate enums that only appear in query arguments ([#59](https://github.com/brandonchinn178/graphql-client/pull/59))
 
 # v1.1.0
 
