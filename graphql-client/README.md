@@ -1,6 +1,6 @@
 # graphql-client
 
-[![GitHub Actions](https://img.shields.io/github/workflow/status/LeapYear/graphql-client/CI/main)](https://github.com/LeapYear/graphql-client/actions?query=branch%3Amain)
+[![GitHub Actions](https://img.shields.io/github/actions/workflow/status/brandonchinn178/graphql-client/ci.yml?branch=main)](https://github.com/brandonchinn178/graphql-client/actions?query=branch%3Amain)
 [![codecov](https://codecov.io/gh/LeapYear/graphql-client/branch/main/graph/badge.svg?token=WIOxotqPTN)](https://codecov.io/gh/LeapYear/graphql-client)
 [![Hackage](https://img.shields.io/hackage/v/graphql-client)](https://hackage.haskell.org/package/graphql-client)
 
