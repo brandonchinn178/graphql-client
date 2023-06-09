@@ -1,7 +1,7 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeInType #-}
 
 {-|
 Module      :  Data.GraphQL.Query

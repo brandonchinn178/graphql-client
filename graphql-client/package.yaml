@@ -42,10 +42,10 @@ library:
     - http-client >= 0.5.13.1 && < 0.8
     - http-client-tls >= 0.3.5.3 && < 0.4
     - http-types >= 0.12.1 && < 0.13
-    - mtl >= 2.2.2 && < 2.3
+    - mtl >= 2.2.2 && < 2.4
     - template-haskell >= 2.16 && < 3
     - text >= 1.2.3.0 && < 2.1
-    - transformers >= 0.5.2.0 && < 0.6
+    - transformers >= 0.5.2.0 && < 0.7
     - unliftio-core >= 0.1.1.0 && < 0.3
 
 executables:
