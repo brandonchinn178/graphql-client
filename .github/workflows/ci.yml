@@ -40,9 +40,6 @@ jobs:
       -
         name: Build + Test
         run: stack test graphql-client --haddock --no-haddock-deps --coverage
-      -
-        name: Check that files are unmodified
-        run: git diff --exit-code
 
       # Coverage
       -
@@ -95,6 +92,9 @@ jobs:
           - '9.2'
           - '9.4'
           - '9.6'
+        include:
+          - ghc_version: 8.10.1
+            oldest: true
 
     name: ghc_compat_test (${{ matrix.ghc_version }})
     runs-on: ubuntu-latest
@@ -112,6 +112,15 @@ jobs:
         name: Configure the build
         run: |
           cabal configure --enable-test --test-show-details=streaming
+      -
+        if: ${{ matrix.oldest }}
+        name: Use oldest dependencies
+        run:
+          cabal configure --enable-append
+            --prefer-oldest
+      -
+        name: Get build plan
+        run:
           cabal build all --dry-run
       -
         name: Get current month to clear cache
@@ -126,6 +135,9 @@ jobs:
       -
         name: Build + Test
         run: cabal test all
+      -
+        name: Check that files are unmodified
+        run: git add -A && git diff --staged --exit-code
 
   test_node:
     strategy:
