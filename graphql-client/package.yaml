@@ -27,6 +27,7 @@ ghc-options:
   - -Wincomplete-record-updates
   - -Wincomplete-uni-patterns
   - -Wnoncanonical-monad-instances
+  - -Wunused-packages
 
 library:
   source-dirs: src
@@ -50,7 +51,6 @@ executables:
       - base < 5
       - bytestring < 0.12
       - file-embed < 0.1
-      - graphql-client
       - optparse-applicative < 0.19
       - path < 0.10
       - path-io < 2
