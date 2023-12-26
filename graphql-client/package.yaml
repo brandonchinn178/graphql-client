@@ -39,7 +39,7 @@ library:
     - http-types < 0.13
     - mtl < 2.4
     - template-haskell < 3
-    - text < 2.1
+    - text < 2.2
     - transformers < 0.7
     - unliftio-core < 0.3
 
