@@ -9,6 +9,7 @@ import Control.Exception (SomeException, try)
 import Data.Aeson (object, (.=))
 import Data.Aeson.Schema (get)
 import Data.Either (isLeft)
+import Data.Maybe (listToMaybe)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (assertFailure, testCase, (@?), (@?=))
 
@@ -35,7 +36,7 @@ testTestUtils =
         obj <- try @SomeException $ runMockQueryT runTestQuery []
         case obj of
           Right _ -> assertFailure "MockQueryT did not error"
-          Left e -> (head . lines . show) e @?= "No more mocked responses for query: test"
+          Left e -> (listToMaybe . lines . show) e @?= Just "No more mocked responses for query: test"
     , testCase "MockQueryT removes mock after use" $ do
         obj <-
           try @SomeException $
