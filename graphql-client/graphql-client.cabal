@@ -1,6 +1,6 @@
 cabal-version: >= 1.10
 
--- This file has been generated from package.yaml by hpack version 0.35.2.
+-- This file has been generated from package.yaml by hpack version 0.36.0.
 --
 -- see: https://github.com/sol/hpack
 
@@ -42,7 +42,7 @@ library
       Paths_graphql_client
   hs-source-dirs:
       src
-  ghc-options: -Wall
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
   build-depends:
       aeson >=1.2.4.0 && <3
     , aeson-schemas >=1.3 && <1.5
@@ -56,16 +56,12 @@ library
     , transformers >=0.5.2.0 && <0.7
     , unliftio-core >=0.1.1.0 && <0.3
   default-language: Haskell2010
-  if impl(ghc >= 8.0)
-    ghc-options: -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
-  if impl(ghc < 8.8)
-    ghc-options: -Wnoncanonical-monadfail-instances
 
 executable graphql-codegen
   main-is: exe/Codegen.hs
   other-modules:
       Paths_graphql_client
-  ghc-options: -Wall
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
   build-depends:
       base >=4.14 && <5
     , bytestring >=0.10.8.2 && <0.12
@@ -77,10 +73,6 @@ executable graphql-codegen
     , template-haskell >=2.16 && <3
     , typed-process >=0.2.3.0 && <0.3
   default-language: Haskell2010
-  if impl(ghc >= 8.0)
-    ghc-options: -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
-  if impl(ghc < 8.8)
-    ghc-options: -Wnoncanonical-monadfail-instances
 
 test-suite graphql-client-test
   type: exitcode-stdio-1.0
@@ -92,7 +84,7 @@ test-suite graphql-client-test
       Paths_graphql_client
   hs-source-dirs:
       test
-  ghc-options: -Wall
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
   build-depends:
       aeson
     , aeson-schemas
@@ -102,7 +94,3 @@ test-suite graphql-client-test
     , tasty
     , tasty-hunit
   default-language: Haskell2010
-  if impl(ghc >= 8.0)
-    ghc-options: -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
-  if impl(ghc < 8.8)
-    ghc-options: -Wnoncanonical-monadfail-instances

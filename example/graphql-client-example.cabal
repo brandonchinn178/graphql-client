@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.35.0.
+-- This file has been generated from package.yaml by hpack version 0.36.0.
 --
 -- see: https://github.com/sol/hpack
 
@@ -20,17 +20,13 @@ library
       Paths_graphql_client_example
   hs-source-dirs:
       src
-  ghc-options: -Wall
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
   build-depends:
       aeson
     , base
     , graphql-client
     , text
   default-language: Haskell2010
-  if impl(ghc >= 8.0)
-    ghc-options: -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
-  if impl(ghc < 8.8)
-    ghc-options: -Wnoncanonical-monadfail-instances
 
 executable graphql-client-example
   main-is: Main.hs
@@ -38,7 +34,7 @@ executable graphql-client-example
       Paths_graphql_client_example
   hs-source-dirs:
       exe
-  ghc-options: -Wall
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
   build-depends:
       aeson
     , base
@@ -46,10 +42,6 @@ executable graphql-client-example
     , graphql-client-example
     , text
   default-language: Haskell2010
-  if impl(ghc >= 8.0)
-    ghc-options: -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
-  if impl(ghc < 8.8)
-    ghc-options: -Wnoncanonical-monadfail-instances
 
 test-suite graphql-example-test
   type: exitcode-stdio-1.0
@@ -58,7 +50,7 @@ test-suite graphql-example-test
       Paths_graphql_client_example
   hs-source-dirs:
       test
-  ghc-options: -Wall
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
   build-depends:
       aeson
     , aeson-qq
@@ -70,7 +62,3 @@ test-suite graphql-example-test
     , tasty-golden
     , text
   default-language: Haskell2010
-  if impl(ghc >= 8.0)
-    ghc-options: -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
-  if impl(ghc < 8.8)
-    ghc-options: -Wnoncanonical-monadfail-instances
