@@ -53,7 +53,7 @@ test-suite graphql-example-test
   ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
   build-depends:
       aeson
-    , aeson-qq
+    , aeson-qq >=0.8.4
     , base
     , bytestring
     , graphql-client

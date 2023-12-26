@@ -28,7 +28,7 @@ tests:
     source-dirs:  test
     main:         Main.hs
     dependencies:
-      - aeson-qq
+      - aeson-qq >= 0.8.4
       - bytestring
       - graphql-client-example
       - tasty
