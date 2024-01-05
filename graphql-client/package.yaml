@@ -49,7 +49,7 @@ executables:
     main: exe/Codegen.hs
     dependencies:
       - base < 5
-      - bytestring < 0.12
+      - bytestring < 0.13
       - file-embed < 0.1
       - optparse-applicative < 0.19
       - path < 0.10
