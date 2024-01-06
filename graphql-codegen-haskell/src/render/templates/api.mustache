@@ -4,6 +4,7 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# OPTIONS_GHC -w #-}
 
@@ -56,9 +57,9 @@ instance GraphQLQuery {{queryName}} where
     {{queryText}}
   |]
 
-  getArgs query = object
+  getArgs {{queryName}}{{argsRecordSyntax}} = object
     {{#overArgs}}
-    [ "{{arg}}" .= _{{arg}} (query :: {{queryName}})
+    [ "{{arg}}" .= _{{arg}}
     {{/overArgs}}
     ]
 
