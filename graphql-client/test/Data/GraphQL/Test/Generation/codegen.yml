@@ -1,0 +1,7 @@
+schema: schema.graphql
+documents: queries/*.graphql
+
+hsSourceDir: gen/
+apiModule: Example.API
+enumsModule: Example.Enums
+scalarsModule: Example.Scalars
