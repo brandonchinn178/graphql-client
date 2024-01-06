@@ -4,8 +4,7 @@ module Example.GraphQL.Enums.ReleaseStatus where
 
 import Data.GraphQL.Bootstrap
 
-mkEnum
-  "ReleaseStatus"
+mkEnum "ReleaseStatus"
   [ "OFFICIAL"
   , "PROMOTION"
   , "BOOTLEG"

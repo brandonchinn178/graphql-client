@@ -69,15 +69,6 @@ jobs:
 
       # Build + test example
       -
-        name: Install fourmolu
-        run: |
-          curl -fsSL \
-            "https://github.com/fourmolu/fourmolu/releases/download/v${FOURMOLU_VERSION}/fourmolu-${FOURMOLU_VERSION}-linux-x86_64" \
-            -o /usr/local/bin/fourmolu
-          chmod +x /usr/local/bin/fourmolu
-        env:
-          FOURMOLU_VERSION: '0.13.0.0'
-      -
         name: Test that example API is up to date
         run: |
           example/scripts/codegen.sh

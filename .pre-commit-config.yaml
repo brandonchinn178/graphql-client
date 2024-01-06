@@ -13,6 +13,7 @@ repos:
         entry: fourmolu -i
         language: system
         files: '\.hs$'
+        exclude: 'Example/GraphQL/(API.hs|Enums/)'
 
   # Typescript
   - repo: local
