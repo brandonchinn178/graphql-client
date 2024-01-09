@@ -1,0 +1,11 @@
+query getAge($name: String!) {
+  userByName(name: $name) {
+    age
+  }
+}
+
+query getGender($name: String!) {
+  userByName(name: $name) {
+    gender
+  }
+}

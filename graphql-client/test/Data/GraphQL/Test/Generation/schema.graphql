@@ -1,0 +1,20 @@
+type Query {
+    users: [User]
+    user(id: ID!): User
+    userByName(name: String!): User
+}
+
+type User {
+  id: ID!
+  name: String!
+  age: Age
+  gender: Gender
+}
+
+scalar Age
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}

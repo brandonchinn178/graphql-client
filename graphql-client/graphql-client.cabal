@@ -5,7 +5,7 @@ cabal-version: >= 1.10
 -- see: https://github.com/sol/hpack
 
 name:           graphql-client
-version:        1.2.3
+version:        1.2.4
 synopsis:       A client for Haskell programs to query a GraphQL API
 description:    A client for Haskell programs to query a GraphQL API.
 category:       Graphql
@@ -19,6 +19,12 @@ build-type:     Simple
 extra-source-files:
     README.md
     CHANGELOG.md
+    test/Data/GraphQL/Test/Generation/run.sh
+    test/Data/GraphQL/Test/Generation/src/Example/Scalars.hs
+    test/Data/GraphQL/Test/Generation/queries/basic.graphql
+    test/Data/GraphQL/Test/Generation/queries/duplicate-names.graphql
+    test/Data/GraphQL/Test/Generation/schema.graphql
+    test/Data/GraphQL/Test/Generation/codegen.yml
     ./js/graphql-codegen-haskell.js
     ./js/graphql-codegen-haskell-fallback.js
     ./js/mocks/__utils.js
@@ -68,7 +74,7 @@ executable graphql-codegen
     , file-embed <0.1
     , optparse-applicative <0.19
     , path <0.10
-    , path-io <2
+    , path-io >=1.3.3 && <2
     , template-haskell <3
     , typed-process <0.3
   default-language: Haskell2010
@@ -77,6 +83,7 @@ test-suite graphql-client-test
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
+      Data.GraphQL.Test.Generation.TestGeneration
       Data.GraphQL.Test.Monad.Class
       Data.GraphQL.Test.TestQuery
       Data.GraphQL.Test.TestUtils
@@ -90,6 +97,7 @@ test-suite graphql-client-test
     , base
     , graphql-client
     , mtl
+    , process
     , tasty
     , tasty-hunit
   default-language: Haskell2010

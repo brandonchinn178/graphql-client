@@ -31,6 +31,9 @@ export const renderAPIModule = (
         return (text: string) =>
           templateOverList(text, this.args, { context: this })
       },
+      // `X{..}` is not valid in GHC < 9.8 if constructor has no fields
+      // https://github.com/ghc-proposals/ghc-proposals/blob/master/proposals/0496-empty-record-wildcards.rst
+      argsRecordSyntax: operation.args.length === 0 ? '{}' : '{..}',
     })),
   })
 

@@ -69,15 +69,6 @@ jobs:
 
       # Build + test example
       -
-        name: Install fourmolu
-        run: |
-          curl -fsSL \
-            "https://github.com/fourmolu/fourmolu/releases/download/v${FOURMOLU_VERSION}/fourmolu-${FOURMOLU_VERSION}-linux-x86_64" \
-            -o /usr/local/bin/fourmolu
-          chmod +x /usr/local/bin/fourmolu
-        env:
-          FOURMOLU_VERSION: '0.13.0.0'
-      -
         name: Test that example API is up to date
         run: |
           example/scripts/codegen.sh
@@ -106,6 +97,36 @@ jobs:
     steps:
       -
         uses: actions/checkout@v3
+
+      # https://github.com/actions/setup-node/issues/904
+      -
+        uses: actions/setup-node@v3
+        with:
+          node-version: latest
+      -
+        run: corepack enable
+
+      # Build JS
+      -
+        uses: actions/setup-node@v3
+        with:
+          node-version: latest
+          cache: yarn
+      -
+        uses: actions/cache@v3
+        with:
+          path: ~/.stack
+          key: ${{ runner.os }}-stack-cache-${{ hashFiles('stack.yaml', 'package.yaml') }}
+      -
+        name: Build graphql-codegen-haskell
+        run: yarn install --immutable && yarn build
+      -
+        uses: actions/upload-artifact@v3
+        with:
+          name: graphql-codegen-haskell.js
+          path: graphql-client/js/graphql-codegen-haskell.js
+
+      # Build + Test Cabal
       -
         id: setup
         name: Set up GHC ${{ matrix.ghc_version }}
@@ -114,8 +135,11 @@ jobs:
           ghc-version: ${{ matrix.ghc_version }}
       -
         name: Configure the build
-        run: |
-          cabal configure --enable-test --test-show-details=streaming
+        run: >
+          cabal configure
+          --enable-test
+          --test-show-details=streaming
+          --ghc-options '-Wno-unused-packages'
       -
         if: ${{ matrix.oldest }}
         name: Use oldest dependencies
@@ -137,8 +161,9 @@ jobs:
           restore-keys: |
                ${{ runner.os }}-cabal-cache-${{ env.CURR_MONTH }}-${{ matrix.ghc_version }}-
       -
-        name: Build + Test
-        run: cabal test all
+        run: cabal build all
+      -
+        run: cabal exec cabal test all
       -
         name: Check that files are unmodified
         run: git add -A && git diff --staged --exit-code

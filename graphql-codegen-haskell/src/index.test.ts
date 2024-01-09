@@ -18,6 +18,7 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
     {-# LANGUAGE DuplicateRecordFields #-}
     {-# LANGUAGE OverloadedStrings #-}
     {-# LANGUAGE QuasiQuotes #-}
+    {-# LANGUAGE RecordWildCards #-}
     {-# LANGUAGE TypeFamilies #-}
     {-# OPTIONS_GHC -w #-}
 
@@ -68,7 +69,7 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
         }
       |]
 
-      getArgs query = object
+      getArgs GetEnumsQuery{} = object
         [
         ]
 
@@ -108,7 +109,7 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
         }
       |]
 
-      getArgs query = object
+      getArgs GetMoreEnumsQuery{} = object
         [
         ]
 
@@ -154,8 +155,8 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
         }
       |]
 
-      getArgs query = object
-        [ \\"x\\" .= _x (query :: GetBarQuery)
+      getArgs GetBarQuery{..} = object
+        [ \\"x\\" .= _x
         ]
 
     {-----------------------------------------------------------------------------
@@ -216,8 +217,8 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
         }
       |]
 
-      getArgs query = object
-        [ \\"s\\" .= _s (query :: GetNamedQuery)
+      getArgs GetNamedQuery{..} = object
+        [ \\"s\\" .= _s
         ]
 
     {-----------------------------------------------------------------------------
@@ -267,8 +268,8 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
         }
       |]
 
-      getArgs query = object
-        [ \\"s\\" .= _s (query :: GetNamed2Query)
+      getArgs GetNamed2Query{..} = object
+        [ \\"s\\" .= _s
         ]
 
     {-----------------------------------------------------------------------------
@@ -311,7 +312,7 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
         }
       |]
 
-      getArgs query = object
+      getArgs GetNamedWithLiteralParamQuery{} = object
         [
         ]
 

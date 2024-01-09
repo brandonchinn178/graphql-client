@@ -1,5 +1,9 @@
 # Unreleased
 
+# v1.2.4
+
+* Fix ambiguous field name error with same argument name in multiple queries ([#86](https://github.com/brandonchinn178/graphql-client/issues/86))
+
 # v1.2.3
 
 * Add support for GHC 9.8

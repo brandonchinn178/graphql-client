@@ -1,5 +1,5 @@
 name: graphql-client
-version: 1.2.3
+version: 1.2.4
 verbatim:
   cabal-version: '>= 1.10'
 license: BSD3
@@ -14,6 +14,11 @@ description: A client for Haskell programs to query a GraphQL API.
 extra-source-files:
   - README.md
   - CHANGELOG.md
+  # test generation files
+  - test/Data/GraphQL/Test/Generation/run.sh
+  - test/Data/GraphQL/Test/Generation/src/**/*
+  - test/Data/GraphQL/Test/Generation/**/*.graphql
+  - test/Data/GraphQL/Test/Generation/codegen.yml
   # Make sure graphql-codegen-haskell.js is listed in the Cabal file,
   # in the off-chance it's not built yet
   - ./js/graphql-codegen-haskell.js
@@ -53,7 +58,7 @@ executables:
       - file-embed < 0.1
       - optparse-applicative < 0.19
       - path < 0.10
-      - path-io < 2
+      - path-io >= 1.3.3 && < 2
       - template-haskell < 3
       - typed-process < 0.3
 
@@ -67,5 +72,6 @@ tests:
       - base
       - graphql-client
       - mtl
+      - process
       - tasty
       - tasty-hunit
