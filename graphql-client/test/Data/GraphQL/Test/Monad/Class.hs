@@ -38,7 +38,7 @@ testRunQuery =
   testGroup
     "runQuery <-> runQuerySafe"
     [ testCase "runQuery throws if runQuerySafe returns an error" $ do
-        let err = GraphQLError "Something went wrong" Nothing Nothing Nothing
+        let err = GraphQLError "Something went wrong" Nothing Nothing
         result <- try $ runMockQueryM (Left err) (runQuery TestQuery)
         show <$> result @?= Left (GraphQLException [err])
     , testCase "runQuery returns the result of runQuerySafe" $ do
