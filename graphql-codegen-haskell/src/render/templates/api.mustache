@@ -5,11 +5,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# OPTIONS_GHC -w #-}
 
 module {{apiModule}} where
 
+import Data.Aeson
+import Data.Aeson.TH
 import Data.GraphQL
 import Data.GraphQL.Bootstrap
 
@@ -44,6 +47,8 @@ data {{queryName}} = {{queryName}}
   }
   deriving (Show)
 
+$(deriveJSON defaultOptions {fieldLabelModifier = drop 1} ''{{queryName}})
+
 type {{schemaType}} = [schema|
   {{schema}}
 |]
@@ -57,10 +62,6 @@ instance GraphQLQuery {{queryName}} where
     {{queryText}}
   |]
 
-  getArgs {{queryName}}{{argsRecordSyntax}} = object
-    {{#overArgs}}
-    [ "{{arg}}" .= _{{arg}}
-    {{/overArgs}}
-    ]
+  getArgs {{queryName}}{{argsRecordSyntax}} = toJSON {{queryName}}{{argsRecordSyntax}}
 
 {{/operations}}
