@@ -26,6 +26,7 @@ data GraphQLError = GraphQLError
   { message :: Text
   , locations :: Maybe [GraphQLErrorLoc]
   , path :: Maybe [Value]
+  , extensions :: Maybe Value
   }
   deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
