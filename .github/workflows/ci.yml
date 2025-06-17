@@ -37,7 +37,7 @@ jobs:
         name: Build graphql-codegen-haskell
         run: yarn install --immutable && yarn build
       -
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: graphql-codegen-haskell.js
           path: graphql-client/js/graphql-codegen-haskell.js
@@ -122,11 +122,6 @@ jobs:
       -
         name: Build graphql-codegen-haskell
         run: yarn install --immutable && yarn build
-      -
-        uses: actions/upload-artifact@v3
-        with:
-          name: graphql-codegen-haskell.js
-          path: graphql-client/js/graphql-codegen-haskell.js
 
       # Build + Test Cabal
       -
@@ -269,7 +264,7 @@ jobs:
         name: Create sdist bundle
         run: stack sdist graphql-client --test-tarball --tar-dir .
       -
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: graphql-client-sdist
           path: graphql-client-*.tar.gz
