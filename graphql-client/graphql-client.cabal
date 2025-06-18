@@ -83,6 +83,7 @@ test-suite graphql-client-test
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
+      Data.GraphQL.Test.Error
       Data.GraphQL.Test.Generation.TestGeneration
       Data.GraphQL.Test.Monad.Class
       Data.GraphQL.Test.TestQuery
