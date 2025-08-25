@@ -19,11 +19,14 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
     {-# LANGUAGE OverloadedStrings #-}
     {-# LANGUAGE QuasiQuotes #-}
     {-# LANGUAGE RecordWildCards #-}
+    {-# LANGUAGE TemplateHaskell #-}
     {-# LANGUAGE TypeFamilies #-}
     {-# OPTIONS_GHC -w #-}
 
     module Example.GraphQL.API where
 
+    import Data.Aeson
+    import Data.Aeson.TH
     import Data.GraphQL
     import Data.GraphQL.Bootstrap
 
@@ -50,6 +53,8 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
       }
       deriving (Show)
 
+    $(deriveJSON defaultOptions {fieldLabelModifier = drop 1} ''GetEnumsQuery)
+
     type GetEnumsSchema = [schema|
       {
         enumFoo: Maybe EnumFoo,
@@ -69,9 +74,7 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
         }
       |]
 
-      getArgs GetEnumsQuery{} = object
-        [
-        ]
+      getArgs GetEnumsQuery{} = toJSON GetEnumsQuery{}
 
     {-----------------------------------------------------------------------------
     -- getMoreEnums
@@ -92,6 +95,8 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
       }
       deriving (Show)
 
+    $(deriveJSON defaultOptions {fieldLabelModifier = drop 1} ''GetMoreEnumsQuery)
+
     type GetMoreEnumsSchema = [schema|
       {
         enumFoo: Maybe EnumFoo,
@@ -109,9 +114,7 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
         }
       |]
 
-      getArgs GetMoreEnumsQuery{} = object
-        [
-        ]
+      getArgs GetMoreEnumsQuery{} = toJSON GetMoreEnumsQuery{}
 
     {-----------------------------------------------------------------------------
     -- getBar
@@ -131,6 +134,8 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
       { _x :: Int
       }
       deriving (Show)
+
+    $(deriveJSON defaultOptions {fieldLabelModifier = drop 1} ''GetBarQuery)
 
     type GetBarSchema = [schema|
       {
@@ -155,9 +160,7 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
         }
       |]
 
-      getArgs GetBarQuery{..} = object
-        [ \\"x\\" .= _x
-        ]
+      getArgs GetBarQuery{..} = toJSON GetBarQuery{..}
 
     {-----------------------------------------------------------------------------
     -- getNamed
@@ -177,6 +180,8 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
       { _s :: Text
       }
       deriving (Show)
+
+    $(deriveJSON defaultOptions {fieldLabelModifier = drop 1} ''GetNamedQuery)
 
     type GetNamedSchema = [schema|
       {
@@ -217,9 +222,7 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
         }
       |]
 
-      getArgs GetNamedQuery{..} = object
-        [ \\"s\\" .= _s
-        ]
+      getArgs GetNamedQuery{..} = toJSON GetNamedQuery{..}
 
     {-----------------------------------------------------------------------------
     -- getNamed2
@@ -239,6 +242,8 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
       { _s :: Text
       }
       deriving (Show)
+
+    $(deriveJSON defaultOptions {fieldLabelModifier = drop 1} ''GetNamed2Query)
 
     type GetNamed2Schema = [schema|
       {
@@ -268,9 +273,7 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
         }
       |]
 
-      getArgs GetNamed2Query{..} = object
-        [ \\"s\\" .= _s
-        ]
+      getArgs GetNamed2Query{..} = toJSON GetNamed2Query{..}
 
     {-----------------------------------------------------------------------------
     -- getNamedWithLiteralParam
@@ -290,6 +293,8 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
       {
       }
       deriving (Show)
+
+    $(deriveJSON defaultOptions {fieldLabelModifier = drop 1} ''GetNamedWithLiteralParamQuery)
 
     type GetNamedWithLiteralParamSchema = [schema|
       {
@@ -312,9 +317,7 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
         }
       |]
 
-      getArgs GetNamedWithLiteralParamQuery{} = object
-        [
-        ]
+      getArgs GetNamedWithLiteralParamQuery{} = toJSON GetNamedWithLiteralParamQuery{}
 
     "
   `)
@@ -322,6 +325,7 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
   expect(outputFile('src/Example/GraphQL/Enums/EnumBar.hs'))
     .toMatchInlineSnapshot(`
     "{-# LANGUAGE TemplateHaskell #-}
+    {-# OPTIONS_GHC -w #-}
 
     module Example.GraphQL.Enums.EnumBar where
 
@@ -337,6 +341,7 @@ it(`generates files using files from ${TEST_DIR}`, async () => {
   expect(outputFile('src/Example/GraphQL/Enums/EnumFoo.hs'))
     .toMatchInlineSnapshot(`
     "{-# LANGUAGE TemplateHaskell #-}
+    {-# OPTIONS_GHC -w #-}
 
     module Example.GraphQL.Enums.EnumFoo where
 
